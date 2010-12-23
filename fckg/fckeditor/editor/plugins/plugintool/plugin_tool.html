@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!--
+ * FCKeditor - The text editor for internet
+ * Copyright (C) 2003-2005 Frederico Caldeira Knabben
+ * 
+ * Licensed under the terms of the GNU Lesser General Public License:
+ *    http://www.opensource.org/licenses/lgpl-license.php
+ * 
+ * For further information visit:
+ *    http://www.fckeditor.net/
+ * 
+ * File Name: fck_abbr.html
+ *  Plugin to insert abbr-title TAGs which let a text-info pop up while mousecursor moves over this text.
+ * 
+ * File Authors:
+ *  SNOOPY-0815  
+ *   [based upon plugin infopup by Thomas Goerldt]
+ *	further developed by:
+ *  kwillems (kwillems-at-zonnet.nl 02-14-2007)
+
+-->
+<html>
+<head>
+<title>Abbr</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta content="noindex, nofollow" name="robots">
+<script language="javascript">
+
+var oEditor	= window.parent.InnerDialogLoaded() ;
+var FCKLang	= oEditor.FCKLang ;
+var FCKAbbr	= oEditor.FCKAbbr ;
+var FCKAbbrSelection;
+window.onload = function () {
+	// First of all, translate the dialog box texts
+	oEditor.FCKLanguageManager.TranslatePage( document );
+
+	var oLink = getoLink();
+
+	var oSelection = checkSelection ();
+    FCKAbbrSelection = oSelection;
+
+	// display an alert-message when no selection is made if we want to make a abbr
+	// and also the cursor is not placed in a abbr
+	if(oSelection == '' && !oLink) {
+		document.getElementById('message').style.display = 'block';
+       
+	}
+	// the cursor is placed in a abbr, so we have one!
+	// we want to display the inputfield and the checknbox to remove the abbr
+	else if (oLink) {
+		document.getElementById('inputfield').style.display = 'block';
+		document.getElementById('checkbox').style.display = 'block';
+		oEditor.FCK.Selection.SelectNode( oLink );
+		document.getElementById("infotext").value = oLink.title;
+		document.getElementById('infotext').focus();
+	}
+	// we want to insert a abbr
+	else {
+		document.getElementById('inputfield').style.display = 'block';
+        document.getElementById('stet_checkbox').style.display = 'block';
+        document.getElementById('stet_checkbox').style.display = 'block';
+        document.getElementById('edit_checkbox').style.display = 'block';
+      
+	}
+
+	// Show the "Ok" button?
+	if(oSelection != '' || oLink) {
+		window.parent.SetOkButton( true ) ;
+		document.getElementById('infotext').focus();
+	}
+}
+
+
+function toggle_infotext() {
+   if(document.getElementById("stet").checked) {
+     document.getElementById('infotext').value = 'stet';
+     document.getElementById('infotext').disabled = true;
+   }
+  else {
+     document.getElementById('infotext').disabled = false;
+     document.getElementById('infotext').value = '';
+  }
+}
+
+function Ok() {
+    if(document.getElementById("remove").checked) {
+        document.getElementById("infotext").value = '';
+    }
+    if(document.getElementById("stet").checked) {
+        document.getElementById("infotext").value = 'stet';
+    }
+    if(document.getElementById("edit").checked) {
+        //document.getElementById("infotext").value = 'edited';
+        FCKAbbr.InsertEdited(document.getElementById("edited_text").value);
+        return true;
+    }
+
+
+		if (oLink && document.getElementById("infotext").value != '') {	
+							// if abbr already exists, insert or replace title
+			oLink.title=document.getElementById("infotext").value;
+		}
+		else if(oLink && oLink.title && document.getElementById("infotext").value == '') {			// title should me removed
+
+			oLink.removeAttribute('title');
+            FCKAbbr.Insert(document.getElementById("infotext").value, oEditor.FCKBrowserInfo.IsSafari, document.getElementById("stet").checked);
+		}
+		else {	
+												// otherwise, make a new abbr, with or without title
+			FCKAbbr.Insert(document.getElementById("infotext").value, oEditor.FCKBrowserInfo.IsSafari, document.getElementById("stet").checked);
+		}
+
+	return true;
+}
+
+function checkSelection () {
+	if (document.selection) {													// IE
+		oSelection = oEditor.FCK.EditorDocument.selection.createRange().text;
+	}
+	else if (window.getSelection) {												// Mozilla, Safari (ok, I know: Safari ain't supported yet!
+		oSelection = oEditor.FCK.EditorWindow.getSelection();
+	}
+	else if (document.getSelection) {
+		oSelection = oEditor.FCK.EditorDocument.getSelection();					// Mozilla, Netscape, Opera
+	}
+
+	return oSelection;
+
+}
+
+function getoLink () {
+	if( oEditor.FCKBrowserInfo.IsIE) {
+		oLink = oEditor.FCK.Selection.MoveToAncestorNode( 'plugin' )				// lower-case!!!!!!! I don't know why, but it's working!!!
+        if(!oLink) oLink = oEditor.FCK.Selection.MoveToAncestorNode( 'PLUGIN' );
+	}
+	else {
+		oLink = oEditor.FCK.Selection.MoveToAncestorNode( 'PLUGIN' );
+	}
+
+	return oLink;		
+}
+
+ 
+function openEditor() {
+        if(!FCKAbbrSelection) return;
+		document.getElementById('inputfield').style.display = 'none';
+        document.getElementById('stet_checkbox').style.display = 'none';
+        document.getElementById('stet_checkbox').style.display = 'none';
+        document.getElementById('edit_checkbox').style.display = 'none';
+        document.getElementById('editing_area').style.display = 'block';
+
+        var str = FCKAbbrSelection.toString();
+        str = str.replace(/([\{\}:~\?\!])\s/g, "$1");
+        document.getElementById('edited_text').value = str;
+
+
+}
+
+</script>
+
+<style type="text/css">
+#message, #inputfield, #checkbox,#stet_checkbox, #edit_checkbox, #editing_area { display: none; }
+#inputfield, .title { font-size: 10pt; }
+#checkbox,#stet_checkbox, #edit_checkbox, #message, #edited_text { font-size: 9pt; }
+abbr { border-bottom: 1px dotted rgb(102, 102, 102); cursor: help; }
+</style>
+
+</head>
+<body scroll="no" style="OVERFLOW: hidden">
+
+<table cellSpacing="8"  cellPadding="0" align="center" border="0">
+<tr>
+<td><span style="font-family:Verdana, Arial, sans-serif;font-size:10pt; color:#444;"></span>
+<span id="message" fckLang="AbbrDlgSelectFirst">You have to select the plugin syntax first!</span>
+<div id="inputfield"><span fckLang="AbbrDlgHLCreate"><b>Create a Plugin</b></span><br />
+<span style="line-height: 150% font-size: 100%" fckLang="AbbrDlgName">Enter Plugin Name</span><br>&nbsp;&nbsp;&nbsp;
+
+<input type = "text" size="30" style="font-size:10pt;" name="infotext" id="infotext">
+</input><br><span fckLang="AbbrDlgClick">Click OK when done. Or Cancel.</span>
+<br></div>
+
+<tr><td>
+<div id="stet_checkbox"><span fckLang="AbbrDlgHLStet">
+<b class="title" >Stet Plugin</b></span><br>
+<input id="stet" type="checkbox" onclick='toggle_infotext();'>&nbsp;&nbsp;<label for="stet">
+<span fckLang="AbbrDlgStet">Create a string literal from text containing HTML and/or DokuWiki Markup characters </span></label>
+<br><span fckLang="AbbrDlgClick"><br><b>Click OK when done. Or Cancel.</b></span>
+</div>
+<tr><td>
+<div id="edit_checkbox"><span fckLang="AbbrDlgHLEdit">
+<b class="title">Edit Dokuwiki Plugin</b></span><br> 
+<input id="edit" onclick="openEditor();" type="checkbox">&nbsp;&nbsp;&nbsp;<label for="edit">
+<span fckLang="AbbrDlgEditPlugin">Edit a plugin which was not created using the plugin tool</span></label></div>
+</td>
+</tr>
+
+<tr><td>
+<div id="checkbox">
+<input id="remove" type="checkbox">&nbsp;&nbsp;&nbsp;<label for="remove">
+<span fckLang="AbbrDlgRemove">Remove Plugin</span></label></div>
+
+</td>
+</tr>
+</table>
+<div id='editing_area'>
+<textarea id="edited_text" rows=8 cols=40>
+text area
+</textarea>
+
+</div>
+
+
+</body>
+</html>

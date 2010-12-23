@@ -1,0 +1,8 @@
+# General Plugin Info do not edit
+
+author Myron Turner
+email  turnermm02@shaw.ca
+date   2009-19-08
+name   FCKG Lite Plugin
+desc   Integrate into DokuWiki open-source wysiwyg FCKEditor.
+url    http://mturner.org/

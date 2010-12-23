@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+	<title>insertHtml</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="robots" content="noindex, nofollow" />
+
+
+		<script type="text/javascript">
+
+var oEditor = window.parent.InnerDialogLoaded() ;
+
+var FCKKeyboard = oEditor.FCKKeyboard ;
+var FCKLang = oEditor.FCKLang ;
+
+
+window.onload = function()
+{
+    oEditor.FCKLanguageManager.TranslatePage( document );
+	document.body.style.padding = '0px' ;	
+	window.parent.SetOkButton( true ) ;
+	window.parent.SetAutoSize( true ) ;	
+    if(oEditor.FCK.VKI_keyboards) {
+
+      document.getElementById('openKBbutton').style.display='none';
+      document.getElementById('keyboard_form').style.display='block';
+      load_selections();
+    }
+}
+
+
+function open_keyboard() {
+   FCKKeyboard.openkb();  
+   window.parent.document.getElementById('btnCancel').click();
+  }
+
+function Ok()
+{
+  
+	return true ;
+}
+
+
+function show(id) {
+ document.getElementById(id).style.display='block';  
+}
+
+function hide(id) {
+ document.getElementById(id).style.display='none';  
+
+}
+
+function open_illustrations(){
+hide('keyboard_main');
+show('full_kb');
+show('sel_kb');
+}
+
+function close_illustrations() {
+
+hide('full_kb');
+hide('sel_kb');
+show('keyboard_main');
+
+}
+		</script>
+
+<style type="text/css">
+body { overflow: scroll; }
+/*
+.VKcloseBut {
+       
+        
+ }
+*/
+
+a:link {  color: #333333;  text-decoration: none; font-weight: bold;  font-size: 9pt;}
+a:hover { color: #999999; }
+
+#keyboard_main, .illustration_text {
+  padding: 10px;
+  padding-left: 20px; 
+  font-size: 9pt;
+  line-height: 1.25;
+}
+#sel_kb, #full_kb  { display: none; padding: 4px;}
+
+
+</style>
+
+
+</head>
+<body scroll='yes'>
+
+<div id='keyboard_main'>
+
+          <P>    
+		<span fckLang="VKkeyboardHelp" class='bigger'>
+                   Clicking on the "Start Virtual Keyboard" button starts up the Virtual Keyboard.
+                   A Keyboard button/icon will appear at the lower left of the editing window;
+                   when clicked it opens the keyboard. Clicking "Illustrations" explains the
+                   various functions accessed from the virtual keyboard's top row 
+
+        </span> 
+         </p>
+        <p>
+        <button onclick="open_keyboard();" id="openKBbutton"><span fckLang="startVKeyboard" id="startVKeyboard">Start Keyboard</span></button>
+        &nbsp;        &nbsp;        &nbsp;        &nbsp;
+        <button onclick="open_illustrations();" id="illustrations"><span fckLang="VKeyboardIllustrations" id="VKeyboardIllustrations">Illustrations</span></button>
+        </p>
+           
+</div>
+
+<div id='full_kb'>
+<p style="text-align:right; padding-right: 20px;">
+<a href ="javascript:close_illustrations();void 0;">
+<span fckLang="DlgBtnClose">Close</span></a>
+</p>
+<center>
+<img src = 'images/keyboard_full.png' align='center'>
+</center>
+<p class='illustration_text'>  
+  <span fckLang="VKIllustrationText">
+  <b>Top row functions from left-to-right</b><br />
+     1. Clicking the language identifier or on the down arrow to its right opens 
+     a drop-down menu of languages; selecting one of these immediately changes the keyboard 
+     to the selected language. For an illustration of the drop-down menu scroll to the image at the bottom of this page.<br /> 
+     2. Clicking the hash symbol(#)opens and closes the numeric keypad <br />
+     3. The up and down arrows to the right of the hash change the size of the keyboard and its fonts <br />
+     4. In fckgLite the "Clear" button has no function
+</span>
+</p>
+</div>
+
+<div id='sel_kb'>
+<center>            
+<img src = 'images/keyboard_sel.png'>
+</center>            
+</div>
+<br /><br />
+</body>
+</html>

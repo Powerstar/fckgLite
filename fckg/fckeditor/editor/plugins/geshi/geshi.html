@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+	<title>insertHtml</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="robots" content="noindex, nofollow" />
+
+
+		<script type="text/javascript">
+
+var oEditor = window.parent.InnerDialogLoaded() ;
+
+var FCKGeshi = oEditor.FCKGeshi ;
+var FCKLang = oEditor.FCKLang ;
+var selectedText="";
+window.onload = function()
+{
+    oEditor.FCKLanguageManager.TranslatePage( document );
+	document.body.style.padding = '0px' ;	
+	window.parent.SetOkButton( true ) ;
+	window.parent.SetAutoSize( true ) ;	
+
+   var sel_opts = document.getElementById('langs');
+
+
+    if(oEditor.FCKConfig && oEditor.FCKConfig.Geshi_Types) {
+       var lang_opts = oEditor.FCKConfig.Geshi_Types;
+       sel_opts.options[0] = new Option(FCKLang.DlgCellBtnSelect,'none',true,false);
+       for(var i=0; i < lang_opts.length; i++) {
+           sel_opts.options[sel_opts.options.length] = new Option(lang_opts[i],lang_opts[i],false,false);
+       }    
+    }
+
+}
+
+function Ok()
+{
+
+
+    var select = document.getElementById('langs');
+    var selection = select.selectedIndex;
+    if(selection < 1) {
+       alert("Please select a language");
+       return;
+    }
+    var formObj = document.geshi_form;
+    var code_type = '';
+    var fname = '';
+    if(formObj['gtype'][1].checked) {
+      code_type = formObj['gtype'][1].value;
+      fname = formObj['snip_fn'].value;
+      if(!fname) {
+        alert("Please enter a file name for this snippet");
+      }
+    }
+    else {
+     code_type = formObj['gtype'][0].value;
+    }
+ 
+   
+   FCKGeshi.Insert(code_type, select.options[selection].value, fname);	
+
+	return true ;
+}
+
+		</script>
+
+<style type="text/css">
+option, select { font-size: 9pt; }
+#geshi_types { padding: 20px; font-size: 9pt; }
+</style>
+
+
+</head>
+<body style="padding-bottom: 0px">
+
+<div id='geshi_types' >
+          <P>    
+			<span fckLang="geshiHelp" id="geshiHelp">help</span> 
+
+		
+	            
+         </p>
+
+     <form name='geshi_form'>    
+     <b><span fckLang="DlgButtonType"></span>: </b><input type='radio' name='gtype' value='code' checked>
+        <span fckLang="GeshiCodeBlock"></span> 
+       <input type='radio' name='gtype' value='file'><span fckLang="GeshiDownloadable"></span> 
+
+       <br />
+       Snippet File Name: <input type="text" name="snip_fn">  
+     <p>
+			<select id="langs">
+             <!-- option value="none"><span fckLang='DlgCellBtnSelect'></span  -->
+
+           </select>
+   </p>
+     <br />
+
+    </form>
+</div>
+</body>
+</html>

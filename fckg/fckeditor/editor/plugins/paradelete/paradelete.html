@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Delete Paragraph</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta content="noindex, nofollow" name="robots">
+<script language="javascript">
+
+var oEditor	= window.parent.InnerDialogLoaded() ;
+var oParaDel;
+
+window.onload = function () {
+	// First of all, translate the dialog box texts
+	// oEditor.FCKLanguageManager.TranslatePage( document );
+
+//oEditor.FCKCommands.GetCommand('Blockquote').Execute() ;
+
+window.parent.SetOkButton( true ) ;
+window.parent.document.getElementById('btnOk').value = "Apply"
+
+window.parent.delPara_help = function() {
+    delPara_hide_el('delParaDiv');
+    delPara_hide_el('delParaLabel');
+    delPara_display_el('delParaHelp', 'block');
+   
+};
+IconPath = oEditor.FCK.Config['PluginsPath']+ 'paradelete/delete_p_lg.gif'
+//IconPath	= FCKConfig.PluginsPath + 'paradelete/delete_p.gif' ;
+
+window.parent.delPara_helpClose = function() {
+
+    delPara_hide_el('delParaHelp');
+   
+    delPara_display_el('delParaDiv', 'block');
+    delPara_display_el('delParaLabel', 'inline');
+
+};
+
+var dlg_TitleArea = window.parent.document.getElementById('TitleArea');
+
+dlg_TitleArea.innerHTML +=
+    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+    
+    "<a href='#' " +
+     "  class = 'PopupTitle' style='font-size: 9pt; text-decoration: none;' " +     
+     "  onclick = 'delPara_help();'>info</a>"+
+
+ 
+    "&nbsp;" +
+
+    "<a href='#' " +
+     "  class = 'PopupTitle' style='font-size: 8pt; text-decoration: none;' " +     
+     "  onclick = 'delPara_helpClose();'>info close</a>&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;";
+
+var text = delPara_GetSelectedHTML();
+
+var  str =  (typeof text == 'object') ? text.toString() : text;
+
+
+if(!text  || str.length == 0) {
+   delPara_hide_el('delParaDiv');
+   delPara_hide_el('delParaLabel');
+   delPara_display_el('error_msg', 'inline');
+   return;
+}
+var dom = document.getElementById('delParaDiv');
+//dom.innerHTML = text;
+
+var oParaDel = new oEditor.FCK.paraDelObject(oEditor);
+str =  oParaDel.debug();
+dom.innerHTML = str;
+oParaDel.replace();
+}
+
+
+
+
+function Ok() {
+// return false;
+   return true;
+}
+
+
+function delPara_helpClose() {
+    delPara_hide_el('delParaHelp');
+   
+    delPara_display_el('delParaDiv', 'block');
+    delPara_display_el('delParaLabel', 'inline');
+
+}
+
+function delPara_display_el(id, type) {
+
+  var dom = document.getElementById(id);
+  dom.style.display = type;  
+
+}
+
+
+function delPara_hide_el(id) {
+  var dom = document.getElementById(id);
+  dom.style.display = "none";   
+}
+
+
+
+
+function delPara_GetSelectedHTML() {	
+   var oSelection;
+	if (document.selection) {													// IE
+		oSelection = oEditor.FCK.EditorDocument.selection.createRange().text;
+//oSelectionobj = oEditor.FCK.EditorDocument.selection.createRange()
+	}
+	else if (window.getSelection) {												// Mozilla, Safari (ok, I know: Safari ain't supported yet!
+		oSelection = oEditor.FCK.EditorWindow.getSelection();
+	}
+	else if (document.getSelection) {
+		oSelection = oEditor.FCK.EditorDocument.getSelection();					// Mozilla, Netscape, Opera
+	}
+
+	return oSelection;
+
+}
+</script>
+
+<style type="text/css">
+#delParaDiv { 
+     background-color: white; font-size: 9pt; overflow:scroll; height: 80px;
+     border: #3B3B1F solid 1px; color #3B3B1F
+   }
+#delParaHelp { display: none; background-color: #F1F1E3; font-size: 10pt; padding: 10px; 
+     background-color: white; font-size: 9pt; }
+#delParaLabel, .labelText { font-size: 9pt; color #3B3B1F; }
+
+</style>
+
+</head>
+<body>
+<div id="delParaHelp">
+Each press of the Return key creates a new paragraph.
+Single-spacing occurs only within paragraphs.  This tool substitutes line breaks
+for paragraphs, making it possible to have a sequence of single-spaced short lines.
+To remove the space from between two lines, the paragraph markup must be removed from both 
+the lines.
+</div>
+
+<div id="delParaDiv">
+</div>
+<div id="delParaLabel">
+Click <b>Apply</b> to remove HTML paragraph markup from text.
+</div>
+<div id="error_msg" style="display:none" class="labelText">
+  You must first select a line of text. Then either click the icon<br>
+     <center>  <img  style = "background-color:white" src = "delete_p_lg.gif"></center>
+   or right click  at the selected text and click the <b>&lt;P&gt; to &lt;BR&gt</b> menu item.
+</div>
+</body>
+</html>

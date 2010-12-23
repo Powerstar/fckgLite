@@ -1,0 +1,36 @@
+
+
+IMAGES
+UNIX
+The fckeditor/userfiles directory contains three symbolic links, all pointing 
+to DokuWiki's data/media directory.  If for some reason this is not the case, correct
+these links so that they do point to data/media.
+
+Files can be uploaded from either the image tool or the link tool.  In each case, the upload
+panel is for quick uploads, in which the file will be sent to the top level of data/media.
+If the user instead clicks on the "Browse Server" button, it will be possible to create
+new directories and to upload your files to these directories.  
+
+WINDOWS
+To use the above you must create three Windows junctions as opposed to unix links.  But
+Windows users shuould not need these, if the software installs correctly.  See the document
+on the fckgLIlte webset concening media and/or the header to the file config.js in
+the directory fckg/fckeditor/editor/filemanager/connectors/php
+
+
+SKINS
+There are three color schemes or "skins" for the toolbar.  DokuWikiFCK uses the 'silver'
+skin as its default color scheme.  You can change this to the ochre color scheme that came
+with previous versions of DokuWikiFCK or to one based on Microsoft Office 2003.  
+
+To do this go to the file fckeditor/fckskin.js and follow the instructions;
+it's simply matter of uncommenting the line which activates the new scheme.
+
+
+
+
+
+
+
+
+

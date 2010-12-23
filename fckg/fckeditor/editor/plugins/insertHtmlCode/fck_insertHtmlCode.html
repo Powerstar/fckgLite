@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
+<!--
+ * File Name: fck_insertHtmlCode.html
+ * 	Insert Code dialog window.
+ * 
+ * File Authors:
+ * 		Abdul-Aziz Al-Oraij (top7up@hotmail.com)
+ * 		Michel Staelens
+ * 		Bernadette Cierzniak
+ * 		Frederico Caldeira Knabben (fredck@fckeditor.net)
+ *      Nico Piponides	
+-->
+<html>
+	<head>
+		<title>Insert Code</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta content="noindex, nofollow" name="robots">
+		<link rel="stylesheet" type="text/css" href="fck_insertHtmlCode.css" />
+
+<style type = 'text/css'>
+  body, .std_font { font-size: 8pt; }
+</style>
+		<script type="text/javascript">
+
+
+var oEditor = window.parent.InnerDialogLoaded() ;
+var insertHTMLCodeObject = oEditor.FCK.oinsertHtmlCodeObj;
+var insertHTMLCodeObjectEdit = false;
+var insertHTMLCodeObjectLoaded = false;
+
+window.onload = function()
+{
+	document.body.style.padding = '0px' ;
+
+	// First of all, translate the dialog box texts
+	oEditor.FCKLanguageManager.TranslatePage(document) ;
+
+	window.parent.SetOkButton( true ) ;
+	window.parent.SetAutoSize( true ) ;	
+   
+}
+
+
+function loadNoteToEdit() {
+	var editorInstance = oEditor.FCK;
+    var UID = document.getElementById('citationId').value;
+    
+    if(insertHTMLCodeObject.notes[UID]) {
+       var edit_area = document.getElementById('insCode_area');
+       edit_area.value = insertHTMLCodeObject.notes[UID];
+       insertHTMLCodeObjectLoaded = true;
+    }
+
+ }
+
+
+
+function Ok()
+{
+	 var oArea = document.getElementById( 'insCode_area' ) ;
+     var UID = document.getElementById('citationId').value;
+     
+     if(UID && !insertHTMLCodeObjectLoaded) {
+          alert('You must first load your note into the editing window.');
+          return false;
+     }
+
+	if ( oArea.value.length > 0 ) {
+         if(UID) {     
+            insertHTMLCodeObject.notes[UID] = document.getElementById('insCode_area').value;    
+            return true
+         }
+
+        var instance = ++insertHTMLCodeObject.count;
+        var fn_id = 'fckgL'+ instance;     
+        insertHTMLCodeObject.notes[fn_id] = oArea.value ;
+        var note = '<sup class="dwfcknote ' + fn_id +'" title="' + oArea.value + '">' + fn_id + '</sup>';
+      // var note = '<sup class="dwfcknote ' + fn_id +'">' + fn_id + '</sup>';
+  
+       oEditor.FCK.InsertHtml(note) ;
+	}
+
+	return true ;
+}
+
+		</script>
+	</head>
+	<body>
+        <span class='std_font' fcklang="DlgFootnoteExplaination">Use the text area for both creating and revising your footnotes.
+       </span><br />
+		<textarea id="insCode_area" cols="60" rows="15" style="width:100%;; height:70%;font-size:9pt;"></textarea>
+        
+        <span class="std_font" fcklang="DlgFootnoteId">Footnote ID&nbsp;&nbsp;</span><input type ='text' id = 'citationId' size='8' style="font-size:9pt">
+        <input type = 'button' id="loadNote" class="std_font" value = 'Load Note in Editor' onclick="loadNoteToEdit();" fcklang="DlgFootnoteLoad">     
+       <br /><span class="std_font" fcklang="DlgFootnoteExplainationBottom">To Revise enter the footnote ID and click "Load Note in Editor" 
+          </span>
+		<script type="text/javascript" src="dialogue.js"></script>
+	</body>
+</html>

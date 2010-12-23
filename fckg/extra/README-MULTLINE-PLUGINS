@@ -1,0 +1,34 @@
+HOW-TO
+
+Place the php files in the fckg directory as follows:
+
+1.  edit.php and save.php go in fckg/action and replace the current edit.php and
+save.php found in that directory.
+
+2. specials.php is a new file and goes into fckg/syntax
+
+-------------------------------------------------
+Writing the Markup
+
+Place the plugin markup at the top and bottom of the multi-line plugin:
+
+~~MULTI_PLUGIN_OPEN~~
+
+~~MULTI_PLUGIN_CLOSE~~
+
+See the example file (bureaucracy3.txt)
+
+The easiest and least error prone way to include the plugin text is to first type
+it into a text editor and then to copy it from the text editor and paste it into the
+fckgLite editing window.  This will give you the precise line spacing that is
+required.  You cannot have spaces at the beginning of lines, since they will be treated
+as standard markup for DokuWiki code blocks. 
+
+
+
+
+
+
+
+
+

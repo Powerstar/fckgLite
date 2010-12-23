@@ -1,0 +1,1261 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!--
+ * FCKeditor - The text editor for Internet - http://www.fckeditor.net
+ * Copyright (C) 2003-2007 Frederico Caldeira Knabben
+ *
+ * == BEGIN LICENSE ==
+ *
+ * Licensed under the terms of any of the following licenses at your
+ * choice:
+ *
+ *  - GNU General Public License Version 2 or later (the "GPL")
+ *    http://www.gnu.org/licenses/gpl.html
+ *
+ *  - GNU Lesser General Public License Version 2.1 or later (the "LGPL")
+ *    http://www.gnu.org/licenses/lgpl.html
+ *
+ *  - Mozilla Public License Version 1.1 or later (the "MPL")
+ *    http://www.mozilla.org/MPL/MPL-1.1.html
+ *
+ * == END LICENSE ==
+ *
+ * This is the sample "Replace" plugin window.
+-->
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta content="noindex, nofollow" name="robots">
+		<script type="text/javascript">
+
+var oEditor = window.parent.InnerDialogLoaded() ;
+var oEditorTables;
+var prevColors;
+var tfrm_ini_done = false;
+var lastSelectedEl;
+var color_name_id;
+var visibleTable;
+var firstTableDone = false;
+var howToULs = new Array('howto_color', 'howto_align', 'howto_size', 'howto_intro', 'howto_insdel');
+var removedNodes;  // tracks td's altered in setSize()
+var insDelNodes;  //  saves references to nodes inserted or deleted
+var BrowserIsIE;   
+var currentHelp;
+var rowParentNode;
+var colParentNode;
+
+
+function OnLoad()
+{
+	// First of all, translate the dialog box texts
+	oEditor.FCKLanguageManager.TranslatePage( document ) ;
+
+	window.parent.SetAutoSize( true ) ;
+    // window.parent.document.getElementById('btnCancel').style.display = "none";
+     window.parent.document.getElementById('btnCancel').value = " Close Dialog ";
+    window.parent.SetOkButton( true ) 
+    var d = oEditor.FCK.EditorDocument.body;
+    oEditorTables = d.getElementsByTagName('table');
+    prevColors = new Array(oEditorTables.length);   
+    
+// set up the table arrays
+
+    for(var i=0; i < prevColors.length; i++) {
+            var row = getNodeList(oEditorTables[i], 'tr');
+            if(row == null) continue;
+            var rows = row.length 
+            prevColors[i] = new Array(rows);
+            for(var j=0; j < rows; j++) {             
+             prevColors[i][j] = new Array();
+            }
+    }
+
+ 
+
+  removedNodes = new Array(oEditorTables.length);
+
+  insDelNodes = new Array();
+  for(var i=0; i < removedNodes.length; i++) {
+      removedNodes[i] = new Array();
+      insDelNodes[i] = new Array();
+      insDelNodes[i]['col'] = new Array();
+      insDelNodes[i]['row'] = new Array();
+  }
+  if(window.parent.dialogArguments) {
+      BrowserIsIE = window.parent.dialogArguments.Editor.FCKBrowserInfo.IsIE;
+  }
+
+  
+}
+
+
+function Ok() {
+ //window.close();
+  return true;
+}
+
+function showFirstTable(id) {
+ if(!tfrm_ini_done) window.setTimeout("showFirstTable(id)", 100);
+
+  if(id != 'color_table') {  // color table is loaded initially into the tfrm div, to size the display
+      var save_table = document.getElementById('color_table');
+      var display_div = document.getElementById('tfrm');   
+      save_table.innerHTML = display_div.innerHTML;
+      display_div.innerHTML = document.getElementById(id).innerHTML;
+      document.getElementById(id).innerHTML = "";    // empty visible tables div
+  }
+
+  display_el('tfrm');
+
+  visibleTable = id;
+}
+
+function display_el(id) {
+
+  var dom = document.getElementById(id);
+  dom.style.display = "block";  
+
+}
+
+
+function hide_el(id) {
+  var dom = document.getElementById(id);
+  dom.style.display = "none";   
+}
+
+function getHelp() {
+  display_el(currentHelp);
+}
+
+function howToCloseAll() {
+
+   for(var i=0; i < howToULs.length; i++) {
+         var dom = document.getElementById(howToULs[i]) ;
+         dom.style.display = 'none';
+   }
+
+}
+
+function features_disable(features, bool) {
+       for(var i=0; i < features.length; i++) {
+         document.getElementById(features[i]).disabled = bool;          
+       }
+
+}
+
+
+function switchIntro(id) {
+
+   checkForReload();
+   features_disable(['b_al','b_c', 'b_sz', 'b_insdel'], false);
+   howToCloseAll();
+   var display_div = document.getElementById('tfrm');
+   display_div.style.display = 'none';
+       
+   display_el(id);
+   currentHelp = id;
+}
+
+
+function switchTable(id) {
+
+   features_disable(['b_al','b_c', 'b_sz', 'b_insdel'], false);
+   if(!firstTableDone) {
+      showFirstTable(id) ;
+      firstTableDone=true;     
+   }
+   else {
+
+   checkForReload();   
+   var save_table = document.getElementById(visibleTable);
+   var display_div = document.getElementById('tfrm');
+
+   display_el('tfrm');
+   save_table.innerHTML = display_div.innerHTML;
+   display_div.innerHTML = document.getElementById(id).innerHTML;
+   document.getElementById(id).innerHTML = "";    // empty visible tables div
+   visibleTable = id;                             // save visible id so it can be returned to its div  
+   }
+    howToCloseAll();
+
+   id = id.replace(/_table/,""); 
+   var table_id = "tableT_" + id;  
+   id = 'howto_' + id;
+   display_el(id);
+   currentHelp = id;
+
+}
+
+function getNodeList(parent, elName) {
+  if(parent && parent.getElementsByTagName(elName))
+   return parent.getElementsByTagName(elName);   
+
+  return null;
+}
+
+
+
+function setColBackground(color) {  
+
+  if(!colParentNode) return;
+    
+   var column = colParentNode.col;  
+   var id = colParentNode.row_id;
+   var colnum = colParentNode.colnum;
+
+   colParentNode = null;
+   
+  
+   if(!column) return null;
+   for(var i=0; i < column.length; i++) {
+     if(!column[i] || isTableHeader(column[i])) continue;  
+     lastSelectedEl = column[i];
+     color_name_id = "td" + id + i + "_" + colnum;
+     SelectBackColor(color);
+   }
+
+}
+
+
+
+function setRowBackground(color) {  
+
+  if(!rowParentNode) return;
+
+   var parent = rowParentNode.node;  
+   var id = rowParentNode.row_id;  // used to create color_name_id for writing text name of color
+
+   rowParentNode = null;
+
+   var cols = getNodeList(parent, 'td');   
+   if(cols == null) return null;
+   for(var i=0; i < cols.length; i++) {
+    var name = cols[i].nodeName.toUpperCase();
+    if(name == 'TH') {  
+           alert('th');         
+           continue;
+     }
+     lastSelectedEl = cols[i];
+     color_name_id = "td" + id + "_" + i;
+     SelectBackColor(color);
+   }
+
+}
+
+// function name created in macroSettings()
+function colColor(textbox,tablenum) {
+   var colnum = textbox.value-1;
+   var id = "c" + tablenum + "_";
+
+   var column = getColumnArray(tablenum, colnum);
+  
+   colParentNode = { col: column, row_id: id, colnum: colnum };
+
+   oEditor.FCKDialog.OpenDialog( 'FCKDialog_Color', oEditor.FCKLang.DlgColorTitle, 
+         'dialog/fck_colorselector.html', 400, 330,  setColBackground, window ) ;
+
+}
+
+// function name created in macroSettings()
+function rowColor(textbox, tablenum) {
+    var rownum = textbox.value-1;
+    var id = "c" + tablenum + "_" + rownum;
+ 
+    var rows = getNodeList(oEditorTables[tablenum], 'tr');
+    rowParentNode = { node: rows[rownum], row_id: id };
+
+   oEditor.FCKDialog.OpenDialog( 'FCKDialog_Color', oEditor.FCKLang.DlgColorTitle, 
+         'dialog/fck_colorselector.html', 400, 330, setRowBackground, window ) ;
+
+}
+
+
+ /**
+    checks radio buttons to see which one has been set
+    then returns its value
+*/
+function getAlignPosition(n) {
+
+   for(i=0; i < n.length; i++) {     
+       if(n[i].type == 'radio' && n[i].checked) {
+             return n[i].value;
+       }       
+   }
+
+  return null;
+}
+
+
+// function name created in macroSettings()
+function rowAlign(textbox,tablenum) {
+   var id = 'ent' + 'align' + '_' + tablenum;
+   var m_id = id + 'macro';
+   var tableT = 'T' + 'align' + '_';
+   var formName = tableT + 'F'
+
+   var rownum = textbox.value-1; 
+   var rows = getNodeList(oEditorTables[tablenum], 'tr');
+   var row = rows[rownum];
+
+   var n = document.forms[formName][m_id]; 
+   var position = getAlignPosition(n);
+
+   if(!row || !position) return null;
+
+   var indexes = new Array();
+   indexes['left'] = 0;
+   indexes['center'] = 1;
+   indexes['right'] = 2;
+
+   var index = indexes[position];
+
+   var cells = getCellArray_r(row);
+
+   for(var i=0; i < cells.length; i++) {
+        if(cells[i]) {
+            var id = setAlign(tablenum, rownum, i, position);
+            document.forms[formName][id][index].checked = true;
+        }
+   }
+}
+
+
+// function name created in macroSettings()
+ 
+function colAlign(textbox, tablenum) {
+   var id = 'ent' + 'align' + '_' + tablenum;
+   var m_id = id + 'macro';
+   var tableT = 'T' + 'align' + '_';
+   var formName = tableT + 'F'
+
+   var colnum = textbox.value-1;  
+   var column = getColumnArray(tablenum, colnum);
+  
+   var n = document.forms[formName][m_id]; 
+   var position = getAlignPosition(n);
+
+   if(!column || !position) return null;
+
+   var indexes = new Array();
+   indexes['left'] = 0;
+   indexes['center'] = 1;
+   indexes['right'] = 2;
+
+   var index = indexes[position];
+
+   for(var i=0; i < column.length; i++) {  // i = row number
+     if(!column[i]) continue;      
+     var id = setAlign(tablenum, i, colnum, position);
+     document.forms[formName][id][index].checked = true;
+   }
+
+}
+
+function insDelNodesReset(tablenum, row, col) {
+
+    if(row !== null) {
+        var t = insDelNodes[tablenum]['row'];     
+        for(var i=0; i < t.length; i++) {
+           if(t[i].num == col) {
+             insDelNodes[tablenum]['row'][i] = null;
+           }
+        }
+    }
+   else {
+        var t = insDelNodes[tablenum]['col']; 
+        for(var i=0; i < t.length; i++) {
+           if(t[i].num == col) {
+             insDelNodes[tablenum]['col'][i] = null;
+           }
+        }
+   }
+
+}
+
+
+function reinsertCol(tablenum,text_box) {
+    var colnum = document.getElementById(text_box).value -1;
+
+    var t = insDelNodes[tablenum]['col'];
+    var insertNode = null;
+    for(var i=0; i < t.length; i++) {
+       if(t[i].num == colnum && t[i].deleted) {
+          insertNode = t[i].node;
+          if(insertNode) {
+            insDelNodesReset(tablenum, colnum, null);
+          }
+          break;
+       }
+    }
+
+    if(!insertNode) return;
+    features_disable(['b_al','b_c', 'b_sz', 'b_insdel'], true);
+    var rows = getNodeList(oEditorTables[tablenum], 'tr');
+
+    var maxcells = getMaxCells(tablenum, rows.length, rows);
+
+    var move_to = checkForMove(tablenum);
+    if(move_to.isNumber) {
+         colnum = move_to.value;
+    }
+    for(var i=0; i < rows.length; i++) {
+         if(!insertNode[i]) continue;
+         if(colnum >= maxcells) {
+           rows[i].appendChild(insertNode[i]);
+        }
+        else {  
+             var cells = getCellArray_r(rows[i]);
+             if(cells[colnum]) {
+                rows[i].insertBefore(insertNode[i],cells[colnum]);
+             }
+        }
+    }
+    
+}
+
+  /**
+    Used by reinsertRow/Col functions
+    Evaluates Move To text box to determine whether value is 
+    a number, returns number, and resets the text box to a null string 
+ */
+function checkForMove(tablenum) {
+
+  var id = 'ent' + 'size' + '_' + tablenum
+  var mv_id = id + '_mov';
+  var mv_to_node = document.getElementById(mv_id);
+
+  var mv_to_pos;
+  if(mv_to_node) {
+      mv_to_pos = parseInt(mv_to_node.value)
+  }
+   
+  var isNum = isNaN(mv_to_pos) ? false : true;
+ 
+  if(isNum && mv_to_pos > 0) {
+      mv_to_pos--;
+  }
+  mv_to_node.value = "";
+  return { isNumber: isNum, value: mv_to_pos};
+}
+
+function reinsertRow(tablenum, text_box) {
+    var rownum = document.getElementById(text_box).value -1;
+
+
+    var t = insDelNodes[tablenum]['row'];
+    var insertNode = null;
+    for(var i=0; i < t.length; i++) {
+       if(t[i].num == rownum && t[i].deleted) {
+          insertNode = t[i].node;
+          if(insertNode) {
+            insDelNodesReset(tablenum, rownum, null);
+          }
+          break;
+       }
+    }
+   
+    if(!insertNode) return;
+    var move_to = checkForMove(tablenum);
+
+    if(move_to.isNumber) {
+         rownum = move_to.value;
+    }
+
+    features_disable(['b_al','b_c', 'b_sz', 'b_insdel'], true);
+    var rows = getNodeList(oEditorTables[tablenum], 'tr');
+    if(rows[rownum]) {
+       var parent = rows[rownum].parentNode;
+       parent.insertBefore(insertNode,rows[rownum]);  
+    }
+    else {
+       appendRow(tablenum, insertNode);
+    }
+}
+
+
+  // function name created in macroSettings()
+function rowInsDel(row, tablenum, del) {
+   var rownum = row.value-1;
+   var rows = getNodeList(oEditorTables[tablenum], 'tr');
+
+   if(!rows) return;
+   features_disable(['b_al','b_c', 'b_sz', 'b_insdel'], true);  
+
+   if(del) {
+      if(rows[rownum]) {
+            var parent = rows[rownum].parentNode;
+            insDelNodes[tablenum]['row'].push({ num: rownum, node: rows[rownum], deleted: del });
+            parent.removeChild(rows[rownum]);
+      }
+   }
+   else
+    {
+     try {                             
+       
+        var maxcells = getMaxCells(tablenum, rows.length, rows);
+        var d = oEditor.FCK.EditorDocument;      
+        var tr = d.createElement('tr');     
+        for(var i=0; i < maxcells; i++) {       
+                var td = d.createElement('td');           
+                var t = "\u00A0\u00A0";
+                var text = d.createTextNode(t);  
+                td.appendChild(text); 
+                tr.appendChild(td);     
+        }
+                   
+                // in theory insertBefore should append when rows[rownum] == null
+                // but doesn't, hence the else {} clause
+        if(rows[rownum]) {  
+            var parent = rows[rownum].parentNode;
+            parent.insertBefore(tr,rows[rownum]);             
+        }
+        else {   // rownum exceeds number of rows in table
+            appendRow(tablenum, tr)
+        }
+        insDelNodes[tablenum]['row'].push({ num: rownum, node: tr, deleted: del });
+     }  catch(e) { alert(e.message);  }  
+    
+   }
+
+}
+
+function appendRow(tablenum, tr) {
+
+        var tbody = getNodeList(oEditorTables[tablenum], 'tbody');
+        var tbody_len = tbody.length;
+        if(tbody_len > 0) {          
+           tbody[tbody_len-1].appendChild(tr);  
+        }
+        else {    //last ditch fallback -- doesn't work in IE 6
+            oEditorTables[tablenum].appendChild(tr);
+        }
+
+}
+
+    // function name created in macroSettings()
+function colInsDel(col, tablenum, del) {
+    
+   var colnum = col.value-1;
+   features_disable(['b_al','b_c', 'b_sz', 'b_insdel'], true);
+   if(colnum < 0) return;
+   insDelNodesReset(tablenum, null, col);
+    if(del) {
+        var column = getColumnArray(tablenum, colnum);
+
+        for(var i=0; i < column.length; i++) {
+           if(column[i]) {
+              var parent =  column[i].parentNode;
+              parent.removeChild(column[i]);
+           }
+        }
+        insDelNodes[tablenum]['col'].push({ num: colnum, node: column, deleted: del });
+    }
+
+    else {
+
+        var d = oEditor.FCK.EditorDocument;      
+        var column = getColumnArray(tablenum, colnum);
+        var rows = getNodeList(oEditorTables[tablenum], 'tr')
+    
+        var maxcells = getMaxCells(tablenum, rows.length, rows);   
+        var append = (colnum >= maxcells) ? true: false;      
+
+        for(var i=0; i < column.length; i++) {
+
+            if(!column[i] && ! append) continue; 
+
+            var td = d.createElement('td');
+            var t = "\u00A0\u00A0";
+            var text = d.createTextNode(t);  
+            td.appendChild(text); 
+            if(append) {
+                rows[i].appendChild(td);
+            }
+            else {
+                var parent =  column[i].parentNode;
+                parent.insertBefore(td,column[i]);            
+            }
+        }
+        insDelNodes[tablenum]['col'].push({num: colnum, node: null, deleted: del });
+    }
+   
+}
+
+
+// sets cell background color using style.cssText and forwards to setColorName
+// to place color value in span to left of checkbox
+function SelectBackColor( color )
+{
+	if ( color && color.length > 0 && lastSelectedEl) {	
+       var rgb = color.match(/rgb/) ? color : hexToRGB(color);	
+       try {   
+           lastSelectedEl.style.cssText = "background-color: " + rgb;
+       }
+       catch (e) {
+          // alert("Unable to reset color to: " + rgb + "; " +  e.message);
+       } 
+      
+       setColorName(rgb);
+   }
+      lastSelectedEl = "";
+}
+
+
+  // puts hex color value in span to left of col checkbox
+function setColorName(rgb) {
+
+  if(!color_name_id) return;
+
+  var color = rgbToHex(rgb);
+  if(!color) return;
+ 
+  var dom = document.getElementById(color_name_id);
+  if(dom) {
+    dom.innerHTML = color;
+  }
+
+  color_name_id = "";
+}
+
+function hexToRGB(color) {
+   var result = color.match(/#(\w\w)(\w\w)(\w\w)/);
+   return "rgb(" + parseInt(result[1],16) + ", " + parseInt(result[2],16) + ", " + parseInt(result[3],16) + ")";
+ 
+}
+
+function rgbToHex(style) {
+
+   var result = style.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+   if(result) {
+     var n1 = new Number(result[1]);
+     var n2 = new Number(result[2]);
+     var n3 = new Number(result[3]);    
+     return "#" + n1.toString(16) + "" + n2.toString(16) + "" + n3.toString(16);
+   }
+   return "";
+}
+
+
+function SelectColor(tablenum, rownum, cellnum)
+{   
+   var id = "c" + tablenum + "_" + rownum + "_" + cellnum;
+   color_name_id = "td"+ id    // sets span id for later text color value insertion
+   var selected = document.getElementById(id).checked;
+ 
+   var rows = getNodeList(oEditorTables[tablenum],'tr');
+   if(rows == null) return;
+   var cells = getNodeList(rows[rownum],'td'); 
+   if(cells == null) return;
+   lastSelectedEl = cells[cellnum];
+  
+   if(!selected) {
+     if(!prevColors[tablenum][rownum][cellnum]) {
+        prevColors[tablenum][rownum][cellnum] = 'rgb(255, 255, 255)';
+     }
+     SelectBackColor(prevColors[tablenum][rownum][cellnum]);
+     return;
+   }
+
+   if(lastSelectedEl.getAttribute('style')) {    
+       var bgcolor = lastSelectedEl.style.cssText;      
+       bgcolor = bgcolor.replace(/\s*background-color:\s*/i,""); 
+       prevColors[tablenum][rownum][cellnum] = bgcolor;         
+    }
+   else {
+     prevColors[tablenum][rownum][cellnum] = 'rgb(255, 255, 255)';
+   }
+
+   oEditor.FCKDialog.OpenDialog( 'FCKDialog_Color', oEditor.FCKLang.DlgColorTitle, 
+         'dialog/fck_colorselector.html', 400, 330,  SelectBackColor, window ) ;
+ 
+}
+
+/**
+   returns all cells, th or td, ina row, based on table number and row number
+*/
+function getCellArray_t(tablenum, rownum) {
+    var d = oEditor.FCK.EditorDocument.body;
+    var tables = d.getElementsByTagName('table');
+
+    var rows = getNodeList(tables[tablenum],'tr');
+    var node = rows[rownum];
+    return getCellArray_r(node);
+
+}
+
+
+/**
+    returns all cells in a row, either th or td
+    param node:  row node
+*/ 
+function getCellArray_r(node) {
+
+    var cells = new Array();
+    for(var c = node.firstChild; c != null; c = c.nextSibling) {
+             if(c.nodeType == 1 && c.nodeName.match(/(th)|(td)/i)) {
+                  cells.push(c);
+             }
+
+    }
+
+  return cells;
+}
+
+
+/**
+ return td's if found, else return th's 
+ See getCellArray_t() for function that returns all cells in a row
+*/
+
+function getCellArray(tablenum, rownum) {
+
+    var rows = getNodeList(oEditorTables[tablenum],'tr');
+    var cells = getNodeList(rows[rownum],'td'); 
+    if(cells == null) return;    
+    if(cells.length == 0) {
+       cells = getNodeList(rows[rownum],'th');
+       if(cells.length == 0) return null;
+    }
+
+    return cells;
+}
+
+function isTableHeader(n) {
+
+       var name = n.nodeName.toUpperCase();
+       if(name == 'TH') {
+           return true;          
+       }
+    
+    return false;
+}
+
+function getColumnArray(tablenum, colnum) {
+   var rows = getNodeList(oEditorTables[tablenum], 'tr');
+   var len = rows.length;
+
+   var column = new Array();
+
+   for(var i=0; i < len; i++) {
+     cells = getCellArray_t(tablenum, i);
+     if(cells && cells[colnum]) {
+       column[i] = cells[colnum];
+     }
+     else {
+        column[i] = null;
+     }
+   }
+
+   return column;
+}
+
+function checkForReload() {
+   var re_load = false;
+
+   for(var i=0; i < removedNodes.length; i++) {      
+       for(var j = 0; j < removedNodes[i].length; j++) {
+                if(removedNodes[i][j]) {
+                    re_load = true;
+                    break;
+                }
+       }
+  }
+
+  for(var i=0; i < insDelNodes.length; i++) {
+      if(insDelNodes[i]['col'].length || insDelNodes[i]['row'].length) {
+            re_load = true;
+            break;
+      }
+  }
+
+    if(re_load) {  // the first one that works gets the job
+      location.reload(true);       
+      location.replace(location.href);   
+      location = location.href;
+    }
+}
+
+
+
+function IEAppendAlert() {
+  var browser = BrowserIsIE ? 'IE' : 'this browser';
+     
+  alert("Option not supported by "  + browser + ".\n" +
+  "Try Firefox, Safari or newer version of " + browser + " .");
+
+}
+
+
+
+function setSize(tablenum, rownum, cellnum, type) {
+
+    var cells = getCellArray_t(tablenum, rownum);    
+    var node = cells ? cells[cellnum] :null;
+    var id = "sz" + tablenum + "_" + rownum + "_" + cellnum;
+                       
+    switch(type) {
+        case 'delete':
+           
+                 // 'delete'  is checked on a deleted node, so reinsert
+           if(removedNodes[tablenum][rownum]) {    
+                if(removedNodes[tablenum][rownum][cellnum]) {       
+                       var td = removedNodes[tablenum][rownum][cellnum];  
+                       if(node) {                       
+                         try {   
+                              node.parentNode.insertBefore(td,node);
+                         } catch(e) {
+                            IEAppendAlert();
+                         }                          
+                       }
+                       else {
+                          var rows = getNodeList(oEditorTables[tablenum],'tr');                                                   
+                           try {                              
+                            rows[rownum].appendChild(td); 
+                           } catch(e) {
+                            IEAppendAlert();  
+                          }                          
+                       }
+                       removedNodes[tablenum][rownum][cellnum] = null;
+                       return; 
+                }
+           }
+
+           if(!node) return;
+
+           var p = node.parentNode;
+           if(p) {
+              
+                if(!removedNodes[tablenum][rownum]) {
+                     removedNodes[tablenum][rownum] = new Array();
+                }
+                var text = node.innerHTML;
+                text = text.replace(/<\/span>/i)
+                text = text.replace(/<span.*?>/i);                
+      
+                removedNodes[tablenum][rownum][cellnum] = node;
+                p.removeChild(node);
+                features_disable(['b_al','b_c', 'b_sz', 'b_insdel'], true);
+           }
+          break;
+
+       case 'colspan':
+           id = id+'c';         
+           node.colSpan = document.getElementById(id).value; 
+          break;
+       case 'width':   
+           id = id+'w';          
+           node.style.width = document.getElementById(id).value + "px"; 
+        
+          break;
+       default:
+        
+    }
+  
+}
+
+function setAlign(tablenum, rownum, cellnum, position) {
+    var id = "al" + tablenum + "_" + rownum + "_" + cellnum;
+    var td_id = "td"+ id;
+ 
+   var cells = getCellArray_t(tablenum, rownum);
+   if(cells == null) return;
+         
+   cells[cellnum].align = position;
+
+    
+    var dom = document.getElementById(td_id);
+    dom.innerHTML = position;
+    return id;
+}
+
+function output_form(table) {   
+  var tables = { align:window.rowToHTMLAlign, color:window.rowToHTMLColor, size: rowToHTMLSize};  
+  var fn = tables[table];
+  var tableT = 'T' + table + '_';
+  var formName = tableT + 'F';
+
+   var d = oEditor.FCK.EditorDocument.body;
+   var tables = d.getElementsByTagName('table');
+   document.write("\n<form  name = '" + formName + "'>");
+   for(var j=0; j < tables.length; j++) {
+       var tableT_id = tableT + j; 
+       document.writeln("<br><b>Table " + (j + 1) + "</b><br>")
+
+       document.writeln("<Button style='font-size: 9pt;' onclick = \"hide_el('" + tableT_id + "');return false;\" >hide table</button>&nbsp;&nbsp;");
+       document.writeln("<Button style='font-size: 9pt;' onclick = \"display_el('" + tableT_id + "');return false;\" >show table</button>")
+   
+       document.writeln("<br><br><table border=0 id= '" + tableT_id + "' >");
+       
+       var rows = tables[j].getElementsByTagName('tr');
+       var maxCells = getMaxCells(j, rows.length, rows); 
+       if(table != 'size') {
+          macroSettings(maxCells, j,table);
+       }
+       if(maxCells > 4) document.writeln(writeColumnHeaders(maxCells));
+       for(var i=0; i < rows.length; i++) {       
+             document.writeln (fn(rows[i], j, i)); 
+       }
+       document.writeln("</table>");
+       
+       document.writeln("<p>")
+  }
+     
+  document.write("\n</form>");
+  
+  tfrm_ini_done = true;
+}
+
+
+
+function macroSettings(maxCells,tablenum, type) {
+  var width = (maxCells*2) + 2;
+  var id = 'ent' + type + '_' + tablenum;
+  var row_id = id + 'r';
+  var col_id = id + 'c';
+
+  var fns = { align:'Align', color:'Color', size: 'InsDel'};  
+  var row_fn = 'row'+ fns[type];
+  var col_fn = 'col'+ fns[type];
+  var prefix = (type == 'size') ? 'Insert:&nbsp;&nbsp;&nbsp;&nbsp;' : "Reset: ";
+  var bool = (type == 'size') ? ',' + false : "";
+
+   
+
+       document.write('<tr><td style="font-size:9pt;" colspan ="' + width + '">');
+       document.write(prefix + '&nbsp;&nbsp;<input type="text" size="2" id="' + col_id +  '">');
+       document.write('&nbsp;<input type = "button" value="column" onclick="' + col_fn + '('+  col_id + ',' + tablenum + bool + ');">');
+       document.write('&nbsp;&nbsp;<input type="text" size="2" id="' + row_id +  '">');
+       document.write('&nbsp;<input type = "button" value="row" onclick="' + row_fn + '(' + row_id + ',' + tablenum + bool + ');">');
+       if(type == 'align') {
+           var m_id = id + 'macro';     
+ 
+           document.write(
+              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alignment:&nbsp; "
+             + "<input type='radio'checked value='left' id='" + m_id +"' name='" + m_id + "'>"   
+             + "<input type='radio' value='center' id='" + m_id +"' name='" + m_id + "'>"   
+             + "<input type='radio' value='right' id='" + m_id +"' name='" + m_id + "'>");   
+       }
+
+      
+      
+       document.write("</td></tr>"); 
+    
+ 
+
+      if (type == 'size') {
+       col_id += 'd';
+       row_id += 'd'
+       document.write('<tr><td style="font-size:9pt;" colspan ="' + width + '">');
+       document.write('Delete: &nbsp;&nbsp;&nbsp;&nbsp;<input type="text" size="2" id="' + col_id +  '">');
+       document.write('&nbsp;<input type = "button" value="column" onclick="' + col_fn + '(this.form.'+ col_id + ',' + tablenum + ',' + true + ');">');
+       document.write('&nbsp;&nbsp;<input type="text" size="2" id="' + row_id +  '">');
+       document.write('&nbsp;<input type = "button" value="row"  onclick="' + row_fn + '(this.form.' + row_id + ',' + tablenum + ',' + true + ');">');
+       document.write("</td></tr>"); 
+
+       document.write('<tr><td style="font-size:9pt;" colspan ="' + width + '">');
+       col_id += 're';
+       row_id += 're'
+       document.write('Reinsert: &nbsp;<input type="text" size="2" id="' + col_id +  '">');
+       document.write('&nbsp;<input type = "button" value="column" onclick="reinsertCol(' + tablenum + ",'" + col_id +'\');">');
+
+       document.write('&nbsp;&nbsp;<input type="text" size="2" id="' + row_id +  '">');
+       document.write('&nbsp;<input type = "button" value="row"  onclick="reinsertRow(' + tablenum + ",'" + row_id +'\');">');
+       var mv_id = id + '_mov';
+       document.write('&nbsp;&nbsp;&nbsp;&nbsp;Move To (optional): &nbsp;<input type="text" size="2" value = "" id="' + mv_id +  '">');      
+       document.write("</td></tr>"); 
+
+      }
+}
+
+function getMaxCells(tablenum, rownum, rows) {
+  var max=0;
+
+   for(var i=0; i < rownum; i++) {
+       var num = getNodeList(rows[i], 'td').length;     
+       if(num > max) max = num; 
+   }
+
+  return max;
+}
+
+function writeColumnHeaders(cells) {
+
+    var columns = "<tr><th>&nbsp;</th><th>&nbsp;</th>";
+    for(var cols = 0; cols < cells; cols++) {
+            columns +="<td align = 'center'>" + (cols + 1) + "</td><td>&nbsp;</td>";    
+      }
+    return columns;
+    document.writeln(columns);
+
+}
+
+function rowToHTMLColor(row, tablenum, rownum) {
+ 
+  var cells = getCellArray_t(tablenum, rownum);
+ 
+
+  if(cells == null || cells.length == 0) {   
+        return;
+  }
+
+ var row_text = "";
+ 
+  var row_id = "rowc_" + tablenum + "_" + rownum;
+  row_text += "<tr id='" + row_id + "'>";
+  row_text += "<td>" + (rownum + 1) + "</td>"; 
+  for(var i=0; i< cells.length; i++) {
+     var id = "c" + tablenum + "_" + rownum + "_" + i;
+     var td_id = "td"+ id;
+     var bgcolor = "";
+     if(cells[i].style && cells[i].style.cssText) {
+         bgcolor = rgbToHex(cells[i].style.cssText);
+     }
+     var disabled = isTableHeader(cells[i]) ? " disabled " : "";
+     row_text += "<td align='right' style='width:80px; font-size:9pt;'>&nbsp;&nbsp;<span id='" + td_id + "'>"; 
+     if(bgcolor) row_text += bgcolor;
+        else row_text += "&nbsp;";
+     row_text += "</span><td><input type='checkbox' onclick='SelectColor("+ tablenum +"," + rownum +"," + i + ");'"   + disabled + "  id=" + id + " > ";
+  } 
+
+  row_text += "</tr>";
+  return row_text;
+ 
+}
+
+function rowToHTMLAlign(row, tablenum, rownum) {
+
+  var cells = getCellArray_t(tablenum, rownum);
+
+  if(cells == null || cells.length == 0) {   
+        return;
+  }
+
+   var row_text = "";
+
+   var row_id = "rowal_" + tablenum + "_" + rownum;
+
+   row_text += "<tr id='" + row_id + "'>";
+   row_text += "<td>" + (rownum + 1) + "</td>";
+   for(var i=0; i< cells.length; i++) {
+     var id = "al" + tablenum + "_" + rownum + "_" + i;
+     var td_id = "td"+ id;
+     var align = cells[i].align;
+
+     row_text += "<td align='right' style='width:80px; font-size:9pt;'>&nbsp;&nbsp;&nbsp;<span id='" + td_id + "'>";
+     var checked = { left: "", center: "", right: "" };
+
+     if(cells[i].nodeName.match(/TH/i) && align.match(/left/i) && !align) {
+           row_text += "TH"; 
+     }
+     else if(align){             
+              row_text += align;
+              checked[align] = 'checked';
+     }
+       else { 
+           
+            row_text += "&nbsp;"
+       }
+    
+     row_text += '</span>&nbsp;';
+    
+    row_text += "\n<td nowrap style='border: 1px solid;'><input type='radio' value='left' " + checked['left'] + " onclick='setAlign("+ tablenum +"," + rownum +"," + i + ", \"left\");' id='" + id + "' name='" + id + "'> "; ;
+    row_text += "\n<input type='radio' value='center' " + checked['center'] + " onclick='setAlign("+ tablenum +"," + rownum +"," + i + ", \"center\");' id='" + id + "' name='" + id + "'> "; 
+    row_text += "\n<input type='radio' value='right' " + checked['right'] + " onclick='setAlign("+ tablenum +"," + rownum +"," + i + ", \"right\");' id='" + id + "' name='" + id + "'>"; 
+
+  } 
+   row_text += "</tr>";
+   return row_text;
+
+}
+
+function rowToHTMLSize(row, tablenum, rownum) {
+
+  var cells = getCellArray_t(tablenum, rownum);
+
+  if(cells == null || cells.length == 0) {   
+        return;
+  }
+
+var row_text = "";
+
+ 
+  var row_id = "rowsz_" + tablenum + "_" + rownum;
+
+  row_text += "<tr id='" + row_id + "'>";
+  row_text += "<td>" + (rownum + 1) + "</td>";
+
+  for(var i=0; i< cells.length; i++) {
+     var id = "sz" + tablenum + "_" + rownum + "_" + i;
+     var td_id = "td"+ id;
+
+     row_text += "<td align='right' style='width:80px; font-size:9pt;'>&nbsp;&nbsp;&nbsp;<span id='" + td_id + "'>"; 
+   
+     row_text +='</span>&nbsp;';
+    
+     row_text += "<td nowrap style='border: 1px solid;'><input type='checkbox'  onclick='setSize("+ tablenum +"," + rownum +"," + i + ", \"delete\");' id='" + id + "' name='" + id + "'> ";
+
+     var width = cells[i].width ? cells[i].width : "";      
+     row_text += "&nbsp;&nbsp;<input type='text' size='3' value='" + width + "' id='" + id + 'w' + "' >";
+     row_text += "<input type='button' onclick ='setSize("+ tablenum +"," + rownum +"," + i + ", \"width\");'    value = \"width\" > ";
+     
+     var colspan = cells[i].colSpan ? cells[i].colSpan : "";
+     row_text +="&nbsp;&nbsp;<input type='text'  size = '1' value='" + colspan + "' id='" + id + 'c' + "' >";    
+     row_text +="<input type='button' onclick='setSize("+ tablenum +"," + rownum +"," + i + ", \"colspan\");'  value = \"cols\" >";
+  } 
+
+  row_text +="</tr>";
+
+  return row_text;
+
+}
+
+function outputInsertDelete() {
+  
+   var d = oEditor.FCK.EditorDocument.body;
+   var tables = d.getElementsByTagName('table');
+   for(var j=0; j < tables.length; j++) {
+        var tno = j+1;
+        document.write("<tr><th>Table " + tno );
+        macroSettings(1,j,'size');
+        document.write("<tr><td>&nbsp; ");
+   }
+  
+ 
+}
+	</script>
+
+   <style type="text/css">
+      body { overflow:scroll; }  
+      a:link, a:visited { color: #737357; font-weight:bold; font-size: 9pt; }   
+      li { font-size: 9pt; font-weight: normal; }
+   </style>
+
+	</head>
+	<body onload="OnLoad()">
+
+     <button id="b_c" onclick="switchTable('color_table');">color</button>&nbsp;&nbsp;&nbsp;
+     <button id="b_al" onclick="switchTable('align_table');">align</button>&nbsp;&nbsp;&nbsp;
+     <button id="b_sz" onclick="switchTable('size_table');">resize</button>&nbsp;&nbsp;&nbsp; 
+     <button id="b_insdel" onclick="switchTable('insdel_table');">ins/del</button>&nbsp;&nbsp;&nbsp; 
+     <button id="b_intro" onclick="switchIntro('howto_intro');">intro</button>&nbsp;&nbsp;&nbsp;  
+     <button id="b_help" onclick="getHelp();"> ? </button>       
+
+      <ul id = 'howto_intro' style="font-size: 9pt;">
+       <b style="font-size: 10pt;">Table Format Utility</b>  
+        <li> This utility supports the following table formatting features:
+        <ol>
+        <li> <b>[&nbsp;color&nbsp;]:</b>&nbsp;&nbsp;&nbsp;&nbsp;background colors for cells, rows, and columns
+        <li> <b>[&nbsp;align&nbsp;]:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;horizontal text alignment for
+        cells, rows, and columns 
+        <li> <b>[&nbsp;resize&nbsp;]:</b>&nbsp;&nbsp;cell width and column spans, cell deletion 
+        <li> <b>[&nbsp;ins/del&nbsp;]:</b>&nbsp;&nbsp;inserting, deleting and moving columns and rows 
+      
+        </ol>
+        
+        <li>At the top of each page, you will find the basic instructions for the features
+         supported by that page.  You can hide the instructions by clicking <b>hide</b>
+         at the bottom right of the instructions.  To re-display the instructions click <b>[&nbsp;?&nbsp;]</b>.
+        <li>After making structural changes to a table, the table will have to be re-read.
+          Consequently, all the top row buttons will be disabled, except for
+         <b>[&nbsp;Intro&nbsp;]</b> and <b>[&nbsp;?&nbsp;].</b>  In order to continue, click <b>Intro</b>.  It will do
+          the re-read and return you to this page.  
+        <li>This page can be re-displayed by clicking the <b>[&nbsp;Intro&nbsp;]</b> button.
+      </ul>
+
+      <ul id = 'howto_color' style="font-size: 9pt; display:none;">
+       <b style="font-size: 10pt;">Setting Background Colors</b>  
+      <li>Each checkbox represents a cell.  To set a background color, select the cell
+      and a pop-up will appear from which you can select a background color.      
+      <li>To revert to the previous color, uncheck the checkbox.      
+      <li>You can also enter a color in the pop-up text box, using the form <b>#nnnnnn</b>.      
+      <li>To set the background color for a DokuWiki Table header, you must first remove
+      the &lt;TH&gt; tag using the <b>Styles</b> menu.
+      <li>To set the background color for an entire row or column use the <b>Reset</b>
+      feature. Enter the row or column number and click the button.  The color
+      dialog will pop up.
+      <table width="80%"><tr><td align ="right">
+      <a href = "javascript:hide_el('howto_color');">hide</a>
+      </td></tr></table>       
+      </ul>
+
+      <ul id = "howto_align" style="font-size: 9pt; display:none"> 
+       <b style="font-size: 10pt;">Setting Alignment</b>      
+       <li> Alignment positions are controlled by radio buttons: <input type="radio">
+       <li> The buttons, in order, are left, center, and right.
+       <li> Clicking on a button will immediately re-align a cell's text.
+       <li> To set alignment to another position, simply select another button.
+       <li>To align an entire row or column use the <b>Reset</b>
+       feature. Select the required radio button and enter the row or column number.
+       Click the button.  The entire row or column will be re-aligned.  
+
+      <table width="80%"><tr><td align ="right">
+       <a href = "javascript:hide_el('howto_align');">hide</a>
+      </td></tr></table>       
+      </ul>   
+ 
+      <ul id = "howto_size" style="font-size: 9pt; display:none"> 
+       <b style="font-size: 10pt;">Setting Column Sizes</b>     
+        <li> To change width of cell enter the width in pixels and click the <b>width</b> button
+        <li> To change the number of columns a cell spans enter the number in the <b>cols</b> box and click
+the <b>cols</b> button
+        <li> When extending a cell over more than one column it may be necessary to remove adjacent
+cells.  You do this by checking off the checkboxes of the relevant cells.  Unchecking a cell
+will restore its content but the formatting will be lost.
+      <table width="80%"><tr><td align ="right">
+      <a href = "javascript:hide_el('howto_size');">hide</a>       
+      </td></tr></table>       
+      </ul>
+
+
+      <ul id = "howto_insdel" style="font-size: 9pt; display:none"> 
+       <b style="font-size: 10pt;">Inserting and Deleting Columns and Rows</b>
+        <li><b>Insert:</b> To insert a new column or row, enter its position number and click the relevant
+        button.  A new column or row will be inserted at that position.
+        <li><b>Delete:</b> To delete a column or row, enter its position number and click the
+        relevant button. The deleted column or row will be saved for possible re-insertion.   
+       <li><b>Reinsert:</b> To return a column or row that has been deleted to its original position,
+        use the Reinsert facility.  Enter the number of the deleted row or column in the
+        row or column box; this number must be the
+        same as the number of the deletion. Click the button. The deleted row or column
+        will be reinserted.
+       <li><b>Move To: </b>To move a deleted row or column to a new position in the table, enter the 
+       new position in the <b>Move To</b> box; then follow the procedure for <b>Reinsert</b>.  The
+       column or row will be inserted at the new position instead of at its original position.
+      <table width="80%"><tr><td align ="right">
+       <a href = "javascript:hide_el('howto_insdel');">hide</a>
+      </td></tr></table>       
+
+      </ul>
+
+     <div id = 'tfrm'  style="font-size: 10pt; display: none;">     
+		<script type="text/javascript">
+          output_form('color');
+        </script>    
+     </div>
+
+     <div id = 'align_table'  style="font-size: 10pt;  display: none; ">   
+		<script type="text/javascript">
+           output_form('align');
+        </script>    
+     </div>
+
+     <div id = 'size_table'  style="font-size: 10pt;  top: 0px; left: 0px; display: none;">   
+		<script type="text/javascript">
+          output_form('size');
+        </script>    
+     </div>
+
+     <div id = 'insdel_table'  style="font-size: 10pt;  top: 0px; left: 0px; display: none;"> 
+        <FORM>
+            <TABLE>  
+    		<script type="text/javascript">
+              outputInsertDelete();
+            </script>    
+            </TABLE>
+        </FORM>
+     </div>
+
+     <div id = 'color_table'  style="font-size: 10pt; top 0px; left: 0px; display: none;">   
+     </div>
+    
+	</body>
+</html>

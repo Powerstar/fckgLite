@@ -1,0 +1,156 @@
+/**
+*   To Upgrade for your language, create the following language items in your language file,
+*   which is found in the following directory: /fckg/fckeditor/editor/lang   
+*   You can use this file as your template and over-write the English with your tanslations
+*/
+
+// Toolbar tooltips
+NestedNumberedList  : "Insert Nested Ordered List",
+InsertFootnote      : "Create/Edit Footnotes",
+
+// Image Dialog
+DlgImgNote          : "<b>Note:</b> The DokuWiki Mediamangager can be used only for uploading.  It cannot insert images into your text.",
+DlgImgHelp          : "<b>Image Alignment</b> The align property will place your images in text contexts as illustrated in the preview box. It can also be used to align images with respect to one another:",
+DlgImgHelpLiLeft    : "Use <b>left</b> alignment to create a horizontal row of images.",
+DlgImgHelpLiBase    : "Use <b>baseline</b> to create a vertical column of images at the left-hand margin.",
+DlgImgHelpLiRight   : "Use <b>right</b> and <b>middle</b> to create columns at the center and right.",
+DlgImgHelpNote      : "<b>Note</b>: Placing a column of images in the left margin without the baseline property will result in a horizontal row of images.",
+
+DlgImgAlertSucess	: "Your file has been successfully uploaded.",
+DlgImgAlertInvalid	: "Invalid file type",
+DlgImgAlertName		: "A file with the same name is already available. The uploaded file has been renamed to ",
+DlgImgAlertSecurity	: "Security error. You probably don't have enough permissions to upload. Please check your server.",
+
+// Link Dialog
+DlgLnkTypeInternal	: "DokuWiki internal link",
+DlgLnkTypeMime		: "Non-DokuWiki Internal Files",
+DlgLnkTypeSamba		: "SMB Share",
+DlgLnkTypeAnchor	: "Anchor in this page",
+DlgLnkTypeEMail	    :  "E-Mail",
+DlgLnkQS            : "Query String (For example: value_1=1&value_2='abc')",
+DlgnLnkMsgNoWikiFile : "Please enter a file name for your internal link",
+DlgnLnkMsgQSErr      : "Malformed Query String element(s). Press Cancel to revise:",
+
+DlgLnkIntText		: "Enter DokuWiki namespace Or Select from File Browser.",
+DlgLnkIntExample	: "For example: <i>:directory:directory:file</i>",
+DlgLnkMimeText		: "Enter DokuWiki namespace Or Select from, File Browser.",
+DlgLnkMimeExample	: "For example: <i>:directory:directory:zipfile.zip",
+DlgLnkSambaText		: "Enter the share name.",
+DlgLnkSambaExample	: "For example: \\\\Server\\\directory_path\\file",
+
+
+// File Browser
+DlgFileBrowserSelect: "Please select a file from your computer",
+DlgFileBrowserUpPrg : "Upload a new file in this folder (Upload in progress, please wait...)",
+DlgFileBrowserUpMsg : "Upload a new file in this folder",
+DlgFileBrowserRead  : "read-only",
+DlgFileBrowserWrite : "uploadable",
+DlgFileBrowserBrowse: "browse",
+DlgFileBrowserNewFolder: "Create Folder",
+DlgFileBrowserResourceType: "Resource Type",
+DlgFileBrowserThumbnail: 'thumbnail',
+DlgFileBrowserMagnify: 'mangify',
+
+// The following 4 are the labels at upper left corner of file browser
+DlgFileBrowserResSelectFile: "File",  
+DlgFileBrowserResSelectFlash: "Flash",
+DlgFileBrowserResSelectMedia: "Media",
+DlgFileBrowserResSelectImage: "Image",
+
+DlgFileBrowserFolderPrompt: 'Type the name of the new folder:',
+DlgFileBrowserFolderWarning: 'Please type the folder name' ,
+
+
+// File Browser Errors
+FileBrowserError_101:	'Folder already exists.', 
+FileBrowserError_102:	'Invalid folder name', 
+FileBrowserError_103:   'You have no permissions to create the folder.',
+FileBrowserError_110:   'Unknown error creating folder',
+FileBrowserError_201:   'A file with the same name is already available. The uploaded file has been renamed to: ',
+FileBrowserError_202:   'Invalid file',
+FileBrowserError_203:   'You do not have permission to upload files to this folder. If you think this is incorrect please notify your administrator.',
+FileBrowserError_204:   'Unable to delete the selected file', 
+FileBrowserError_205:  'Unable to rename the selected file; check your directory/write permisssions', 
+FileBrowserError_206: ' already exists; you must either delete or rename it. ',
+FileBrowserError_default: 'Error on your request. Error number: ',
+FileBrowserError_Ajax: 'Your browser does not support AJAX.',
+FileBrowserError_XML:  'The server didn\'t reply with a proper XML data. Please check your configuration.' ,
+FileBrowserError_Folder_Submit: 'Please type the folder name.',
+FileBrowserError_File_Submit:  'Please select a file from your computer',
+FileBrowserError_Upload: 'Error on upload. Error number: ',
+FileBrowserError_Connector: 'The connector is disabled. Check editor/filemanager/connectors/php/config.php', 
+FileBrowserError_Command: 'Unsupported command: ',
+FileBrowserError_Type: 'Invalid type specified: ',
+FolderMoveWarning: 'You can only move files to a folder one level below the current directory',	
+
+//Special Characters
+DlgSpecialExplaination : "Click on a character or Enter an entity number or code in the text box, test it and then click insert",
+DlgSpecialTest         : "test",
+DlgSpecialInsert       : "insert",
+
+//Footnote Dialog
+DlgFootnoteTitle              : "Footnote Editor",
+DlgFootnoteExplaination       : "Use the text area for both creating and revising your footnotes.",
+DlgFootnoteId                 : "Footnote ID ",
+DlgFootnoteLoad               : "Load Note in Editor",
+DlgFootnoteExplainationBottom : "To Revise enter the footnote ID and click \"Load Note in Editor\"",
+
+// Plugin Tool
+Abbr	      		: "Plugin",
+AbbrBtn      		: "Insert Syntax Plugin",
+AbbrDlgTitle 		: "Insert Syntax Plugin Name",
+AbbrDlgHLCreate		: "<b>Create a Plugin</b>",
+AbbrDlgHLStet		: "<b>Stet Plugin</b>",
+AbbrDlgHLEdit		: "<b>Edit Dokuwiki Plugin</b>",
+AbbrDlgClick		: "<b>Click OK when done. Or Cancel.</b>",
+AbbrDlgStet			: "Create a string literal from text containing HTML and/or DokuWiki Markup characters",
+AbbrDlgEditPlugin	: "Edit a plugin which was not created using the plugin tool.",
+AbbrDlgName  		: "Enter Plugin Name--try to be exact",
+AbbrDlgRemove		: "Remove plugin-tag (content remains)",
+AbbrDlgSelectFirst	: "You have to select the plugin syntax first!",
+
+
+//Break To Paragraph
+BreakToParagraph :	"<BR> to <P>",
+
+//Paragraph to Break
+ParagraphToBreak :	"<P> to <BR>",
+
+
+// Geshi plugin
+geshiHelp:        'With this tool you can create either a "Code Block" or "Downloadable Code Snippet".' 
+	               + 'For a snippet you must also enter a file name for the download. Then '
+	               +'  select the language type from the drop down menu and click OK. ' ,
+
+GeshiToolTip: "Insert Geshi Code Block",
+GeshiCodeBlock: 'Code Block',
+GeshiDownloadable: 'Downloadable Code Snippet',
+GeshiDlgTitle:       'Geshi Selection Tool',
+
+//Smileys
+FckEditorSmileys    : "FCKEditor Smileys",
+DokuwikiSmileys     : "Dokuwiki Smileys", 
+SmileysDlgInfo      : "FCKeditor smileys are inserted as images. Dokuwiki smileys are inserted as text and display as images in the browser.",
+
+// These two are for the toolbar and are already included in the language js files
+// so they should be edited rather than added to the file
+Style               : "Code Types",
+FontFormats         : "Headers",
+
+//VKI Keyboard Plugin
+KeyboardToolTip:  'Open Virtual Keyboard',
+KeyboardDlgTitle: 'Virtual Keyboard',
+startVKeyboard:   'Start Virtual Keyboard',
+VKkeyboardHelp:     'Clicking the "Start Virtual Keyboard" button starts up the Virtual Keyboard. '
+                  + ' A Keyboard button/icon will appear at the lower left of the editing window; '
+                  + ' when clicked it opens the keyboard. Clicking "Illustrations" explains the '
+                  + ' various functions accessed from the virtual keyboard\'s top row.'  ,
+
+
+
+VKIllustrationText: '<b>Top row functions from left-to-right</b><br />' 
+                    + '1. Clicking on the language identifier or the down arrow to its right opens a drop-down menu of languages; selecting one of these immediately changes the keyboard to the selected language. For an illustration of the drop-down menu scroll to the image at the bottom of this page.<br /> '
+                    + '2. Clicking the hash symbol(#)opens and closes the numeric keypad <br />'
+                    + '3. The up and down arrows to the right of the hash change the size of the keyboard and its fonts <br />'
+                    + '4. In fckgLite the "Clear" button has no function.',
+

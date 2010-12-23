@@ -1,0 +1,6 @@
+fckconfig.js
+
+FCKConfig.Plugins.Add('tableformat') ;
+
+FCKConfig.ToolbarSets: ['Format_Table']
+
