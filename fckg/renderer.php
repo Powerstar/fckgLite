@@ -16,6 +16,32 @@ require_once DOKU_INC.'inc/parser/xhtml.php';
 class renderer_plugin_fckg extends Doku_Renderer_xhtml 
 {
 
+    var $ver_anteater;
+    var $dwiki_version;
+
+    
+    function renderer_plugin_fckg() {
+      global $conf;
+      $this->ver_anteater = mktime(0,0,0,11,7,2010); 
+      $this->dwiki_version=mktime(0,0,0,01,01,2008);
+
+      if(isset($conf['fnencode'])) {
+          $this->ver_anteater = mktime(0,0,0,11,7,2010); 
+          $this->dwiki_version=mktime(0,0,0,11,7,2010); 
+      }
+      else if(function_exists('getVersionData')) {
+          $verdata= getVersionData();
+          if(isset($verdata) && preg_match('/(\d+)-(\d+)-(\d+)/',$verdata['date'],$ver_date)) {
+              if($ver_date[1] >= 2005 && ($ver_date[3] > 0 && $ver_date[3] < 31) && ($ver_date[2] > 0 && $ver_date[2] <= 12)) { 
+                                              // month        day               year
+              $this->dwiki_version=@mktime(0,  0,  0, $ver_date[2],$ver_date[3], $ver_date[1]); 
+              if(!$this->dwiki_version) $this->dwiki_version = mktime(0,0,0,01,01,2008);         
+              $this->ver_anteater = mktime(0,0,0,11,7,2010); 
+          }
+        }
+      }
+
+    }
     /**
      * return some info
      */
@@ -34,6 +60,7 @@ class renderer_plugin_fckg extends Doku_Renderer_xhtml
         // by saying we're the 'xhtml' renderer here.
         return 'xhtml';
     }
+
 
 
 
@@ -74,7 +101,11 @@ class renderer_plugin_fckg extends Doku_Renderer_xhtml
     
     function table_close()
     {
-        $this->doc .= "</table>\n<span class='np_break'>&nbsp;</span>\n</div>";
+        global $conf;  
+        $this->doc .= "</table>\n<span class='np_break'>&nbsp;</span>\n";
+        if($this->dwiki_version >= $this->ver_anteater) {
+           $this->doc .= "</div>";
+        }
     }
     /* 
      * Dokuwiki displays __underlines__ as follows
