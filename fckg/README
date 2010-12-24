@@ -2,3 +2,9 @@
 For information on the installation and features of fckgLite, see
 the fckgLite web site:  http://www.mturner.org/fckgLite
 
+This version of fckgLite does not support the new safe-encoding
+protocol implemented in Dokuwiki versions starting with Anteater
+(11-7-2010).  For that, you must use fckgLiteSafe, which is available
+for download from the dailies menu on the  web site.
+
+
