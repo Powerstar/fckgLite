@@ -1,4 +1,4 @@
-rev 10-Dec_23-15_00
+rev 10-Dec_27-16_50
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1333,7 +1333,7 @@ Nov 8 2009
 
   14 Dec
   Revised code in helper.php for checking DW version, since DW's getVersionData() can't
-  report back a valid version date is the user has not included a proper version file
+  report back a valid version date if the user has not included a proper version file
   in the DW root directory.
   
   16 Dec
@@ -1361,3 +1361,8 @@ Nov 8 2009
  23 Dec
  Put version check into fckg renderer.php for table close(), since prior to anteater
  (Nov 7,2010), tables were not embedded in a Div.
+ 
+ 27 Dec
+ Converted % and [] to nowiki escapes in edit.php (i.e. converting them to entities before
+ passing them into DW parser).  The brackets in particular are useful because they prevent
+ url markup from being converted to HTML urls in FCKeditor.

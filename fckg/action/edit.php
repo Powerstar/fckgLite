@@ -207,11 +207,11 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
 
 
            $text = preg_replace_callback(
-            '/(<nowiki>)(.*?)(<\/nowiki>)/ms',
+            '/(<nowiki>)(.*?)(<\/nowiki>)/ms',          
             create_function(
                 '$matches',         
-                 '$needles =  array("/",  ".", "*", "_","\'","<",">");
-                  $replacements = array("&#47;", "&#46;", "&#42;", "&#95;", "&#39;", "&#60;","&#62;"); 
+                 '$needles =  array("[","]", "/",  ".", "*", "_","\'","<",">","%");
+                  $replacements = array("&#91;","&#93;","&#47;", "&#46;", "&#42;", "&#95;", "&#39;", "&#60;","&#62;","&#37;"); 
                   $matches[2] = str_replace($needles, $replacements, $matches[2]);
                   return  $matches[1] . $matches[2] . $matches[3];'            
             ),
