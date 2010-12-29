@@ -1,4 +1,4 @@
-rev 10-Dec_27-16_50
+rev 10-Dec_28-21_03
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1366,3 +1366,10 @@ Nov 8 2009
  Converted % and [] to nowiki escapes in edit.php (i.e. converting them to entities before
  passing them into DW parser).  The brackets in particular are useful because they prevent
  url markup from being converted to HTML urls in FCKeditor.
+
+ 28 Dec
+ Fixed escaping of backslash characters in edit.php which were lost when implementing
+ accommodation of troublesome characters in plugin syntax.  Now any character that
+ causes trouble for a  plugin can be escaped with backslashes except for the backslash 
+ itself and the percent character.  A backslash must both precede and follow the
+ character being escaped, as in: \*\.

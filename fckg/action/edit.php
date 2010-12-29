@@ -1722,8 +1722,7 @@ function parse_wikitext(id) {
       we allow escaping of troublesome characters in plugins by enclosing them withinback slashes, as in \*\
       the escapes are removed here together with any DW percent escapes
    */
-
-            results = results.replace(/%*\\%*([\*\-\%\\])%*\\%*/g, "$1"); 
+     results = results.replace(/%*\\%*([^\\%]{1})%*\\%*/g, "$1"); 
 
   
     if(id == 'test') {
