@@ -341,6 +341,7 @@ function FCKeditor_OnComplete( editorInstance )
   oDokuWiki_FCKEditorInstance.VKI_attach = function() {
      VKI_attach(f, oDokuWiki_FCKEditorInstance.get_FCK(), 'French');
   }
+  oDokuWiki_FCKEditorInstance.get_FCK().fckLImmutables = fckLImmutables;
   oDokuWiki_FCKEditorInstance.dwiki_user = "$user_type"; 
   oDokuWiki_FCKEditorInstance.dwiki_client = "$client";  
   oDokuWiki_FCKEditorInstance.dwiki_usergroups = "$user_groups";  

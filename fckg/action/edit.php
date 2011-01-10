@@ -614,6 +614,13 @@ var fckgLPluginPatterns = new Array();
  
    }
 
+   global $fckLImmutables;
+   echo "if(!fckLImmutables) var fckLImmutables = new Array();\n";
+
+   for($i=0; $i< count($fckLImmutables); $i++) {
+      echo "fckLImmutables.push('$fckLImmutables[$i]');\n";         
+   }
+   
    $pos = strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE');
    if($pos === false) {
      echo "var isIE = false;";
@@ -626,7 +633,7 @@ var fckgLPluginPatterns = new Array();
      
 ?>  
 
-
+   
    function safe_convert(value) {            
 
      if(oDokuWiki_FCKEditorInstance.dwiki_fnencode && oDokuWiki_FCKEditorInstance.dwiki_fnencode == 'safe') {
@@ -649,12 +656,15 @@ function parse_wikitext(id) {
          'h1': "\n====== ", 'h2': "\n===== ", 'h3': "\n==== ", 'h4': "\n=== ", 'h5': "\n== ",
          'td': "|", 'th': "^", 'tr':" ", 'table': "\n\n", 'ol':"  - ", 'ul': "  * ", 'li': "",
          'plugin': '<plugin ', 'code': "\'\'",'pre': "\n<", 'hr': "\n\n----\n\n", 'sub': '<sub>',
+         //'font': "<font ",
+         'font': "\n",
          'sup': '<sup>', 'div':"\n\n",'acronym': " ", 'span': "\n", 'dl': "\n", 'dd': "\n", 'dt': "\n"
      };
     var markup_end = { 'del': '</del>', 'strike': '</del>', 'p': " ", 'br':" ", 'a': ']] ','img': '\}\}',
           'h1': " ======\n", 'h2': " =====\n", 'h3': " ====\n", 'h4': " ===\n", 'h5': " ==\n", 
           'td': " ", 'th': " ", 'tr':"|\n", 'ol':" ", 'ul': " ", 'li': "\n", 'plugin': '</plugin>',
-           'pre': "\n</",'sub': '</sub>', 'sup': '</sup>', 'div':"\n\n", 'p': "\n\n"
+           'pre': "\n</",'sub': '</sub>', 'sup': '</sup>', 'div':"\n\n", 'p': "\n\n",
+           'font': "</font>"
      }; 
    
     markup['blank'] = "";
@@ -685,8 +695,7 @@ function parse_wikitext(id) {
  //   var geshi_classes = 'br0|co0|co1|co2|co3|coMULTI|es0|kw1|kw2|kw3|kw4|kw5|me1|me2|nu0|re0|re1|re2|re3|re4|st0|sy0|sy1|sy2|sy3|sy4';
       var geshi_classes = '(br|co|coMULTI|es|kw|me|nu|re|st|sy)[0-9]';
 
-    geshi_classes = new RegExp(geshi_classes);
-   
+   geshi_classes = new RegExp(geshi_classes);
    HTMLParser(oDokuWiki_FCKEditorInstance.GetData( true ), {
     attribute: "",
     link_title: "",
@@ -722,6 +731,7 @@ function parse_wikitext(id) {
     curid: false,
     format_in_list: false,
     prev_li: new Array(),
+    immutable_plugin: false,
 
     backup: function(c1,c2) {
         var c1_inx = results.lastIndexOf(c1);     // start position of chars to delete
@@ -801,7 +811,11 @@ function parse_wikitext(id) {
               HTMLParser_TABLE=true;
           }
        }
-
+       else if(tag == 'font') {
+          var font_family = "arial";
+          var font_size = "9pt";
+          var font_weight = "normal";
+       }
        
        if(tag == 'table') {
         this.td_no = 0;
@@ -825,8 +839,8 @@ function parse_wikitext(id) {
        
            
        }
-      
-
+       
+       
         var matches;        
         this.attr=false;    
         this.td_align = '';
@@ -836,7 +850,7 @@ function parse_wikitext(id) {
 
         for ( var i = 0; i < attrs.length; i++ ) {     
     
-          // alert(tag + ' ' + attrs[i].name + '="' + attrs[i].escaped + '"');
+           //alert(tag + ' ' + attrs[i].name + '="' + attrs[i].escaped + '"');
              if(attrs[i].escaped == 'u' && tag == 'em' ) {
                      tag = 'u';
                      this.attr='u'    
@@ -878,6 +892,28 @@ function parse_wikitext(id) {
                     this.geshi = true;  
                     break;              
                  }
+            }
+
+            if(tag == 'span' && attrs[i].name == 'id') {                   
+               if((matches= attrs[i].value.match(/imm_(\d+)/))) {                  
+                   this.immutable_plugin = fckLImmutables[matches[1]];
+               }
+            }
+            else if(tag == 'font') {
+               if(attrs[i].name == 'face') {
+                    font_family = attrs[i].value;
+               }
+               else if(attrs[i].name == 'style') {
+                   matches = attrs[i].value.match(/font-size:\s*(\d+(\w+|%))/);
+                   if(matches){
+                     font_size = matches[1];
+                   }
+                   matches = attrs[i].value.match(/font-weight:\s*(\w+)/);   
+                   if(matches) {
+                      font_weight = matches[1];
+                   }
+               }
+            
             }
             if(tag == 'td' || tag == 'th') {
               if(attrs[i].name == 'align') {
@@ -1356,6 +1392,13 @@ function parse_wikitext(id) {
                }
                return;
           }
+          else if(tag == 'font') {
+              //<font 18pt:bold/garamond>
+               var font_tag = '<font ' + font_size + ':'+ font_weight + '/'+font_family+'>';
+               results += font_tag;   
+               return;            
+       }
+
           if(this.in_endnotes && tag == 'a') return; 
 
           results += markup[tag];
@@ -1595,6 +1638,10 @@ function parse_wikitext(id) {
             this.in_link = false;
 
          }
+         else if(current_tag == 'span' ) {
+                  this.immutable_plugin = false;
+         }
+
     },
 
     chars: function( text ) {
@@ -1603,7 +1650,11 @@ function parse_wikitext(id) {
         text = text.replace(/\x20{6,}/, "   "); 
         text = text.replace(/^(&nbsp;)+/, '');
         text = text.replace(/(&nbsp;)+/, ' ');   
-        
+        if(this.immutable_plugin) {
+             text = this.immutable_plugin;
+             text = text.replace(/\/\/<\/\//g,'<');
+             this.immutable_plugin = false;
+        }
         if(this.format_tag) {
           if(!this.list_started) text = text.replace(/^\s+/, '@@_SP_@@');  
         }
@@ -1626,9 +1677,9 @@ function parse_wikitext(id) {
     }
     else {
       text = text.replace(/&lt;\s/g, '<');   
-      text = text.replace(/\s&gt;/g, '>');   
-      text = text.replace(/\\/g, '\\\\');    
+      text = text.replace(/\s&gt;/g, '>');            
     }
+
     if(this.attr && this.attr == 'dwfcknote') {
          if(text.match(/fckgL\d+/)) {
              return;
@@ -1659,7 +1710,9 @@ function parse_wikitext(id) {
     if(!this.code_type) {   // keep special character literals outside of code block
                               // don't touch samba share or Windows path backslashes
         if(!results.match(/\[\[\\\\.*?\|$/) && !text.match(/\w:(\\(\w?))+/ ))
-             text = text.replace(/([\*\\])/g, '%%$1%%');
+         {
+             text = text.replace(/([\*\\])/g, '%%$1%%');            
+         }
     }
 
     if(this.in_endnotes && HTMLParserTopNotes.length) {
@@ -1722,9 +1775,10 @@ function parse_wikitext(id) {
       we allow escaping of troublesome characters in plugins by enclosing them withinback slashes, as in \*\
       the escapes are removed here together with any DW percent escapes
    */
-     results = results.replace(/%*\\%*([^\\%]{1})%*\\%*/g, "$1"); 
 
-  
+     results = results.replace(/%*\\%*([^\\%]{1})%*\\%*/g, "$1"); 
+     
+ 
     if(id == 'test') {
       if(!HTMLParser_test_result(results)) return;     
     }
@@ -1738,6 +1792,8 @@ function parse_wikitext(id) {
         results = results.replace(regex,"$1$2$3");
         var regex = new RegExp(HTMLParser_FORMAT_SPACE + '@@_SP_@@',"g");
         results = results.replace(regex,' ');
+        results = results.replace(/\n@@_SP_@@\n/g,'');
+        results = results.replace(/@@_SP_@@\n/g,'');
         results = results.replace(/@@_SP_@@/g,'');
         var regex = new RegExp(HTMLParser_FORMAT_SPACE + '([^\\)\\]\\}\\{\\-\\.,;:\\!\?"\x94\x92\u201D\u2019' + "'" + '])',"g");
         results = results.replace(regex," $1");
@@ -1800,6 +1856,9 @@ function parse_wikitext(id) {
     }
 
    if(HTMLParser_NOWIKI) {
+      /* any characters escaped by DW %%<char>%% are replaced by NOWIKI_<char>
+         <char> is restored in save.php
+     */
       var nowiki_escapes = '%';  //this technique allows for added chars to attach to NOWIKI_$1_
       var regex = new RegExp('([' + nowiki_escapes + '])', "g");
                  
@@ -1809,7 +1868,9 @@ function parse_wikitext(id) {
                      return start + mid.replace(regex,"NOWIKI_$1_") + close; 
              });
     }
-
+    
+    results = results.replace(/\n{3,}/g,'\n\n');
+   
     if(id == 'test') {
       if(HTMLParser_test_result(results)) {
          alert(results);
@@ -1974,17 +2035,39 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
         $fckgLPluginPatterns = array();
 
         $instructions = p_get_instructions("=== header ==="); // loads DOKU_PLUGINS array --M.T. Dec 22 2009
-        $regexes = $this->get_plugins();
+
+        $installed_plugins = $this->get_plugins();
+        $regexes = $installed_plugins['plugins'];
+
         $text = preg_replace_callback('/('. $regexes .')/', 
                 create_function(
                 '$matches', 
-                'global $fckgLPluginPatterns;                                  
+                'global $fckgLPluginPatterns;                                 
                  $retv =  preg_replace("/([\{\}:&~\?\!<>])/", "$1 ", $matches[0]);            
                  $fckgLPluginPatterns[] = array($retv, $matches[0]);
                  return $retv;' 
                ),
           $text);
 
+        global $fckLImmutables;                                 
+        $fckglImmutables=array();           
+
+         foreach($installed_plugins['xcl'] as $xcl) {                           
+               $text = preg_replace_callback('/'. $xcl . '/',
+               create_function(
+               '$matches',
+              'global $fckLImmutables;
+               if(preg_match("#//<//font#",$matches[0])) {
+                   return str_replace("//<//", "<", $matches[0]);
+               }
+               $index = count($fckLImmutables);
+               $fckLImmutables[] = $matches[0]; 
+               return "<span id=\'imm_" . "$index\' title=\'imm_" . "$index\' >" . str_replace("//<//", "<", $matches[0]) . "</span>" ;' 
+              
+              ),
+          $text);   
+
+          }   
 
             global $multi_block;
             if(preg_match('/(?=MULTI_PLUGIN_OPEN)(.*?)(?<=MULTI_PLUGIN_CLOSE)/ms', $text, $matches)) {
@@ -2064,6 +2147,7 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
 
   function write_debug($what) {
      $handle = fopen("edit_php.txt", "a");
+     if(is_array($what)) $what = print_r($what,true);
      fwrite($handle,"$what\n");
      fclose($handle);
   }
@@ -2091,7 +2175,7 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
  $patterns = $DOKU_PLUGINS['syntax'][$list[0]]->Lexer->_regexes['base']->_patterns;
  $labels = array();
  $regex = '~~NOCACHE~~';
- // $regex = '';
+ 
 
  $exclusions = $this->getConf('xcl_plugins');
  $exclusions = trim($exclusions, " ,");
@@ -2118,9 +2202,33 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
     }
   
  }
-
  $regex = ltrim($regex, '|'); 
 
+ $regex_xcl = array();
+ foreach($exclusions as $plugin) {
+   if(preg_match('/fckg_dwplugin/',$plugin)) continue;
+   $plugin = 'plugin_' . $plugin;
+
+   $indices = array_keys($data, $plugin);
+   if(empty($indices)) {
+       $plugin = '_' . $plugin;
+      $indices = array_keys($data, $plugin);
+   }
+
+   if(!empty($indices)) {
+       foreach($indices as $index) { 
+            $pos = strpos($patterns[$index],'<');
+            if($pos !== false) {
+               $pattern = str_replace('<', '\/\/<\/\/', $patterns[$index]);
+               $pattern = str_replace('?=',"",$pattern);
+               $regex_xcl[] = $pattern; 
+            }
+          }
+       }
+    }
+
+ //file_put_contents('exclusions.txt', print_r($regex_xcl,true));
+ return array('plugins'=> $regex, 'xcl'=> $regex_xcl);
  return $regex; 
 
 

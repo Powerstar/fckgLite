@@ -1,4 +1,4 @@
-rev 11-Jan_02-08_44
+rev 11-Jan_05-19_22
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1376,3 +1376,22 @@ Nov 8 2009
  
  2 Jan 2011
  Added backslash and curly brackets to nowiki entity replacements in edit.php _preprocess()
+
+ 
+ Upgraded Immutable Plugin feature: (1) immutable plugins now keep their HTML formats
+ and (2) they can be edited in the plugin tool's editor, either the content or the
+ raw plugin syntax.
+
+ Also added fckg_font plugin to fckg/syntax, which enables setting of font family,
+ size, and weight.   
+   
+ 4 Jan 2011
+ Fixed bug in code blocks which multiplied backslash characters (in edit.php: chars:)
+ 
+
+ 5 Jan 2011
+ Added fonts plugin to FCKeditor, tied into syntax plugin font.php.  User can set font,
+ size, weight with plugin and edit these features.  The plugin's text can be
+ edited in situ.
+ 
+ Added additional error checking and language texts to fonts plugin.

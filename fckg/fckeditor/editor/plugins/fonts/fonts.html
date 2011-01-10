@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+	<title>insertHtml</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="robots" content="noindex, nofollow" />
+
+
+		<script type="text/javascript">
+
+var oEditor = window.parent.InnerDialogLoaded() ;
+
+var FCKFonts = oEditor.FCKFonts ;
+var FCKLang = oEditor.FCKLang ;
+var selectedText="";
+var saveSelection;
+
+window.onload = function()
+{
+    oEditor.FCKLanguageManager.TranslatePage( document );
+	document.body.style.padding = '0px' ;	
+	window.parent.SetOkButton( true ) ;
+	window.parent.SetAutoSize( true ) ;	
+
+    var sel_opts = document.getElementById('fonts_styles');
+    var font_node = checkSelection();
+
+    var face_regex = false;
+    if(font_node) {
+         var face = font_node.getAttribute('face');
+         if(face) {          
+          face_regex=new RegExp(face,'i');
+         }
+
+          var style = font_node.getAttribute('style');
+          if(style.cssText) style = style.cssText; //IE
+
+          matches = style.match(/font-size:\s*((\d+)(\w+|%))/i);
+          if(matches && matches[3].match(/pt/i)){              
+              var font_size = matches[1];
+              var sizes = document.fonts_form['size'];
+              for(var i=0; i < sizes.length; i++) {
+                 if(sizes[i].value == matches[2]) {                   
+                    sizes[i].checked = true;
+                    break;                 
+                 }
+              }         
+          }
+
+          matches = style.match(/font-weight:\s*(\w+)/i);   
+          if(matches) {
+              var font_weight = matches[1];
+              if(font_weight.match(/bold/i)) {
+                 document.fonts_form['weight'][0].checked = false;
+                 document.fonts_form['weight'][1].checked = true;
+              }
+
+          }
+
+    }
+
+
+    if(oEditor.FCKConfig && oEditor.FCKConfig.FontNames) {
+
+       var lang_opts_str = oEditor.FCKConfig.FontNames;
+       var lang_opts = lang_opts_str.split(/;/);
+       sel_opts.options[0] = new Option(FCKLang.DlgCellBtnSelect,'none',true,false);
+       for(var i=0; i < lang_opts.length; i++) {
+           if(face_regex && lang_opts[i].match(face_regex)) {
+             sel_opts.options[sel_opts.options.length] = new Option(lang_opts[i],lang_opts[i],true,true);
+             sel_opts.options[0] = new Option(FCKLang.DlgCellBtnSelect,'none',false,false);
+             face_regex=false;
+           }
+           else sel_opts.options[sel_opts.options.length] = new Option(lang_opts[i],lang_opts[i],false,false);
+       }    
+    }
+
+
+}
+function allreset(){
+    var font_node = FCKFonts.getSelection();
+    
+    if(font_node) {
+       font_node = font_node.replace(/\n/g,"");
+       matches = font_node.match(/<FONT[^>]+>(.*)<\/font/i);
+       if(matches) {
+          matches[1] = matches[1].replace(/\n+/g,"");
+         return matches[1];
+       }
+    }
+    return false;
+}
+function Ok()
+{
+
+    var select = document.getElementById('fonts_styles');
+    var selection = select.selectedIndex;
+    if(selection < 1) {
+       alert(FCKLang.FontSelectWarning);
+       return;
+    }
+    var formObj = document.fonts_form;
+    var font_weight = 'normal';
+    var font_size = '';
+
+    if(formObj['weight'][1].checked) {
+      font_weight = formObj['weight'][1].value;
+    }
+    else {
+     font_weight = formObj['weight'][0].value;
+    }
+    var sizes = formObj['size'];
+    for(var i=0; i < sizes.length; i++) {
+       if(sizes[i].checked) {
+          font_size = sizes[i].value + 'pt';
+          break;  
+       }
+    }
+   if(!font_size) {
+     font_size = formObj['other_size'].value;
+     if(font_size) {
+         font_size = font_size.replace(/\s/g,"");
+         if(font_size.length) {
+             var size_specs = formObj['size_spec'];   
+             for(var i=0; i < size_specs.length; i++) {
+               if(size_specs[i].checked) {
+                  size_spec = size_specs[i].value;
+                  break;  
+               }
+            }
+        font_size += size_spec; 
+       }
+     }
+   }
+
+   if(!font_size) {
+      alert(FCKLang.FontSizeWarning);
+      return false;
+   }
+
+    var font_node = checkSelection();
+
+    if(font_node) {
+        font_node.setAttribute('face',select.options[selection].value);
+        var style = " font-weight: " + font_weight + "; ";
+        style += " font-size: " + font_size + "; ";
+        font_node.setAttribute('style', style);         
+        return true
+   }
+
+   if(! FCKFonts.Insert(font_weight, select.options[selection].value, font_size)) {
+        alert(FCKLang.FontSelectTextWarning);
+        return false;
+   }
+
+	return true ;
+}
+
+function remove_fontSize() {
+
+    var sizes = document.fonts_form['size'];
+    for(var i=0; i < sizes.length; i++) {
+       if(sizes[i].checked) {
+          sizes[i].checked = false;
+          break;  
+       }
+    }
+
+}
+
+function checkSelection() {
+
+	if (document.selection) {													// IE
+		saveSelection = oEditor.FCK.EditorDocument.selection.createRange().text;
+	}
+	else if (window.getSelection) {												// Mozilla, Safari (ok, I know: Safari ain't supported yet!
+		saveSelection = oEditor.FCK.EditorWindow.getSelection();
+	}
+	else if (document.getSelection) {
+		saveSelection = oEditor.FCK.EditorDocument.getSelection();					// Mozilla, Netscape, Opera
+	}
+
+    if(!saveSelection) {
+        allreset();
+        saveSelection = allreset();
+        if(!saveSelection) {
+           saveSelection = allreset();
+        }
+    }
+
+    if(!saveSelection) return false;
+
+    saveSelection = saveSelection.toString();
+    saveSelection = saveSelection.replace(/<.*?>/g,"");
+    saveSelection = saveSelection.replace(/^\s+/,"");
+    saveSelection = saveSelection.replace(/\s+$/,"");
+
+    var parent = getSelectedNodeParent();
+    if(parent.nodeName.toUpperCase() == 'FONT') {
+         return parent;
+    }
+ 
+    var currentNode = getCurrentNode(parent);
+
+    if(currentNode && currentNode.nodeName.toUpperCase() == 'FONT') {
+         return currentNode;
+    }
+
+   return false;
+
+}
+
+function getCurrentNode(node) {
+  
+  var children = node.childNodes;
+
+  for(var i=0; i<children.length; i++) {
+      
+      if(children[i].nodeName == '#text') {
+        var text = children[i].nodeValue;
+
+        if(text) {
+            text = text.replace(/^\s+/);
+            text = text.replace(/\s+$/);           
+            if(text == saveSelection) {                 
+                return children[i].parentNode; 
+            }
+        }
+      }
+         var retv = getCurrentNode(children[i]);
+         if(retv) return retv;
+    }
+    return false;
+}
+
+function getSelectedNodeParent()
+{
+    if (document.selection)
+        return oEditor.FCK.EditorDocument.selection.createRange().parentElement();
+    else
+    {
+        var selection = oEditor.FCK.EditorWindow.getSelection();
+        if (selection.rangeCount > 0)
+                return selection.getRangeAt(0).startContainer.parentNode;
+    }
+}
+
+		</script>
+
+<style type="text/css">
+option, select, input,span { font-size: 9pt; }
+#fonts_types { padding: 20px; font-size: 9pt; }
+</style>
+
+
+</head>
+<body style="padding-bottom: 0px">
+
+<div id='fonts_types' >
+          <P>    
+			<span fckLang="fontsHelp" id="fontsHelp">help</span> 
+
+		
+	            
+         </p>
+
+     <form name='fonts_form'>
+     <table border='0'>
+     <th><span fckLang="FontsDlgButtonSize"></span>: </th>
+     <td><input type='radio' name='size' value='10'><span>10 pt</span>
+     <input type='radio' name='size' value='12'><span>12 pt</span>&nbsp;
+     <input type='radio' name='size' value='14'><span>14 pt</span>&nbsp;
+     <input type='radio' name='size' value='16'><span>16 pt</span>&nbsp;
+     <input type='radio' name='size' value='18'><span>18 pt</span>&nbsp;
+     </td></tr>
+     <tr><td>&nbsp;</td><td>
+     <input type='radio' name='size' value='20'><span>20 pt</span>&nbsp;
+     <input type='radio' name='size' value='24'><span>24 pt</span>&nbsp;
+     <input type='radio' name='size' value='30'><span>30 pt</span>&nbsp;
+     <input type='radio' name='size' value='36'><span>36 pt</span>&nbsp;
+     <input type='radio' name='size' value='48'><span>48 pt</span>&nbsp;
+     </td></tr>
+     <tr><th><span fckLang="FontsDlgButtonOtherSize"></span>:</th><td>
+     <input type = 'text' size = '4' value = "" name = 'other_size' onchange ='remove_fontSize();' >
+     &nbsp;<input type='radio' name='size_spec' value='px' checked><span>px</span>
+     &nbsp;&nbsp;<input type='radio' name='size_spec' value='pt'><span>pt</span>
+     &nbsp;<input type='radio' name='size_spec' value='pcent'><span>%</span>
+     &nbsp;<input type='radio' name='size_spec' value='em'><span>em</span>
+     </td></tr> 
+     </table>
+     <br><b><span fckLang="FontsDlgButtonWeight"></span>: </b><input type='radio' name='weight' value='normal' checked>
+        <span fckLang="FontsDlgNormal"></span> 
+       <input type='radio' name='weight' value='bold'><span fckLang="FontsDlgBold"></span> 
+
+       <br />
+     <p>
+			<select id="fonts_styles">
+           </select>
+   </p>
+     <br />
+    </form>
+</div>
+<script type="text/javascript">
+ 
+</script>
+</body>
+</html>

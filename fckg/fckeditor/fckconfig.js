@@ -116,8 +116,8 @@ FCKConfig.insertHtml_snippet = '<ol><li>&nbsp;</li></ol>';
 //FCKConfig.insertHtml_showDialog = true;
 FCKConfig.insertHtml_buttonTooltip = 'Insert Nested Ordered List';
 FCKConfig.Plugins.Add( 'geshi', 'en') ;
+FCKConfig.Plugins.Add( 'fonts', 'en') ;
 FCKConfig.Plugins.Add('keyboard', 'en') ;
-
 
 FCKConfig.ToolbarSets["Default"] = [
 	['Source','DocProps','-','Save','NewPage','Preview','-','Templates'],
@@ -175,7 +175,7 @@ FCKConfig.EnableMoreFontColors = true ;
 FCKConfig.FontColors = '000000,993300,333300,003300,003366,000080,333399,333333,800000,FF6600,808000,808080,008080,0000FF,666699,808080,FF0000,FF9900,99CC00,339966,33CCCC,3366FF,800080,999999,FF00FF,FFCC00,FFFF00,00FF00,00FFFF,00CCFF,993366,C0C0C0,FF99CC,FFCC99,FFFF99,CCFFCC,CCFFFF,99CCFF,CC99FF,FFFFFF' ;
 
 FCKConfig.FontFormats	= 'p;h1;h2;h3;h4;h5';  // code
-FCKConfig.FontNames		= 'Arial;Comic Sans MS;Courier New;Tahoma;Times New Roman;Verdana;Gill Sans,Gill Sans MT,Arial;Copperplate Gothic Light,CopperplateLight;Baskerville,Baskerville Old Face;Lucida Bright;Palatino, Palatino Linotype';
+FCKConfig.FontNames		= 'Arial;Comic Sans MS;Courier New;Tahoma;Times New Roman;Verdana;Gill Sans,Gill Sans MT,Arial;Copperplate Gothic Light,CopperplateLight;Baskerville,Baskerville Old Face;Lucida Bright;Palatino, Palatino Linotype;Garamond';
 //FCKConfig.FontSizes		= 'smaller;larger;xx-small;x-small;small;medium;large;x-large;xx-large' ;
 FCKConfig.FontSizes		= '6pt;8pt;9pt;10pt;11pt;12pt;14pt;16pt;18pt;24pt;36pt' ;
 
@@ -205,6 +205,7 @@ FCKConfig.ProtectedTags = 'indent' ;
 FCKConfig.ProtectedTags = 'header' ;
 FCKConfig.ProtectedTags = 'plugin' ;
 FCKConfig.ProtectedTags = 'fckg' ;   
+//FCKConfig.ProtectedTags = 'font' ; 
 
 // This will be applied to the body element of the editor
 FCKConfig.BodyId = '' ;
@@ -370,7 +371,7 @@ FCKConfig.ToolbarSets["DokuwikiGuest"] = [
 FCKConfig.ToolbarSets["Dokuwiki"] = [   
   ['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript'],   
   ['OrderedList','UnorderedList','insertHtml','insertHtmlunorderedList', 'insertHtmlCode' ],
-  ['Rule', 'Smiley', 'SpecialChar', 'Style'], [],  
+  ['Rule', 'Smiley', 'SpecialChar', 'Style'], [],['fonts'],  
   ['Cut','Copy','Paste','PasteText','PasteWord', 'SpellCheck', 'Find'],   
   ['FontFormat'], ['Undo','Redo','RemoveFormat', '-','Table' ],   
   ['Plugin_Tool',  'Delete_P' ],['FitWindow'],

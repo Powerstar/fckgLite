@@ -30,6 +30,10 @@ var oEditor	= window.parent.InnerDialogLoaded() ;
 var FCKLang	= oEditor.FCKLang ;
 var FCKAbbr	= oEditor.FCKAbbr ;
 var FCKAbbrSelection;
+var immutable_plugin;
+var immutable_id;
+var immutable_text;
+
 window.onload = function () {
 	// First of all, translate the dialog box texts
 	oEditor.FCKLanguageManager.TranslatePage( document );
@@ -90,9 +94,22 @@ function Ok() {
         document.getElementById("infotext").value = 'stet';
     }
     if(document.getElementById("edit").checked) {
-        //document.getElementById("infotext").value = 'edited';
-        FCKAbbr.InsertEdited(document.getElementById("edited_text").value);
-        return true;
+       var checked = document.getElementById('revise_imm_markup').checked;
+
+       if(checked) {
+             oEditor.FCK.fckLImmutables[immutable_id] = document.getElementById("edited_text").value ;
+             return true;
+       }
+          FCKAbbr.InsertEdited(document.getElementById("edited_text").value);
+       
+       if(immutable_plugin) {
+         var regex = new RegExp(">.*<");
+         immutable_plugin = immutable_plugin.replace(regex,'>' + document.getElementById("edited_text").value + '//<');
+         immutable_plugin = immutable_plugin.replace(/\/{2}<\/{2}/g, '<');
+         oEditor.FCK.fckLImmutables[immutable_id] = immutable_plugin;
+       }
+
+       return true;
     }
 
 
@@ -106,13 +123,13 @@ function Ok() {
             FCKAbbr.Insert(document.getElementById("infotext").value, oEditor.FCKBrowserInfo.IsSafari, document.getElementById("stet").checked);
 		}
 		else {	
-												// otherwise, make a new abbr, with or without title
+												// otherwise, make a new element, with or without title
 			FCKAbbr.Insert(document.getElementById("infotext").value, oEditor.FCKBrowserInfo.IsSafari, document.getElementById("stet").checked);
 		}
 
 	return true;
 }
-
+var saveSelection = "";
 function checkSelection () {
 	if (document.selection) {													// IE
 		oSelection = oEditor.FCK.EditorDocument.selection.createRange().text;
@@ -124,8 +141,77 @@ function checkSelection () {
 		oSelection = oEditor.FCK.EditorDocument.getSelection();					// Mozilla, Netscape, Opera
 	}
 
+    var parent = getSelectedNodeParent().parentNode;    
+    var id = parent ?  parent.getAttribute('id') : false ;
+
+    if(!id) {  //IE when selection overshoots span element
+        saveSelection = oSelection.toString();       
+        saveSelection = saveSelection.replace(/^\s+/,"");       
+        saveSelection = saveSelection.replace(/\s+$/,"");     
+        parent = getCurrentNode(parent);
+        id = parent ?  parent.getAttribute('id') : false ;
+        // id = parent.getAttribute('id');
+        if(!id || !id.match(/imm_\d+/)) {
+            if(parent && parent.parentNode) {
+               id = parent.parentNode.getAttribute('id');
+            }
+        }
+    }
+
+    if(id) {
+      if((matches= id.match(/imm_(\d+)/))) {              
+            immutable_plugin = oEditor.FCK.fckLImmutables[matches[1]];
+            immutable_id = matches[1];
+            immutable_text = oSelection.toString();
+            
+      }
+
+    }
+
 	return oSelection;
 
+}
+
+function getCurrentNode(node) {
+  
+  var children = node.childNodes;
+  
+  for(var i=0; i<children.length; i++) {
+      
+      if(children[i].nodeName == '#text') {
+        var text = children[i].nodeValue;
+        if(text) {
+            text = text.replace(/^\s+/);
+            text = text.replace(/\s+$/);
+            if(text == saveSelection) {                 
+                return children[i].parentNode; 
+            }
+        }
+      }
+         var retv = getCurrentNode(children[i]);
+         if(retv) return retv;
+    }
+    
+}
+function toggleImmutable() {
+   var checked = document.getElementById('revise_imm_markup').checked;
+   
+   if(checked) {
+      document.getElementById('edited_text').value  = immutable_plugin.replace(/\/{2}<\/{2}/g, '<');
+   }
+   else document.getElementById('edited_text').value = immutable_text;
+}
+
+function getSelectedNodeParent()
+{
+    if (document.selection)
+        return oEditor.FCK.EditorDocument.selection.createRange().parentElement();
+    else
+    {
+        var selection = oEditor.FCK.EditorWindow.getSelection();
+        if (selection.rangeCount > 0)
+                return selection.getRangeAt(0).startContainer.parentNode;
+    }
 }
 
 function getoLink () {
@@ -148,7 +234,11 @@ function openEditor() {
         document.getElementById('stet_checkbox').style.display = 'none';
         document.getElementById('edit_checkbox').style.display = 'none';
         document.getElementById('editing_area').style.display = 'block';
-
+        if(immutable_plugin) {
+            document.getElementById('imm_revise_dlg').style.display = 'block';
+           // document.getElementById('editing_area_header').innerHTML = "Immutable Plugin Editor";
+            document.getElementById('editing_area_header').style.display = 'inline';
+        }
         var str = FCKAbbrSelection.toString();
         str = str.replace(/([\{\}:~\?\!])\s/g, "$1");
         document.getElementById('edited_text').value = str;
@@ -161,12 +251,13 @@ function openEditor() {
 <style type="text/css">
 #message, #inputfield, #checkbox,#stet_checkbox, #edit_checkbox, #editing_area { display: none; }
 #inputfield, .title { font-size: 10pt; }
-#checkbox,#stet_checkbox, #edit_checkbox, #message, #edited_text { font-size: 9pt; }
+#checkbox,#stet_checkbox, #edit_checkbox, #edited_text { font-size: 9pt; }
+#message { font-size: 11pt; color: white; background-color:blue; }
 abbr { border-bottom: 1px dotted rgb(102, 102, 102); cursor: help; }
 </style>
 
 </head>
-<body scroll="no" style="OVERFLOW: hidden">
+<body  style="OVERFLOW: auto">
 
 <table cellSpacing="8"  cellPadding="0" align="center" border="0">
 <tr>
@@ -202,11 +293,19 @@ abbr { border-bottom: 1px dotted rgb(102, 102, 102); cursor: help; }
 </td>
 </tr>
 </table>
-<div id='editing_area'>
+
+<div id='editing_area' style="display:none;">
+<span id="editing_area_header" style="font-size:175%; font-weight:bold; display:none;"
+              fckLang="ImmutableEditorHeader">Immutable Plugin Editor</span><br/><br/>
 <textarea id="edited_text" rows=8 cols=40>
 text area
 </textarea>
-
+<br>
+<div id="imm_revise_dlg" style = 'display:none'>
+<input id="revise_imm_markup" onclick="toggleImmutable();" type="checkbox">&nbsp;&nbsp;&nbsp;
+<label for="imm_revise_markup"><span style="font-size:150%" fckLang="AbbrDlgImmRevise"
+>Revise Plugin Syntax</span></label></div>
+</div>
 </div>
 
 
