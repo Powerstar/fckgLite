@@ -2043,7 +2043,7 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
                 create_function(
                 '$matches', 
                 'global $fckgLPluginPatterns;                                 
-                 $retv =  preg_replace("/([\{\}:&~\?\!<>])/", "$1 ", $matches[0]);            
+                 $retv =  preg_replace("/([\{\}\@\:&~\?\!<>])/", "$1 ", $matches[0]);            
                  $fckgLPluginPatterns[] = array($retv, $matches[0]);
                  return $retv;' 
                ),
@@ -2198,10 +2198,11 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
        foreach($indices as $index) {
           $labels[] = "$index: " . $patterns[$index];         
           $pattern = $patterns[$index];       
+          $pattern = preg_replace('/^\(\^/',"(",$pattern); 
           $regex .= "|$pattern";       
        }
     }
-  
+
  }
  $regex = ltrim($regex, '|'); 
 
