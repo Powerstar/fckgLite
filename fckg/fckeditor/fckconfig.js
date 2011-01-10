@@ -176,6 +176,7 @@ FCKConfig.FontColors = '000000,993300,333300,003300,003366,000080,333399,333333,
 
 FCKConfig.FontFormats	= 'p;h1;h2;h3;h4;h5';  // code
 FCKConfig.FontNames		= 'Arial;Comic Sans MS;Courier New;Tahoma;Times New Roman;Verdana;Gill Sans,Gill Sans MT,Arial;Copperplate Gothic Light,CopperplateLight;Baskerville,Baskerville Old Face;Lucida Bright;Palatino, Palatino Linotype;Garamond';
+
 //FCKConfig.FontSizes		= 'smaller;larger;xx-small;x-small;small;medium;large;x-large;xx-large' ;
 FCKConfig.FontSizes		= '6pt;8pt;9pt;10pt;11pt;12pt;14pt;16pt;18pt;24pt;36pt' ;
 
@@ -232,6 +233,33 @@ FCKConfig.CustomStyles =
 {
 //	'Red Title'	: { Element : 'h3', Styles : { 'color' : 'Red' } }
 };
+
+FCKConfig.FontNamesArray = Array(
+'Arial',
+'Arial Black',
+'Arial Narrow',
+'Arial Rounded MT Bold',
+'Baskerville, Baskerville Old Face',
+'Bauhaus 93',
+'Comic Sans MS',
+'Copperplate, Copperplate Gothic Bold',
+'Courier',
+'Courier New',
+'Futura, Futura Md BT',
+'Georgia',
+'Garamond',
+'Helvetica',
+'Impact',
+'Sans-serif',
+'Microsoft Sans Serif',
+'Serif',
+'Palatino, Palatino Linotype',
+'Papyrus',
+'Tahoma',
+'Times New Roman',
+'Trebuchet MS',
+'Verdana'
+);
 
 // Do not add, rename or remove styles here. Only apply definition changes.
 FCKConfig.CoreStyles = 

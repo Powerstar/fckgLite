@@ -24,7 +24,7 @@
 
 FCKCommands.RegisterCommand( 'fonts',
    new FCKDialogCommand( FCKLang['FontsDlgTitle'], FCKLang['FontsDlgTitle'],  
-   FCKConfig.PluginsPath + 'fonts/fonts.html',  475, 400 ) ) ;
+   FCKConfig.PluginsPath + 'fonts/fonts.html',  550, 500 ) ) ;
 
 
 var oFontsTool		= new FCKToolbarButton( 'fonts',  FCKLang['FontsToolTip'] ) ;
@@ -66,8 +66,11 @@ FCKFonts.getSelection = function(){
 
 FCKFonts.haveSelection = function() {
     isSafari = false;
+    if(FCKBrowserInfo.IsIE) return true;
     if(!FCKBrowserInfo.IsIE && !FCKBrowserInfo.IsGecko) isSafari = true;
+     
 	mySelection = ( FCKBrowserInfo.IsIE) ? FCKSelection.GetSelectedHTML(isSafari) : removeBR(FCKSelection.GetSelectedHTML(isSafari),false);
+
     return mySelection;
 }
 FCKFonts.InsertEdited = function(val) {
@@ -81,7 +84,8 @@ FCKFonts.InsertEdited = function(val) {
 FCKSelection.GetSelectedHTML = function(isSafari) {	
 
 							// see http://www.quirksmode.org/js/selected.html for other browsers
-	if( FCKBrowserInfo.IsIE) {												// IE
+	if( FCKBrowserInfo.IsIE) {	
+        											// IE
 		var oRange = FCK.EditorDocument.selection.createRange() ;
 		//if an object like a table is deleted, the call to GetType before getting again a range returns Control
 		switch ( this.GetType() ) {

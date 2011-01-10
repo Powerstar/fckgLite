@@ -1,4 +1,4 @@
-rev 11-Jan_05-19_22
+rev 11-Jan_07-20_49
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1392,6 +1392,25 @@ Nov 8 2009
  5 Jan 2011
  Added fonts plugin to FCKeditor, tied into syntax plugin font.php.  User can set font,
  size, weight with plugin and edit these features.  The plugin's text can be
- edited in situ.
+ edited in situ. edit.php parser has been upgraded to handle the font tag and create
+ the font plugin syntax, which is what is saved to the DW file.  
  
  Added additional error checking and language texts to fonts plugin.
+  
+ 6 Jan 2011
+ Added a Remove All formatting facility, which removes the font tag which formats
+ the text.
+  
+ Added the fckg_font plugin to the permanent list of excluded (immutable) plugins in
+ edit.php get_plugins().
+ 
+ Removed new lines from immutable plugin texts when edited in plugin tool editor.
+ 
+ 7 Jan 2011
+ Fixed bug in fonts plugin tool which caused tool to fail when text was not selected
+ in Safaris and Chrome.
+ 
+ Added samples pane to fonts plugin tool.
+ 
+ Fonts tool: Added auto recognition of non-standard font sizes, i.e. em and px and point
+ sizes not included in radio button selections.

@@ -2180,6 +2180,7 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
  $exclusions = $this->getConf('xcl_plugins');
  $exclusions = trim($exclusions, " ,");
  $exclusions = explode  (',', $exclusions);
+ $exclusions[] = 'fckg_font';
  $list = array_diff($list,$exclusions);
 
  foreach($list as $plugin) {
