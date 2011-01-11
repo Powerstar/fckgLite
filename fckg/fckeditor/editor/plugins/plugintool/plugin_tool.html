@@ -96,8 +96,16 @@ function Ok() {
     if(document.getElementById("edit").checked) {
        var checked = document.getElementById('revise_imm_markup').checked;
 
-       if(checked) {
-             oEditor.FCK.fckLImmutables[immutable_id] = document.getElementById("edited_text").value ;
+       if(checked) {       
+         text =  document.getElementById("edited_text").value ;
+         text = text.replace(/\n/g,"");
+         text = text.replace(/\s+/g," ");
+         oEditor.FCK.fckLImmutables[immutable_id] = text;
+         var regex = new RegExp(">(.*)<");
+         matches = text.match(regex);
+         if(matches && matches[1]){
+           FCKAbbr.InsertEdited(matches[1]);
+         }
              return true;
        }
        

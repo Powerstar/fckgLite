@@ -1,4 +1,4 @@
-rev 11-Jan_10-10_48
+rev 11-Jan_11-08_55
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1420,3 +1420,11 @@ Nov 8 2009
  get_plugins().  They are not needed for fckgLite's plugin recognition and parsing and
  cause plugins not to be recognized, since they indicate start of pattern and in fckgLite
  all plugin patterns are combined into a single string.
+ 
+ Fixed incorrectly escaped backslash character in callback function that replaces nowiki
+ characters with html entities (edit.php).
+
+ 11 Jan 2011
+ Upgraded plugin tool: in raw syntax mode the edited HTML text is now inserted in place in the
+ FCKeditor, whereas previously the edited text did not appear unitl after a save, when
+ the new raw plugin text replaced the old.
