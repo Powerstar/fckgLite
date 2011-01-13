@@ -200,11 +200,15 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
             $pr = true; //preview mode
         }
        
-       $pos = strpos($text, '<');
-      
-      
-       if($pos !== false) {
 
+      if(strpos($text, '%%') !== false) {
+       $text= preg_replace('/%%\s*<([^%]+)>\s*%%/m','<nowiki><$1></nowiki>',$text);        
+       $text= preg_replace('/%%\s*\{([^%]+)\}\s*%%/m','<nowiki>{$1}</nowiki>',$text);        
+       $text= preg_replace('/%%\s*([~#\:\^])([^%]+)\1\s*%%/m','<nowiki>$1$2$1</nowiki>',$text);        
+      }
+
+       $pos = strpos($text, '<');
+       if($pos !== false) {
 
            $text = preg_replace_callback(
             '/(<nowiki>)(.*?)(<\/nowiki>)/ms',          
@@ -262,7 +266,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
        $text = preg_replace('/(={3,}.*?)(\{\{.*?\}\})(.*?={3,})/',"$1$3\n$2",$text);
        $email_regex = '/\/\/\<\/\/(.*?@.*?)>/';
        $text = preg_replace($email_regex,"<$1>",$text);
-      
+
        $this->xhtml = $this->_render_xhtml($text);
        $this->xhtml = str_replace("__GESHI_QUOT__", '&#34;', $this->xhtml);
 

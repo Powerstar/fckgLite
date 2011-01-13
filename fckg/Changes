@@ -1,4 +1,4 @@
-rev 11-Jan_11-08_55
+rev 11-Jan_12-22_40
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1428,3 +1428,12 @@ Nov 8 2009
  Upgraded plugin tool: in raw syntax mode the edited HTML text is now inserted in place in the
  FCKeditor, whereas previously the edited text did not appear unitl after a save, when
  the new raw plugin text replaced the old.
+
+ 12 Jan 2011
+ Added check to edit.php _preprocess() that enables user to bracket plugin-type syntax pairs
+ between Dokuwiki percent escapes, as in %%<WRAP>%%.  It converts the percents to nowiki
+ tags.  It's a convenience to escape plugins for comment-type situations
+ without fear that matching closing markup will be mistaken for the plugin itself. The check
+ is for pairs of the following characters: ~#:^ and then these pairs: {} <>. But
+ it also covers situations where a file is imported into fckgLite which may use this
+ technique.
