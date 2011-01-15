@@ -1403,7 +1403,7 @@ function parse_wikitext(id) {
        }
 
           if(this.in_endnotes && tag == 'a') return; 
-
+          if(this.code_type && tag == 'span') tag = 'blank'; 
           results += markup[tag];
 
           if(tag == 'td' || tag == 'th') {
@@ -1478,6 +1478,8 @@ function parse_wikitext(id) {
           this.code_snippet = false;
           return; 
       }
+
+     if(this.code_type && tag == 'span') tag = 'blank'; 
      var current_tag = tag;
      if(this.footnote) {
        tag = 'fn_end';
@@ -1827,6 +1829,9 @@ function parse_wikitext(id) {
       results = results.replace(/\s+<\/(code|file)>/g, "\n</" + "$1" + ">");
       if(HTMLParser_Geshi) {
         results = results.replace(/\s+;/mg, ";");
+        results = results.replace(/&lt;\s+/mg, "<");
+        results = results.replace(/\s+&gt;/mg, ">");
+
       }
     }
 
