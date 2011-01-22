@@ -58,7 +58,6 @@ class syntax_plugin_fckg_font extends DokuWiki_Syntax_Plugin {
                         }
 
                 }
-               // if(isset($face)) $face = "font-family:$face;";
                            
                 return array($state, array($size, $face));
  
@@ -74,12 +73,26 @@ class syntax_plugin_fckg_font extends DokuWiki_Syntax_Plugin {
     function render($mode, &$renderer, $data) {
         if($mode == 'xhtml'){
             list($state, $match) = $data;
-    //        $match = $this->normalize_syntax($match);
 
             switch ($state) {
               case DOKU_LEXER_ENTER :      
-                list($size, $face) = $match;
-                $renderer->doc .= "<font face='$face' style='$size'>"; 
+                list($style, $face) = $match;
+                if(isset($face)) {
+                    list($face,$fg,$bg) = explode(';;',$face);
+                    if(isset($fg)) {
+                         $color = " color: $fg; ";  
+                         $style .= $color;
+                            
+                    }
+                    if(isset($bg)) {
+                         $color = " background-color: $bg ";  
+                         $style .= $color;
+                            
+                    }
+
+                }
+ 
+                $renderer->doc .= "<font face='$face' style='$style'>"; 
                 break;
  
               case DOKU_LEXER_UNMATCHED :  $renderer->doc .= $renderer->_xmlEntities($match); break;

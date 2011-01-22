@@ -1,4 +1,4 @@
-rev 11-Jan_15-13_14
+rev 11-Jan_20-21_49
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1441,3 +1441,9 @@ Nov 8 2009
  15 Jan 2011
  Fixed bug in handling of Geshi blocks, where extra newlines were inserted after 
  uncaught Geshi span tags.
+ 
+ 20 Jan 2011
+ Upgraded fonts plugin to handle font color.
+ 
+ Implemented a fix for tables which take on extra cells when text markup
+ is included in a colspan cell.

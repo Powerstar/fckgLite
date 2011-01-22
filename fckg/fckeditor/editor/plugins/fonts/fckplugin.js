@@ -35,11 +35,14 @@ FCKToolbarItems.RegisterItem( 'fonts', oFontsTool ) ;
 // The object used for all Fonts operations.
 var FCKFonts = new Object() ;
 
-FCKFonts.Insert = function(font_weight, font_family, font_size) {
+FCKFonts.Insert = function(font_weight, font_family, font_size, fg_color, bg_color) {
     
     var isSafari = false;
     var style = " font-weight: " + font_weight + "; ";
     style += " font-size: " + font_size + "; ";
+    style += " color: " + fg_color + "; ";
+    style += " background-color: " + bg_color + "; ";    
+
 	var hrefStartHtml	=  '<font face="'+ font_family + '" style="' + style + '">';
 	var hrefEndHtml		=  '</font>';
 
@@ -80,6 +83,9 @@ FCKFonts.InsertEdited = function(val) {
 	FCK.InsertHtml(hrefHtml);
 }
 
+FCKFonts.isIE = function() {
+return FCKBrowserInfo.IsIE;
+}
 
 FCKSelection.GetSelectedHTML = function(isSafari) {	
 

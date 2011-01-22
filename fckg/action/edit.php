@@ -818,6 +818,8 @@ function parse_wikitext(id) {
           var font_family = "arial";
           var font_size = "9pt";
           var font_weight = "normal";
+          var font_color = ""; 
+          var font_bgcolor = "";
        }
        
        if(tag == 'table') {
@@ -853,7 +855,7 @@ function parse_wikitext(id) {
 
         for ( var i = 0; i < attrs.length; i++ ) {     
     
-           //alert(tag + ' ' + attrs[i].name + '="' + attrs[i].escaped + '"');
+          // alert(tag + ' ' + attrs[i].name + '="' + attrs[i].escaped + '"');
              if(attrs[i].escaped == 'u' && tag == 'em' ) {
                      tag = 'u';
                      this.attr='u'    
@@ -915,6 +917,20 @@ function parse_wikitext(id) {
                    if(matches) {
                       font_weight = matches[1];
                    }
+                   matches = attrs[i].value.match(/[^\-]color:\s*([#\w\s\d,\(\)]+);?/);   
+                   if(matches) {
+                      font_color = matches[1];
+                   }
+                 matches = attrs[i].value.match(/background[-]color:\s*([#\w\s\d,\(\)]+);?/i);
+             //      matches = attrs[i].value.match(/background\-color:\s*(.*);?/);   
+                   if(matches) {
+                      font_bgcolor = matches[1];
+                   }
+
+
+               }
+               else if(attrs[i].name == 'color') {
+                    font_color = attrs[i].value;
                }
             
             }
@@ -1396,7 +1412,9 @@ function parse_wikitext(id) {
                return;
           }
           else if(tag == 'font') {
-              //<font 18pt:bold/garamond>
+              /* <font 18pt:bold/garamond;;color;;background_color>  */
+               if(font_color) font_family = font_family + ';;'+ font_color;
+               if(font_bgcolor) font_family = font_family + ';;'+ font_bgcolor;
                var font_tag = '<font ' + font_size + ':'+ font_weight + '/'+font_family+'>';
                results += font_tag;   
                return;            
@@ -1839,7 +1857,15 @@ function parse_wikitext(id) {
      results += "\n" + line_break_final + "\n";
      var regex = new RegExp(HTMLParserParaInsert,"g");
      results = results.replace(regex, ' ' +line_break_final + ' ');
+   // fix for colspans which have had text formatting which cause extra empty cells to be created
+    results = results.replace(/\|[ ]+\|\s$/g, "\|\n");
+    results = results.replace(/\|[ ]+\|/g, "\|");
+    
     }
+
+//    results = results.replace(/\|[ ]+\|\s$/g, "\|\n");
+  //  results = results.replace(/\|[ ]+\|/g, "\|");
+
 
     if(HTMLParserOpenAngleBracket) {
          results = results.replace(/\/\/&lt;\/\/\s*/g,'&lt;');
