@@ -848,7 +848,7 @@ function parse_wikitext(id) {
        
         var matches;        
         this.attr=false;    
-        this.td_align = '';
+       // this.td_align = '';
         this.format_tag = false;
         if(format_chars[tag])this.format_tag = true;
         var dwfck_note = false;  
@@ -1424,7 +1424,7 @@ function parse_wikitext(id) {
           if(this.code_type && tag == 'span') tag = 'blank'; 
           results += markup[tag];
 
-          if(tag == 'td' || tag == 'th') {
+          if(tag == 'td' || tag == 'th' || (this.last_col_pipes && this.td_align == 'center')) {
               if(this.is_rowspan) {          
                 results +=  markup['row_span'] + ' | ';
                 this.is_rowspan = false;             
@@ -1590,7 +1590,7 @@ function parse_wikitext(id) {
                tag  = '|' + markup['row_span'] + "|\n";
       }
     }
-    else if(current_tag == 'td') {
+    else if(current_tag == 'td' || current_tag == 'th') {
        this.last_col_pipes = "";     
     }
     
@@ -1626,6 +1626,8 @@ function parse_wikitext(id) {
         if(this.td_colspan) {    
             if(this.td_align == 'center') results += ' ';    
             var colspan = "|";
+            if(current_tag == 'th')
+                   colspan = '^';
             for(var i=1; i < this.td_colspan; i++) {
                 colspan += '|'; 
             }
@@ -1670,9 +1672,11 @@ function parse_wikitext(id) {
     chars: function( text ) {
 
     if(!this.code_type) { 
-        text = text.replace(/\x20{6,}/, "   "); 
-        text = text.replace(/^(&nbsp;)+/, '');
-        text = text.replace(/(&nbsp;)+/, ' ');   
+        if(! this.last_col_pipes) {
+            text = text.replace(/\x20{6,}/, "   "); 
+            text = text.replace(/^(&nbsp;)+/, '');
+            text = text.replace(/(&nbsp;)+/, ' ');   
+        }
         if(this.immutable_plugin) {
              text = this.immutable_plugin;
              text = text.replace(/\/\/<\/\//g,'<');
@@ -1858,14 +1862,10 @@ function parse_wikitext(id) {
      var regex = new RegExp(HTMLParserParaInsert,"g");
      results = results.replace(regex, ' ' +line_break_final + ' ');
    // fix for colspans which have had text formatting which cause extra empty cells to be created
-    results = results.replace(/\|[ ]+\|\s$/g, "\|\n");
-    results = results.replace(/\|[ ]+\|/g, "\|");
+     results = results.replace(/(\||\^)[ ]+(\||\^)\s$/g, "$1\n");
+     results = results.replace(/(\||\^)[ ]+(\||\^)/g, "$1");
     
     }
-
-//    results = results.replace(/\|[ ]+\|\s$/g, "\|\n");
-  //  results = results.replace(/\|[ ]+\|/g, "\|");
-
 
     if(HTMLParserOpenAngleBracket) {
          results = results.replace(/\/\/&lt;\/\/\s*/g,'&lt;');

@@ -1,4 +1,4 @@
-rev 11-Jan_20-21_49
+rev 11-Jan_25-14_05
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1447,3 +1447,8 @@ Nov 8 2009
  
  Implemented a fix for tables which take on extra cells when text markup
  is included in a colspan cell.
+ 
+ 25 Jan 2011
+ Additional code and fixes to handle complex configurations of table colspans.  
+ (Still to be done: better handling of table header markup with colspans; the colspans
+ are accurate but the header markup gets lost in some configurations.)
