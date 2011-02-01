@@ -1037,13 +1037,37 @@ function Ok()
 		SetAttribute( oLink, 'type'		, GetE('txtAttContentType').value ) ;
 		SetAttribute( oLink, 'charset'	, GetE('txtAttCharSet').value ) ;
 
-        if(GetE('cmbLinkType').value == 'other_mime') {
-             SetAttribute( oLink, 'type', 'other_mime');
+        var sLinkType = GetE('cmbLinkType').value;
+         var classes = GetE('txtAttClasses').value;
+        if(sLinkType == 'other_mime') {
+              SetAttribute( oLink, 'type', 'other_mime');                
+              if(!classes.match(/mediafile/)) {
+                 var matches = sUri.match(/\.(\w+)$/);
+                 if(matches && matches[1]) {
+                   GetE('txtAttClasses').value += ' mediafile mf_'+ matches[1] + ' ';   
+                 }
+                 else GetE('txtAttClasses').value += ' mediafile ';
+             }
+  
         }
-        if(GetE('cmbLinkType').value == 'internal') {
+        else if(sLinkType == 'internal') {
+             if(!classes.match(/wikilink/)) {
+                 GetE('txtAttClasses').value += ' wikilink1 ';
+             }
              SetAttribute( oLink, 'type', 'internal');
              SetAttribute( oLink, 'title', GetE('txtDokuWikiId').value);
         }
+
+        else if(sLinkType == 'url'){
+            GetE('txtAttClasses').value += ' urlextern ';
+        }
+        else if(sLinkType == 'samba'){
+            GetE('txtAttClasses').value += ' windows ';
+        }
+        else if(sLinkType == 'email'){
+            GetE('txtAttClasses').value += ' mail ';
+        }
+
 
 		if ( oEditor.FCKBrowserInfo.IsIE )
 		{

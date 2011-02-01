@@ -100,15 +100,6 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
         global $REV;
         global $INFO;
 
-        global $WASSHOW;
-        // load the text and check if it is a fck
-        if($INFO['exists']){
-            if($RANGE){
-                list($PRE,$text,$SUF) = rawWikiSlices($RANGE,$ID,$REV);
-            }else{
-                $text = rawWiki($ID,$REV);
-            }
-        }
         $event->data['script'][] = 
             array( 
                 'type'=>'text/javascript', 
@@ -159,7 +150,6 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
    /**
     * function _preprocess
 	* @author  Myron Turner <turnermm02@shaw.ca>
-    * @author  Pierre Spring <pierre.spring@liip.ch>
     */
     function _preprocess()
     {
@@ -182,9 +172,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                 $SUM = $lang['created'];
             }
         }
-        //no text? Load it!
-        if(!isset($text)){
-            $pr = false; //no preview mode
+        
             if($INFO['exists']){
                 if($RANGE){
                     list($PRE,$text,$SUF) = rawWikiSlices($RANGE,$ID,$REV);
@@ -193,13 +181,9 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                 }
             }else{
                 //try to load a pagetemplate
-                $data = array($ID);
-                $text = trigger_event('HTML_PAGE_FROMTEMPLATE',$data,'pageTemplate',true);
+                 $text = pageTemplate($ID);
             }
-        }else{
-            $pr = true; //preview mode
-        }
-       
+              
 
       if(strpos($text, '%%') !== false) {
        $text= preg_replace('/%%\s*<([^%]+)>\s*%%/m','<nowiki><$1></nowiki>',$text);        
@@ -334,9 +318,8 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
         global $SUM;
         $wr = $INFO['writable'];
         if($wr){
-            if ($REV) print p_locale_xhtml('editrev');
-            print p_locale_xhtml($include);
-            $ro=false;
+           if ($REV) print p_locale_xhtml('editrev');          
+           $ro=false;
         }else{
             // check pseudo action 'source'
             if(!actionOK('source')){

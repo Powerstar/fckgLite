@@ -1,4 +1,4 @@
-rev 11-Jan_25-14_05
+rev 11-Jan_31-17_10
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1452,3 +1452,13 @@ Nov 8 2009
  Additional code and fixes to handle complex configurations of table colspans.  
  (Still to be done: better handling of table header markup with colspans; the colspans
  are accurate but the header markup gets lost in some configurations.)
+ 
+ 30 Jan 2011
+ Added CSS to FCKeditor's editing area (fck_editorarea.css) to match dokuwiki's handling of
+ link display.  This required outputting matching classes from fck_link.js, which 
+ results in matching link colors and link icons.
+ 
+ 31 Jan  2011
+ Added CSS for editing area email and fixed url for mediafile icon (See 30 Jan).   
+ 
+ Cleaned up some extraneous coding in edit.php.
