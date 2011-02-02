@@ -1342,6 +1342,7 @@ function parse_wikitext(id) {
                     this.list_started = true;
               }
               results = results.replace(/[\x20]+$/,"");  
+              results = results.replace(/_@ACRO_SPACE@_OS\s+$/,"_@ACRO_SPACE@_OS");  
 
               for(var s=0; s < this.list_level; s++) {
 
