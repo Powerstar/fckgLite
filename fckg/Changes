@@ -1,4 +1,4 @@
-rev 11-Jan_31-17_10
+rev 11-Feb_01-14_39
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1462,3 +1462,14 @@ Nov 8 2009
  Added CSS for editing area email and fixed url for mediafile icon (See 30 Jan).   
  
  Cleaned up some extraneous coding in edit.php.
+ 
+ 1 Feb 2011
+ Fixed deleted empty table cells that resulted from recent upgrade to colspans in
+ table handling: insert into valid empty cells the temporary marker _FCKG_BLANK_TD_ 
+ to prevent the empty td/th cells from being removed 
+
+ Start tables with <span class='np_break'>&nbsp;<\/span> to isolate them from 
+ top margin of edting window (in renderer.php)
+
+ Added newline to end of end non-parsed blocks np_break markup (\n_fckg_NPBBR_\n) to keep 
+  \n_fckg_NPBBR_ butting up; against intial table markup and so interfering with frist row of table

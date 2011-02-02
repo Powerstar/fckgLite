@@ -99,6 +99,7 @@ class renderer_plugin_fckg extends Doku_Renderer_xhtml
         $this->doc .= '</strike>';
     }
     
+     // isolate table from bottom and top editor window margins
     function table_close()
     {
         global $conf;  
@@ -106,6 +107,11 @@ class renderer_plugin_fckg extends Doku_Renderer_xhtml
         if($this->dwiki_version >= $this->ver_anteater) {
            $this->doc .= "</div>";
         }
+    }
+    
+    function table_open($maxcols = null, $numrows = null, $pos = null){
+        $this->doc .= "\n<span class='np_break'>&nbsp;</span>\n";
+        parent::table_open($maxcols = null, $numrows = null, $pos = null);
     }
     /* 
      * Dokuwiki displays __underlines__ as follows

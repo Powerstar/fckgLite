@@ -217,7 +217,11 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
             ),
             $text
           );
-          $text = preg_replace('/<\/(code|file)>\s*(?=[^\w])\s*/m',"</$1>\n_fckg_NPBBR_",$text );
+         /* \n_fckg_NPBBR_\n: the final \n prevents this from iterfering with next in line markups
+            -- in particular tables which require a new line and margin left 
+           this may leave an empty paragraph in the xhtml, which is removed below 
+         */
+          $text = preg_replace('/<\/(code|file)>\s*(?=[^\w])\s*/m',"</$1>\n_fckg_NPBBR_\n",$text );
           $text = preg_replace_callback(
             '/(\|\s*)(<code>|<file>)(.*?)(<\/code>|<\/file>)\n_fckg_NPBBR_(?=.*?\|)/ms',
             create_function(
@@ -232,7 +236,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
             $text
           );
                   
-
+       
          $text = preg_replace('/<(?!code|file|plugin|del|sup|sub|\/\/|\s|\/del|\/code|\/file|\/plugin|\/sup|\/sub)/ms',"//<//",$text);
          
          $text = preg_replace_callback('/<plugin(.*?)(?=<\/plugin>)/ms',
@@ -687,6 +691,7 @@ function parse_wikitext(id) {
     link_title: "",
     link_class: "",
     td_align: "",  
+    in_td: false, 
     td_colspan: 0,
     td_rowspan: 0,
     rowspan_col: 0, 
@@ -917,7 +922,8 @@ function parse_wikitext(id) {
                }
             
             }
-            if(tag == 'td' || tag == 'th') {
+            if(tag == 'td' || tag == 'th') { 
+              this.in_td = true;
               if(attrs[i].name == 'align') {
                  this.td_align =attrs[i].escaped;  
                                
@@ -1574,7 +1580,8 @@ function parse_wikitext(id) {
       }
     }
     else if(current_tag == 'td' || current_tag == 'th') {
-       this.last_col_pipes = "";     
+       this.last_col_pipes = "";
+       this.in_td = false;     
     }
     
    else if (current_tag.match(/h\d+/)) {
@@ -1684,6 +1691,11 @@ function parse_wikitext(id) {
         if(this.format_in_list ) {  
            text = text.replace(/^[\n\s]+$/g, '');       
         }
+
+       if(this.in_td && !text) {
+           text = "_FCKG_BLANK_TD_";
+           this.in_td = false;
+       }
     }
     else {
       text = text.replace(/&lt;\s/g, '<');   
@@ -1844,9 +1856,14 @@ function parse_wikitext(id) {
      results += "\n" + line_break_final + "\n";
      var regex = new RegExp(HTMLParserParaInsert,"g");
      results = results.replace(regex, ' ' +line_break_final + ' ');
+
    // fix for colspans which have had text formatting which cause extra empty cells to be created
      results = results.replace(/(\||\^)[ ]+(\||\^)\s$/g, "$1\n");
      results = results.replace(/(\||\^)[ ]+(\||\^)/g, "$1");
+    
+     // prevents valid empty td/th cells from being removed above
+     results = results.replace(/_FCKG_BLANK_TD_/g, " ");
+     
     
     }
 
@@ -2048,6 +2065,7 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
                 return $matches[1] . $quot . $matches[3];' 
           ), $text); 
 
+
         global $fckgLPluginPatterns;
         $fckgLPluginPatterns = array();
 
@@ -2138,6 +2156,8 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
 
         }  
 
+         // remove empty paragraph: see _fckg_NPBBR_ comment above
+        $xhtml = preg_replace('/<p>\s+_fckg_NPBBR_\s+<\/p>/ms',"\n",$xhtml);
         $xhtml = str_replace('_fckg_NPBBR_', "<span class='np_break'>&nbsp;</span>", $xhtml);
         $xhtml = str_replace('_fckg_QUOT_', '&quot;', $xhtml);
         $xhtml = str_replace('_fckg_NL', "\n", $xhtml);
