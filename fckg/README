@@ -2,9 +2,21 @@
 For information on the installation and features of fckgLite, see
 the fckgLite web site:  http://www.mturner.org/fckgLite
 
+
+There are two versions of .htaccess files found in fckg/fckeditor/userfiles.  One of these
+is called .htaccess.security and allows direct http access only to image files, but not
+to any others.  The other is called .htaccess.open and allows access to any files in the
+data/media directory.  In this case security is enforced using the "secure" directory
+system.  
+
+See the section on Security on the fckgLite web site:
+   http://www.mturner.org/fckgLite/doku.php?id=media&#security_and_the_media_directory
+Also: http://www.dokuwiki.org/plugin:fckglite?&#security
+
 This version of fckgLite does not support the new safe-encoding
 protocol implemented in Dokuwiki versions starting with Anteater
 (11-7-2010).  For that, you must use fckgLiteSafe, which is available
 for download from the dailies menu on the  web site.
+
 
 

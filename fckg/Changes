@@ -1,4 +1,4 @@
-rev 11-Feb_02-11_35
+rev 11-Feb_07-23_56
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1476,3 +1476,17 @@ Nov 8 2009
 
  2 Feb 2011
  Removed extra newline from nested lists where nested item ends with an acronym
+ 
+ 6 Feb 2011
+ Change to file browser: When moving a file to a directory named 'secure', the filebrowser
+ automatically includes an .htaccess file denying direct web access.
+
+ 7 Feb 2011
+ Added updated .htaccess files to userfiles: one named .htaccess.security and one named
+ .htaccess.open.  The open version is the default. It allows through all http requests,
+ while preventing indexing.  The security version secures the media directory from all
+ requests except requests for images. In the open version security is achieved by creating
+ secure directories, which are created when files are moved, using the filebrowser,
+ into directories named "secure", which is the default name for directorie to which
+ files are to be moved. More details are available on the web site on the page
+ describing the filebrowser: http://www.mturner.org/fckgLite/doku.php?id=media.

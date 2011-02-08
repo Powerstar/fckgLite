@@ -355,6 +355,13 @@ if(preg_match('/^(.*?)\/(.*?)$/',$filename,$matches)) {
 
   $filename = $matches[2];
   mkdir_rek($sMoveDir);
+  
+  if(preg_match('/secure$/', $sMoveDir)){  
+      if(!file_exists($sMoveDir . '/' . '.htaccess')) {
+         copy( 'htaccess' , $sMoveDir . '/' . '.htaccess') ;  
+     }
+  }
+
   $moveFile = $sMoveDir . '/' . rawurlencode($filename ); 
 }
 else {
