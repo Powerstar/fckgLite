@@ -119,7 +119,7 @@ var sBasePath	= FCKConfig.SmileyPath ;
 var aImages		= FCKConfig.SmileyImages ;
 var iCols		= FCKConfig.SmileyColumns ;
 var iColWidth	= parseInt( 100 / iCols, 10 ) ;
-var dImages = FCKConfig.dokuSmileyImages;
+var dImages = FCKConfig.dokuSmileyConfImages ? FCKConfig.dokuSmileyConfImages : FCKConfig.dokuSmileyImages;
 
 var dBasePath = FCKConfig.dokuSmileyPath;
  	document.write( '<tr>' ) ;

@@ -1,4 +1,4 @@
-rev 11-Feb_07-23_56
+rev 11-Feb_09-08_20
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1490,3 +1490,7 @@ Nov 8 2009
  into directories named "secure", which is the default name for directorie to which
  files are to be moved. More details are available on the web site on the page
  describing the filebrowser: http://www.mturner.org/fckgLite/doku.php?id=media.
+
+ 9 Feb 2011
+ Create Dokuwiki Smiley Array from conf/smiley.conf in fckeditor/fckconfig.js instead
+ of from hard-coded Array, which still remains in fckconfig/js as fall-back.

@@ -443,6 +443,41 @@ FCKConfig.Geshi_Types = new Array(
 
 );
 
+FCKConfig.dokuSmileyConfImages;
+try {
+var ajax = new sack();
+   do_smileys();
+}catch(ex){
+
+}
+
+
+function do_smileys(){
+	ajax.requestFile =  "../dwsmileys.php";
+	ajax.method = 'POST';
+	ajax.onCompletion = whenCompleted;
+	ajax.runAJAX();
+}
+
+
+function whenCompleted(){
+    
+    if(ajax.responseStatus && ajax.responseStatus[0] == 200) {
+
+       FCKConfig.dokuSmileyConfImages = new Array();
+       smileys = ajax.response.replace(/#.*?\n/g,"");
+       smileys = smileys.replace(/^[\s\n]+$/mg,"");
+       smileys=smileys.split(/\n/);
+       if(!smileys[0]) smileys.shift();
+       if(!smileys[smileys.length-1]) smileys.pop();   
+       for(var i=0; i < smileys.length; i++) {            
+            var a = smileys[i].split(/\s+/);
+            if(a[0].match(/DELETEME/) || a[0].match(/FIXME/)) continue;
+            FCKConfig.dokuSmileyConfImages[i] = a;
+      }      
+    }
+}
+
 FCKConfig.dokuSmileyImages	=
                           [['8-)','icon_cool.gif'],
                       	  ['8-O','icon_eek.gif'],
