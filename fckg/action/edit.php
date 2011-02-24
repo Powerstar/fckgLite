@@ -185,6 +185,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
             }
               
 
+
       if(strpos($text, '%%') !== false) {
        $text= preg_replace('/%%\s*<([^%]+)>\s*%%/m','<nowiki><$1></nowiki>',$text);        
        $text= preg_replace('/%%\s*\{([^%]+)\}\s*%%/m','<nowiki>{$1}</nowiki>',$text);        
@@ -217,11 +218,13 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
             ),
             $text
           );
+
          /* \n_fckg_NPBBR_\n: the final \n prevents this from iterfering with next in line markups
             -- in particular tables which require a new line and margin left 
            this may leave an empty paragraph in the xhtml, which is removed below 
          */
-          $text = preg_replace('/<\/(code|file)>\s*(?=[^\w])\s*/m',"</$1>\n_fckg_NPBBR_\n",$text );
+          $text = preg_replace('/<\/(code|file)>(\s*)(?=[^\w])(\s*)/m',"</$1>\n_fckg_NPBBR_\n$2",$text );
+
           $text = preg_replace_callback(
             '/(\|\s*)(<code>|<file>)(.*?)(<\/code>|<\/file>)\n_fckg_NPBBR_(?=.*?\|)/ms',
             create_function(
@@ -235,10 +238,9 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
             ),
             $text
           );
-                  
        
          $text = preg_replace('/<(?!code|file|plugin|del|sup|sub|\/\/|\s|\/del|\/code|\/file|\/plugin|\/sup|\/sub)/ms',"//<//",$text);
-         
+                           
          $text = preg_replace_callback('/<plugin(.*?)(?=<\/plugin>)/ms',
                         create_function(
                           '$matches', 
@@ -248,7 +250,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                  ); 
          $text = str_replace('</plugin>','</plugin> ', $text);           
        }  
-        
+                 
        $text = str_replace('>>','CHEVRONescC',$text);
        $text = str_replace('<<','CHEVRONescO',$text);
        $text = preg_replace('/(={3,}.*?)(\{\{.*?\}\})(.*?={3,})/',"$1$3\n$2",$text);
@@ -275,6 +277,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                 $this->xhtml
               ); 
        }
+
         return true;
     }
 
@@ -1791,6 +1794,7 @@ function parse_wikitext(id) {
 
     for(var i=0; i < fckgLPluginPatterns.length; i++) {
       fckgLPluginPatterns[i].pat = fckgLPluginPatterns[i].pat.replace(/\|/g,"\\|");
+      fckgLPluginPatterns[i].pat = fckgLPluginPatterns[i].pat.replace(/([\[\]])/g, "\\$1");
       var pattern = new RegExp(fckgLPluginPatterns[i].pat,"gm");     
       results = results.replace(pattern, fckgLPluginPatterns[i].orig);
 }

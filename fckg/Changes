@@ -1,4 +1,4 @@
-rev 11-Feb_09-08_20
+rev 11-Feb_23-13_52
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1494,3 +1494,13 @@ Nov 8 2009
  9 Feb 2011
  Create Dokuwiki Smiley Array from conf/smiley.conf in fckeditor/fckconfig.js instead
  of from hard-coded Array, which still remains in fckconfig/js as fall-back.
+ 
+ Fixed bug in edit.php that removed initial spaces from lists after code blocks
+ in _preprocess()
+ 
+ 10 Feb 2011
+ Removed bulleted and numbered lists from FCKeditor context menu.  They have no function
+ for Dokuwiki and are misleading.
+
+ 23 Feb 2011
+ Escaped [ and ] in regular expressions that reconstitute plugin syntax in edit.php.
