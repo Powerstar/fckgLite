@@ -1794,7 +1794,7 @@ function parse_wikitext(id) {
 
     for(var i=0; i < fckgLPluginPatterns.length; i++) {
       fckgLPluginPatterns[i].pat = fckgLPluginPatterns[i].pat.replace(/\|/g,"\\|");
-      fckgLPluginPatterns[i].pat = fckgLPluginPatterns[i].pat.replace(/([\[\]])/g, "\\$1");
+      fckgLPluginPatterns[i].pat = fckgLPluginPatterns[i].pat.replace(/([\.\?\[\]])/g, "\\$1");
       var pattern = new RegExp(fckgLPluginPatterns[i].pat,"gm");     
       results = results.replace(pattern, fckgLPluginPatterns[i].orig);
 }
