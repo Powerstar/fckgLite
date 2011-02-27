@@ -20,3 +20,6 @@ $lang['dw_edit_display'] = 'Controls which users have access to the "DW Edit" bu
 $lang['smiley_as_text']  = 'Display smileys as text in FCKeditor (will still display as image in browser)';
 $lang['editor_bak'] = "Save backup to meta/&lt;namespace&gt;.fckg";
 $lang['create_folder'] = "Enable folder creation button in file browser (y/n)";
+$lang['dwedit_ns'] = "Comma separated list of namespaces where FckgLite automatically switches " .
+                     "over to the native DokuWiki Editor."; 
+             

@@ -11,4 +11,5 @@ $conf['dw_edit_display'] = 'all';
 $conf['smiley_as_text'] = 0;
 $conf['editor_bak'] =  0;
 $conf['create_folder'] ='n';
+$conf['dwedit_ns'] = 'NONE';
 

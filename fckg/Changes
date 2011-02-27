@@ -1,4 +1,4 @@
-rev 11-Feb_23-13_52
+rev 11-Feb_26-17_28
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1504,3 +1504,14 @@ Nov 8 2009
 
  23 Feb 2011
  Escaped [ and ] in regular expressions that reconstitute plugin syntax in edit.php.
+ 
+ 25 Feb 2011
+ Added . and ? to above escapes (approx line 1797).
+ 
+ 26 Feb 2011
+ Add a new configuration option 'dwedit_ns' which enables the admininstrator to designate
+ namespaces where the FCKeditor will not be active; instead the native Dokuwiki
+ editor will come up when those namespaces are part of the page ID.
+ 
+ Appended a P tag with one nbsp to end of PRE tag before sending HTML to FCKeditor, so
+ that code blocks that come at end of page do not capture edit cursor.

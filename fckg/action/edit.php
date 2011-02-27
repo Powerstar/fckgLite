@@ -73,7 +73,17 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
              }
         }
 
-       
+        $dwedit_ns = @$this->getConf('dwedit_ns');
+        if(isset($dwedit_ns)) {
+            $ns_choices = explode(',',$dwedit_ns);
+            foreach($ns_choices as $ns) {
+              $ns = trim($ns);
+              if(preg_match("/$ns/",$_REQUEST['id'])) {
+                      $FCKG_show_preview = true;     
+                       return;
+             }
+            }
+        }
         $controller->register_hook('TPL_ACT_RENDER', 'BEFORE', $this, 'fckg_edit');
         $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'fckg_edit_meta');
     }
@@ -2166,7 +2176,7 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
         $xhtml = str_replace('_fckg_NPBBR_', "<span class='np_break'>&nbsp;</span>", $xhtml);
         $xhtml = str_replace('_fckg_QUOT_', '&quot;', $xhtml);
         $xhtml = str_replace('_fckg_NL', "\n", $xhtml);
-        $xhtml = str_replace('</pre>', "\n\n</pre>", $xhtml);
+        $xhtml = str_replace('</pre>', "\n\n</pre><p>&nbsp;</p>", $xhtml);
 
        if($smiley_as_text) {
            if($haveDokuSmilies) {

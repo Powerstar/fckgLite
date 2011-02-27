@@ -124,8 +124,18 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
    $event->data->insertElement($pos+=1,$button);
    echo "<style type = 'text/css'> #edbtn__save, #edbtn__save { display: none; } </style>";
  }
-
- 
+   global $ID;
+   $dwedit_ns = @$this->getConf('dwedit_ns');
+   if(isset($dwedit_ns)) {
+       $ns_choices = explode(',',$dwedit_ns);
+       foreach($ns_choices as $ns) {
+         $ns = trim($ns);
+         if(preg_match("/$ns/",$ID)) {
+            echo "<style type = 'text/css'> #edbtn__save, #edbtn__save { display: inline; } </style>";         
+            break;
+         }
+       }
+   }
    $act = $event->data;
    if(is_string($act) && $act != 'edit') {  
         return;
@@ -595,7 +605,7 @@ SCRIPT;
 
 
 function write_debug($data) {
-return;
+  return;
   if (!$handle = fopen('meta.txt', 'a')) {
     return;
     }
