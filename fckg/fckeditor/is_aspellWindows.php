@@ -1,4 +1,4 @@
-<?
+<?php
 $aspell_win = '"C:\Program Files\Aspell\bin\aspell.exe" ';
 $aspell_prog = 'aspell';
 
