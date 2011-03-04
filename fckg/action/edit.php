@@ -72,19 +72,23 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                    return;
              }
         }
-
+        $Fck_NmSp = "!!NONSET!!"; 
+        if(isset($_COOKIE['FCK_NmSp'])) {
+          $Fck_NmSp = $_COOKIE['FCK_NmSp'];
+        }
         $dwedit_ns = @$this->getConf('dwedit_ns');
         if(isset($dwedit_ns)) {
             $ns_choices = explode(',',$dwedit_ns);
             foreach($ns_choices as $ns) {
               $ns = trim($ns);
-              if(preg_match("/$ns/",$_REQUEST['id'])) {
+              if(preg_match("/$ns/",$_REQUEST['id']) || preg_match("/$ns/",$Fck_NmSp)) {
                       $FCKG_show_preview = true;     
                        return;
              }
             }
         }
         $controller->register_hook('TPL_ACT_RENDER', 'BEFORE', $this, 'fckg_edit');
+
         $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'fckg_edit_meta');
     }
 
@@ -100,7 +104,6 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
      */
     function fckg_edit_meta(&$event)
     {
-
         global $ACT;
         // we only change the edit behaviour
         if ($ACT != 'edit'){
