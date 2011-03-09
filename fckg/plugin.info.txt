@@ -1,0 +1,7 @@
+base fckg
+author Myron Turner
+email turnermm02@shaw.ca
+date 2011-02-17
+name fckgLite Plugin
+desc Fri Feb 18 00:00:03 CST 2011
+url http://www.mturner.org/fckgLite
