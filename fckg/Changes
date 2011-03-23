@@ -1,4 +1,4 @@
-rev 11-Feb_26-17_28
+rev 11-Mar_03-21_06
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1515,3 +1515,12 @@ Nov 8 2009
  
  Appended a P tag with one nbsp to end of PRE tag before sending HTML to FCKeditor, so
  that code blocks that come at end of page do not capture edit cursor.
+ 
+ 28 Feb 2011
+ Replaced short (<?) tag with full tag (<?php) in is_aspellWindows.php.
+ 
+ 2 March 2011
+ Streamlined user interface to internal link module of link dialog
+ 
+ 3 Mar 2011
+ Fixed 'dwedit_ns' option so that it works with nice urls.
