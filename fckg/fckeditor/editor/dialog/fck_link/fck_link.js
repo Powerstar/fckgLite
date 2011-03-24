@@ -56,9 +56,9 @@ if ( !FCKConfig.LinkDlgHideTarget )
 if ( FCKConfig.LinkUpload )
 	dialog.AddTab( 'Upload', FCKLang.DlgLnkUpload, true ) ;
 
-if ( !FCKConfig.LinkDlgHideAdvanced )
-	dialog.AddTab( 'Advanced', FCKLang.DlgAdvancedTag ) ;
-
+dialog.AddTab( 'Advanced', FCKLang.DlgAdvancedTag ) ;
+dialog.SetTabVisibility('Advanced',false); 
+ 
 
 // Function called when a dialog tag is selected.
 function OnDialogTabChange( tabCode )
@@ -77,7 +77,7 @@ function OnDialogTabChange( tabCode )
 	if(user) {
     //    ShowE('divUpload'	, ( tabCode == 'Upload' ) ) ;
 	}
-//	ShowE('divAttribs'	, ( tabCode == 'Advanced' ) ) ;
+	ShowE('divInternalExtras'	, ( tabCode == 'Advanced' ) ) ;  // internal link extras
 
 	dialog.SetAutoSize( true ) ;
 }
@@ -679,6 +679,7 @@ function SetLinkType( linkType )
 
    HTMLParserVar_linktype = linkType;  
    if(linkType == 'internal') { 
+      dialog.SetTabVisibility('Advanced',true); 
       FCK.dwiki_browser = 'local';
       FCK.islocal_dwikibrowser = true;  
       if(anchorOption.selection) {
@@ -689,6 +690,7 @@ function SetLinkType( linkType )
       else anchorOption.ini('Headings Menu');
    }
    else { 
+     dialog.SetTabVisibility('Advanced',false); 
      FCK.dwiki_browser = 'url';
      FCK.islocal_dwikibrowser = false;
    }

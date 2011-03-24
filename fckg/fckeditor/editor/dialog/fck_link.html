@@ -77,39 +77,24 @@
               <th><span fckLang="DlgLnkTypeInternal"> DokuWiki Internal link </span></th>       
              </tr>
              <tr>
+        	 <td>&nbsp;</td>
+             </tr>
+             <tr>
         	 <td>
                <span style = 'font-size:larger' fckLang="DlgLnkIntText">Enter namespace Or Select from Browser</span><br /> 
                <span style = 'font-size:larger' fckLang="DlgLnkIntExample">For example: <i>:directory:directory:file</i></span><br />
-                 <input id="txtDokuWikiId" style="WIDTH: 100%;font-size:larger" type="text"  />&nbsp;&nbsp;
-                 
+               <input id="txtDokuWikiId" style="WIDTH: 100%;font-size:larger" type="text"  />&nbsp;&nbsp;                 
                </td>
-             </tr>
-              <tr><td valign='bottom'>
-             <span style = 'font-size:larger'>Query String (For example: value_1=1&value_2=2)</span></br>
-              
-            <input id="txtDokuWikiQS" style="WIDTH: 100%; font-size:larger"  type="text"  /></td></tr>
-
-            <tr><td>
-                <!-- Get list of page anchors -->
-                <table>
-                <tr><td>
-                <span style = 'font-size:larger'> Create page anchors from Dokuwiki headers</span>
-                <tr><td>
-                <form name='headings'>
-                  <input type="button" value="Get Headings" style = 'font-size:larger' onclick="getHeaders();" />&nbsp;&nbsp;
-                 <Select name = 'anchors' onchange="anchorOption.selected(this)" style = 'font-size:larger'>  
-                 </select>
-                </form>
-                </td>
-                </tr>
-                </table>
-
-             </td>
              </tr>
             </table>
             
            <div>
 				<input type="button" value="Browse Server" style = 'font-size:larger' fckLang="DlgBtnBrowseServer" onclick="BrowseServer();" />
+                <br /><br />
+           <span style = 'font-size:larger' fckLang="DlgLnkIntExtras">
+           To create a query string and/or to set a page anchor from Dokuwiki headers, click the
+           Advanced tab.
+           </span>
            </div>
            </div>
 
@@ -381,5 +366,27 @@
 				</tr>
 			</table>
 		</div>
+		<div id="divInternalExtras" style="DISPLAY: none">
+            <br />
+             <span style = 'font-size:larger'>Query String (For example: value_1=1&value_2=2)</span></br>              
+             <input id="txtDokuWikiQS" style="WIDTH: 100%; font-size:larger"  type="text"  />
+            <br />
+                <!-- Get list of page anchors -->
+                <table>
+                <tr><td>
+                <span style = 'font-size:larger'> Create page anchors from Dokuwiki headers</span>
+                <tr><td>
+                <form name='headings'>
+                  <input type="button" value="Get Headings" style = 'font-size:larger' onclick="getHeaders();" />&nbsp;&nbsp;
+                 <Select name = 'anchors' onchange="anchorOption.selected(this)" style = 'font-size:larger'>  
+                 </select>
+                </form>
+                </td>
+                </tr>
+                </table>
+
+
+   		</div>
+
 	</body>
 </html>

@@ -32,6 +32,7 @@ DlgnLnkMsgNoWikiFile : "Please enter a file name for your internal link",
 DlgnLnkMsgQSErr      : "Malformed Query String element(s). Press Cancel to revise:",
 
 DlgLnkIntText		: "Enter DokuWiki namespace Or Select from File Browser.",
+DlgLnkIntExtras     : "To create a query string and/or to set a page anchor from Dokuwiki headers, click the <b>Advanced</b> tab.",
 DlgLnkIntExample	: "For example: <i>:directory:directory:file</i>",
 DlgLnkMimeText		: "Enter DokuWiki namespace Or Select from, File Browser.",
 DlgLnkMimeExample	: "For example: <i>:directory:directory:zipfile.zip",

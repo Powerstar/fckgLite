@@ -599,6 +599,7 @@ DlgLnkQS            : "Query String (For example: value_1=1&value_2='abc')",
 
 DlgLnkIntText		: "Enter DokuWiki namespace Or Select from File Browser.",
 DlgLnkIntExample	: "For example: <i>:directory:directory:file</i>",
+DlgLnkIntExtras     : "To create a query string and/or to set a page anchor from Dokuwiki headers, click the <b>Advanced</b> tab.",
 DlgLnkMimeText		: "Enter DokuWiki namespace Or Select from File Browser.",
 DlgLnkMimeExample	: "For example: <i>:directory:directory:zipfile.zip",
 DlgLnkSambaText		: "Enter the share name.",
