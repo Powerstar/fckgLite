@@ -64,18 +64,14 @@ function whenCompleted(){
 		var string = "<p>1 URLString Sent: " + ajax.URLString + "</p>";
 	}
 
+    if(ajax.responseStatus && ajax.responseStatus[0] == 200) {
+       e.innerHTML = ajax.response;
+        var elems = ajax.response.split(/>/);
+        var matches = elems[1].match(/(\d+)\-\w+_/);
+        var copy = document.getElementById('copyright'); 
+          copy.innerHTML= 'Copyright &copy; 2009-20' + matches[1] + ' <a href="#" onclick="SendfckLMail();">Myron Turner</a><br/>';
+    }
 
-
-if(ajax.responseStatus && ajax.responseStatus[0] == 200) {
-   e.innerHTML = ajax.response;
-}
-
-//alert(string);
-   
-     
- 
-   
-   
 }
 
 function SendEMail()
@@ -165,9 +161,10 @@ window.onload = function()
    <b>fckgLite</b> is a Dokuwiki plugin that converts the HTML output by FCKeditor
    into native Dokuwiki markup. 
   <tr><td class="eight_pt">
-   Copyright &copy; 2009-2010 <a href="#" onclick="SendfckLMail();">Myron Turner</a><br />
+   <div id="copyright">Copyright &copy; 2009-2010
+    <a href="#" onclick="SendfckLMail();">Myron Turner</a></div>
 	<b>GNU General Public License</b> Version 2 (GPL 2)<br />
-	<a href="http://www.gnu.org/licenses/gpl.html" target="_blank">http://www.gnu.org/licenses/gpl.html</a>
+	<a href="http://www.gnu.org/licenses/gpl-2.0.html" target="_blank">http://www.gnu.org/licenses/gpl-2.0.html</a>
   <tr><td class="eight_pt">
    &nbsp;
 </table>
@@ -217,6 +214,7 @@ else if ( window.navigator.userLanguage )
 document.write( '<b>User Language<\/b><br />' + sUserLang ) ;
 //-->
 					</script>
+
 				</td>
 			</tr>
 		</table>
