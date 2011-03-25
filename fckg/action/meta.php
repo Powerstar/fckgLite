@@ -479,8 +479,9 @@ SCRIPT;
            array_pop($elems);
  
            $_SESSION['dwfck_ns'] = implode(':',$elems);        
-           $_SESSION['dwfck_top'] = implode('/',$elems);      
-
+           $_SESSION['dwfck_top'] = implode('/',$elems);           
+           $_SESSION['dwfck_del'] = $this->getConf('acl_del');
+           
             // temp fix for puzzling encoding=url bug in frmresourceslist.html,
            // where image loading is processed in GetFileRowHtml()
 

@@ -138,6 +138,7 @@ function has_open_access() {
 function GetFoldersAndFiles( $resourceType, $currentFolder )
 {
 
+   $isInternalLink = isset($_GET['DWFCK_Browser']) && $_GET['DWFCK_Browser'] == 'local'?  true : false;
    global $_FolderClass;
    global $Config;
    $currentFolder=encode_dir($currentFolder);
@@ -146,7 +147,8 @@ function GetFoldersAndFiles( $resourceType, $currentFolder )
        session_id($_COOKIE['FCK_NmSp_acl']);
        session_start();    
    }    
-
+    $acl_del = isset($_SESSION['dwfck_del']) ? $_SESSION['dwfck_del'] : 0;  
+    //write_debug($_SESSION);
 	// Map the virtual path to the local server path.
 	$sServerDir = ServerMapFolder( $resourceType, $currentFolder, 'GetFoldersAndFiles' ) ;
 
@@ -159,7 +161,16 @@ function GetFoldersAndFiles( $resourceType, $currentFolder )
     $temp_folder = $currentFolder;
     $temp_folder = trim($temp_folder,'/');
     has_permission($temp_folder, $resourceType);
-    $sfclass = ($_FolderClass >= 8  || has_open_access()) ? 'u' : 'r'; 
+    if($isInternalLink && $_FolderClass < 16) {
+         $sfclass = 'r';
+    }
+    else { 
+         if($acl_del)  {
+            $sfclass = $_FolderClass >= 16 ? 'u' : 'r'; 
+         }
+         else $sfclass = ($_FolderClass >= 8  || has_open_access()) ? 'u' : 'r'; 
+    }    
+   
     $aFolders[] = '<Folder name="' . ConvertToXmlAttribute( $sFile ) .   
                             '" class="'. $sfclass .'" />' ;
  

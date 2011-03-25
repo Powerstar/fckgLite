@@ -1,4 +1,4 @@
-rev 11-Mar_03-21_06
+rev 11-Mar_24-12_44
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1524,3 +1524,8 @@ Nov 8 2009
  
  3 Mar 2011
  Fixed 'dwedit_ns' option so that it works with nice urls.
+
+ 24 Mar 2011
+ Added new configuration option which allows admin to decide whether or not 
+ allow users with upload permission to delete media files.  The default is to allow
+ users with upload permission to delete files.

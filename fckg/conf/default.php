@@ -12,4 +12,5 @@ $conf['smiley_as_text'] = 0;
 $conf['editor_bak'] =  0;
 $conf['create_folder'] ='n';
 $conf['dwedit_ns'] = 'NONE';
+$conf['acl_del'] = 0;
 

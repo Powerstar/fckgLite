@@ -12,4 +12,4 @@ $meta['smiley_as_text'] = array('onoff');
 $meta['editor_bak'] = array('onoff');
 $meta['create_folder'] = array('multichoice','_choices' => array('n','y'));
 $meta['dwedit_ns'] = array('string');
-
+$meta['acl_del'] = array('onoff');

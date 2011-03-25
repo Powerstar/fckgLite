@@ -22,4 +22,7 @@ $lang['editor_bak'] = "Save backup to meta/&lt;namespace&gt;.fckg";
 $lang['create_folder'] = "Enable folder creation button in file browser (y/n)";
 $lang['dwedit_ns'] = "Comma separated list of namespaces where FckgLite automatically switches " .
                      "over to the native DokuWiki Editor."; 
+$lang['acl_del'] =  "Default (box not checked) allows users with upload permission to delete media files; if box is checked, then user needs delete permission to delete from the folder.";
+
+
              
