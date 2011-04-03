@@ -670,7 +670,7 @@ function parse_wikitext(id) {
           'h1': " ======\n", 'h2': " =====\n", 'h3': " ====\n", 'h4': " ===\n", 'h5': " ==\n", 
           'td': " ", 'th': " ", 'tr':"|\n", 'ol':" ", 'ul': " ", 'li': "\n", 'plugin': '</plugin>',
            'pre': "\n</",'sub': '</sub>', 'sup': '</sup>', 'div':"\n\n", 'p': "\n\n",
-           'font': "</font>"
+           'font': "</font> "
      }; 
    
     markup['blank'] = "";
@@ -1422,7 +1422,7 @@ function parse_wikitext(id) {
                if(font_color) font_family = font_family + ';;'+ font_color;
                if(font_bgcolor) font_family = font_family + ';;'+ font_bgcolor;
                var font_tag = '<font ' + font_size + ':'+ font_weight + '/'+font_family+'>';
-               results += font_tag;   
+               results += font_tag ;   
                return;            
        }
 
