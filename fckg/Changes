@@ -1,4 +1,4 @@
-rev 11-Mar_24-12_44
+rev 11-Apr_09-13_02
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1527,5 +1527,21 @@ Nov 8 2009
 
  24 Mar 2011
  Added new configuration option which allows admin to decide whether or not 
- allow users with upload permission to delete media files.  The default is to allow
+ to allow users with upload permission to delete media files.  The default is to allow
  users with upload permission to delete files.
+ 
+ 25 Mar 2011
+ Added LICENSE document to fckg directory and upgraded fck_about.html so that it automatically
+ inserts correct copyright year from version info.
+ 
+ 3 Apr 2011
+ Inserted space after closing font tag to prevent loss of space between end of font markup
+ and start of next letter. Side effect of this is that fonts cannot be used inside a word,
+ since the character after the marked-up characters will always be a space.
+
+ 9 Apr 2011
+ Added facility in action/edit.php to capture template text output by the
+ template event handler.  Previously fckgLite checked to see if there was
+ a page temmplate to be processed for current $ID but it did not check
+ to see if the template event handler had prevented normal template
+ processing and inserted its own output.

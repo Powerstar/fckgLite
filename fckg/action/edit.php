@@ -28,6 +28,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
     var $fckg_bak_file = "";
     var $debug = false;
     var $test = false;
+    var $page_from_template;
     /**
      * Constructor
      */
@@ -87,11 +88,24 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
              }
             }
         }
-        $controller->register_hook('TPL_ACT_RENDER', 'BEFORE', $this, 'fckg_edit');
+        $controller->register_hook('COMMON_PAGE_FROMTEMPLATE', 'AFTER', $this, 'pagefromtemplate', array());
+        $controller->register_hook('COMMON_PAGETPL_LOAD', 'AFTER', $this, 'pagefromtemplate', array());
 
+        $controller->register_hook('TPL_ACT_RENDER', 'BEFORE', $this, 'fckg_edit');
         $controller->register_hook('TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'fckg_edit_meta');
     }
 
+   /**
+    * function pagefromtemplate
+    * Capture template text output by Template Event handler instead of pageTemplate()
+	* @author  Myron Turner <turnermm02@shaw.ca>     
+    *               
+    */
+    function pagefromtemplate(&$event) {
+      if($event->data['tpl']) { 
+         $this->page_from_template = $event->data['tpl']; 
+      }
+    }
 
     /**
      * fckg_edit_meta 
@@ -195,10 +209,11 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
             }else{
                 //try to load a pagetemplate
                  $text = pageTemplate($ID);
+                //Check for text from template event handler
+                 if(!$text && $this->page_from_template) $text = $this->page_from_template;
             }
               
-
-
+ 
       if(strpos($text, '%%') !== false) {
        $text= preg_replace('/%%\s*<([^%]+)>\s*%%/m','<nowiki><$1></nowiki>',$text);        
        $text= preg_replace('/%%\s*\{([^%]+)\}\s*%%/m','<nowiki>{$1}</nowiki>',$text);        
@@ -1969,7 +1984,9 @@ function parse_wikitext(id) {
 
 
 try {
-if(!HTMLParserInstalled){};
+  if(!HTMLParserInstalled){
+    LoadScript(script_url);   
+  }
 }
 catch (ex) {  
    LoadScript(script_url); 
