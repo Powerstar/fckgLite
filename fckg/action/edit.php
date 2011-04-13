@@ -702,6 +702,7 @@ function parse_wikitext(id) {
     var HTMLParser_PRE = false;
     var HTMLParser_Geshi = false;
     var HTMLParser_TABLE = false;
+    var HTMLParser_COLSPAN = false;
     var HTMLParser_PLUGIN = false;
     var HTMLParser_FORMAT_SPACE = false;
     var HTMLParser_MULTI_LINE_PLUGIN = false;
@@ -786,8 +787,8 @@ function parse_wikitext(id) {
             this.prev_list_level = this.list_level;
             this.list_level++;     
             if(this.list_level == 1) this.list_started = false;
-//            if(this.list_started) this.prev_li = markup['li'] ;
-             if(this.list_started) this.prev_li.push(markup['li']) ;
+//           if(this.list_started) this.prev_li = markup['li'] ;
+            if(this.list_started) this.prev_li.push(markup['li']) ;
             markup['li'] = markup[tag];
 
             return;
@@ -966,6 +967,7 @@ function parse_wikitext(id) {
                    }
               }
               else if(attrs[i].name == 'colspan') {
+                  HTMLParser_COLSPAN = true;
                   this.td_colspan =attrs[i].escaped;                
               }
               else if(attrs[i].name == 'rowspan') {
@@ -1354,13 +1356,14 @@ function parse_wikitext(id) {
                }
           }
           else if(this.last_col_pipes) {
+               if(format_chars[tag]) results += markup[tag];
                tag = 'blank';
           }
           else if(dwfck_note) {
            results += dwfck_note;
            return;              
          }
-      
+
           if(tag == 'b' || tag == 'i'  && this.list_level) { 
                  if(results.match(/(\/\/|\*)(\x20)+/)) {
                      results = results.replace(/(\/\/|\*)(\x20+)\-/,"$1\n"+"$2-"); 
@@ -1496,6 +1499,7 @@ function parse_wikitext(id) {
     if(this.in_endnotes && tag == 'a') return;
 
     if(!markup[tag]) return; 
+
      if(tag == 'sup' && this.attr == 'dwfcknote') {         
          return;   
      }
@@ -1595,7 +1599,6 @@ function parse_wikitext(id) {
     }
     else {
            tag = markup[tag];
-
      }
 
     if(current_tag == 'tr') {
@@ -1620,7 +1623,7 @@ function parse_wikitext(id) {
            this.in_header = false;
     }
 
-
+ 
     if(markup['li']) { 
 
          if(results.match(/\n$/)) {
@@ -1688,7 +1691,6 @@ function parse_wikitext(id) {
          else if(current_tag == 'span' ) {
                   this.immutable_plugin = false;
          }
-
     },
 
     chars: function( text ) {
@@ -1705,7 +1707,7 @@ function parse_wikitext(id) {
              this.immutable_plugin = false;
         }
         if(this.format_tag) {
-          if(!this.list_started) text = text.replace(/^\s+/, '@@_SP_@@');  
+          if(!this.list_started || this.in_table) text = text.replace(/^\s+/, '@@_SP_@@');  
         }
         else text = text.replace(/^\s+/, '');  
 
@@ -1839,7 +1841,12 @@ function parse_wikitext(id) {
     }
 
     if(HTMLParser_FORMAT_SPACE) { 
-
+        if(HTMLParser_COLSPAN) {           
+             results =results.replace(/\s*([\|\^]+)((\W\W_FORMAT_SPACE_)+)/gm,function(match,pipes,format) {
+                 format = format.replace(/_FORMAT_SPACE_/g,"");
+                 return(format + pipes);                  
+             });
+        }
         results = results.replace(/&quot;/g,'"');
         var regex = new RegExp(HTMLParser_FORMAT_SPACE + '([\\-]{2,})', "g");
         results = results.replace(regex," $1");

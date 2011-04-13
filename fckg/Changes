@@ -1,4 +1,4 @@
-rev 11-Apr_09-13_02
+rev 11-Apr_13-09_30
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1545,3 +1545,14 @@ Nov 8 2009
  a page temmplate to be processed for current $ID but it did not check
  to see if the template event handler had prevented normal template
  processing and inserted its own output.
+
+
+ 11 April 2011
+ Inserted missing opening format markup in colspans.
+
+ 12 Apr 2011
+ Experimental upgrade to table handling of colspans with text formatting.
+ 
+ 13 Apr 2011
+ Added missing format-tag  space marker (@@_SP_@@) to tables where they were missed when
+ preceded by lists (at current line 1710).  Above colspan upgrade apparently is working.
