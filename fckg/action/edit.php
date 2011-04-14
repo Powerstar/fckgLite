@@ -955,6 +955,9 @@ function parse_wikitext(id) {
             
             }
             if(tag == 'td' || tag == 'th') { 
+              if(tag == 'td') {
+                 results = results.replace(/\^$/,'|');
+              }
               this.in_td = true;
               if(attrs[i].name == 'align') {
                  this.td_align =attrs[i].escaped;  
@@ -1456,6 +1459,7 @@ function parse_wikitext(id) {
              if(this.td_align == 'center' || this.td_align == 'right') {
                  results += '  ';
              }
+
           }
           else if(tag == 'a' && this.attr) {
               results += this.attr + '|';
@@ -1650,15 +1654,16 @@ function parse_wikitext(id) {
 
         if(this.td_colspan) {    
             if(this.td_align == 'center') results += ' ';    
-            var colspan = "|";
+            var _colspan = "|";            
             if(current_tag == 'th')
-                   colspan = '^';
+                   _colspan = '^';
+            var colspan = _colspan; 
             for(var i=1; i < this.td_colspan; i++) {
-                colspan += '|'; 
-            }
-            this.last_col_pipes = colspan;
+                colspan += _colspan; 
+            }            
+            this.last_col_pipes = colspan;          
             results += colspan;
-            this.td_colspan = ""; 
+            this.td_colspan = false; 
           }
           else if(this.td_align == 'center') {
                 results += ' ';
@@ -1691,6 +1696,7 @@ function parse_wikitext(id) {
          else if(current_tag == 'span' ) {
                   this.immutable_plugin = false;
          }
+       
     },
 
     chars: function( text ) {

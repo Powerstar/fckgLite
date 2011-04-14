@@ -1,4 +1,4 @@
-rev 11-Apr_13-09_30
+rev 11-Apr_13-21_08
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1556,3 +1556,5 @@ Nov 8 2009
  13 Apr 2011
  Added missing format-tag  space marker (@@_SP_@@) to tables where they were missed when
  preceded by lists (at current line 1710).  Above colspan upgrade apparently is working.
+ 
+ When headers appeared in colspans they were converted to td's; this is now fixed.
