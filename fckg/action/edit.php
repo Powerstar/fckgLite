@@ -266,7 +266,8 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
             ),
             $text
           );
-       
+         $text = preg_replace('/TPRE_CLOSE\s+/ms',"TPRE_CLOSE",$text); 
+      
          $text = preg_replace('/<(?!code|file|plugin|del|sup|sub|\/\/|\s|\/del|\/code|\/file|\/plugin|\/sup|\/sub)/ms',"//<//",$text);
                            
          $text = preg_replace_callback('/<plugin(.*?)(?=<\/plugin>)/ms',
