@@ -2211,6 +2211,9 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
         $xhtml = str_replace('_fckg_QUOT_', '&quot;', $xhtml);
         $xhtml = str_replace('_fckg_NL', "\n", $xhtml);
         $xhtml = str_replace('</pre>', "\n\n</pre><p>&nbsp;</p>", $xhtml);
+        //remove empty markup remaining after removing marked-up acronyms in lists
+        $xhtml = preg_replace('/<(em|b|u|i)>\W+<\/(em|b|u|i)>/ms',"",$xhtml);
+
 
        if($smiley_as_text) {
            if($haveDokuSmilies) {

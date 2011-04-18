@@ -1,4 +1,4 @@
-rev 11-Apr_14-19_45
+rev 11-Apr_17-19_24
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1562,3 +1562,9 @@ Nov 8 2009
  14 Apr 2011  
  Fixed bug which corrupted table cells when non-parsed block was included in cell by
  removing newline being inserted after npb closing tag.
+ 
+ 17 April
+ Added patches in edit.php and save.php to delete empty format tags left over when
+ removing formatting from acronyms.  These work in conjunction with each other--those
+ empty tags which are not removed by save.php are later removed when re-loading the file
+ in edit.php. (Could use additional testing.)

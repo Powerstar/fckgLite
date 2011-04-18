@@ -62,7 +62,8 @@ class action_plugin_fckg_save extends DokuWiki_Action_Plugin {
         $TEXT = preg_replace('/^\s+(?=\^|\|)/ms',"", $TEXT);    
         $TEXT = preg_replace('/__n__/',"\n", $TEXT);
         $TEXT = str_replace("__code_NL__","\n", $TEXT);
-        $TEXT = str_replace("FCKGPERCENTESC", '%%',  $TEXT);
+        $TEXT = str_replace("FCKGPERCENTESC", '%%',  $TEXT);  
+        $TEXT = preg_replace('/([\*\/_]){2}[^\w\n]+\1{2}/ms', '',  $TEXT);
         $TEXT .= "\n";
       
       
