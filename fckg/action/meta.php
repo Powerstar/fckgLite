@@ -49,6 +49,8 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
            // $controller->register_hook('TPL_ACT_RENDER', 'BEFORE', $this, 'fck_editor');
             $controller->register_hook('TPL_CONTENT_DISPLAY', 'AFTER', $this, 'prevent_output');       
             $controller->register_hook('TPL_CONTENT_DISPLAY', 'BEFORE', $this, 'output_before');
+           $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'fnencode_check');
+      
   }
 
    
@@ -501,7 +503,7 @@ SCRIPT;
   function file_type(&$event, $param) {	 
        global $ACT, $TEXT;
        global $USERINFO, $INFO, $ID; 
-
+     
        if(isset($_COOKIE['FCK_NmSp'])) $this->set_session(); 
        /* set cookie to pass namespace to FCKeditor's media dialog */
       // $expire = time()+60*60*24*30;
@@ -604,13 +606,51 @@ SCRIPT;
 
   }
 
+function fnencode_check() {
+   
+       global $conf;
+       global $updateVersion;
+       $rencode = false;
+        if($conf['fnencode'] != 'safe') return;
+        if(isset($updateVersion) && $updateVersion >= 31) {           
+          $rencode = true;     
+        }
+        else {
+            $list = plugin_list('action');
+            if(in_array('safefnrecode', $list)){
+                $rencode = true;   
+     
+            }
+            elseif(file_exists($conf['datadir'].'_safefn.recoded') ||
+               file_exists($conf['metadir'].'_safefn.recoded') ||
+               file_exists($conf['mediadir'].'_safefn.recoded') )
+            { 
+               $rencode = true;
+            }
+        }
+
+      if($rencode && !file_exists(DOKU_PLUGIN . 'fckg/saferencode')) {
+         msg("This version of fckgLiteSafe does not support the re-encoded safe filenames. "
+         . "You risk corrupting your file system.  Download an fnrencode version from either gitHub or the fckgLite web site."
+         . " <a style='color:blue' href='http://www.dokuwiki.org/plugin:fckglite?&#fckglitesafe'>See fckgLite at Dokuwiki.org</a>  ",
+            -1);
+      }
+}
+
+
+
+
+      
+
 
 function write_debug($data) {
   return;
-  if (!$handle = fopen('meta.txt', 'a')) {
+  if (!$handle = fopen(DOKU_INC .'meta.txt', 'a')) {
     return;
     }
-
+  if(is_array($data)) {
+     $data = print_r($data,true);
+  }
     // Write $somecontent to our opened file.
     fwrite($handle, "$data\n");
     fclose($handle);
