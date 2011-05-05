@@ -39,49 +39,19 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
    * Register its handlers with the dokuwiki's event controller
    */
   function register(&$controller) {
-            $controller->register_hook( 'HTML_EDITFORM_INJECTION', 'AFTER', $this, 'postprocess');    
-            $controller->register_hook( 'TPL_METAHEADER_OUTPUT', 'BEFORE', $this, 'meta_scripts');    
+            $controller->register_hook( 'HTML_EDITFORM_INJECTION', 'AFTER', $this, 'postprocess');              
             $controller->register_hook( 'TPL_METAHEADER_OUTPUT', 'AFTER', $this, 'loadScript');    
             $controller->register_hook( 'HTML_EDITFORM_INJECTION', 'AFTER', $this, 'preprocess'); 
             $controller->register_hook( 'HTML_EDITFORM_OUTPUT', 'BEFORE', $this, 'insertFormElement');
-            // $controller->register_hook( 'HTML_EDITFORM_OUTPUT', 'AFTER', $this, 'disable_textarea');
+            
             $controller->register_hook('DOKUWIKI_STARTED', 'BEFORE', $this, 'file_type');
-           // $controller->register_hook('TPL_ACT_RENDER', 'BEFORE', $this, 'fck_editor');
+         
             $controller->register_hook('TPL_CONTENT_DISPLAY', 'AFTER', $this, 'prevent_output');       
             $controller->register_hook('TPL_CONTENT_DISPLAY', 'BEFORE', $this, 'output_before');
            $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'fnencode_check');
       
   }
 
-   
-  function meta_scripts(&$event) {
-         global  $INFO, $conf;
-      
-          if(isset($_REQUEST['do']) && $_REQUEST['do'] == 'edit') return;
-          $meta_path = str_replace(':', '/', $INFO['id']);
-          $meta_path = $conf['metadir']  . '/' . $meta_path . '_dwpi.meta';
-          
-
-          if(file_exists($meta_path)) {
-             $meta = file_get_contents($meta_path);
-
-             $meta = unserialize($meta);
-             foreach($meta[0] as $p=>$script) {
-               $event->data["script"][] = array (
-                      "type" => "text/javascript",
-                      "charset" => "utf-8",
-					  "_data" => "",
-					  "src" => $script
-			         );
-                 
-             }
-               
-             return $meta;   
-
-          }
-
-          
-  }
 
 
  function  insertFormElement(&$event, $param) {	 

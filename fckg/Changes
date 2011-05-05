@@ -1,4 +1,4 @@
-rev 11-Apr_17-19_24
+rev 11-May_04-10_40
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1568,3 +1568,18 @@ Nov 8 2009
  removing formatting from acronyms.  These work in conjunction with each other--those
  empty tags which are not removed by save.php are later removed when re-loading the file
  in edit.php. (Could use additional testing.)
+ 
+ 25 April
+ Added fnrencode check for safe filenames in Dokuwiki v. 31 and later.
+ 
+ 01 May 
+ Updated save.php to enhanced regex for removing empty acronym tags.
+ 
+ 02 May
+ Removed extraneous code from dwplugin.php that was broken but meant to save plugin
+ script info so that scripts would be loaded in meta.php when plugin
+ was called for a page. This was not needed and based on misunderstanding of how 
+ plugins are loaded. Companion code also removed from meta.php.
+ 
+ Removed unused FCK Preview button and javascript funtion it accessed. This was
+ left over from DokuWikiFCK and not used in fckgLite.

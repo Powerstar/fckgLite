@@ -25,7 +25,6 @@ class syntax_plugin_fckg_dwplugin extends DokuWiki_Syntax_Plugin {
  
    function syntax_plugin_fckg_dwplugin() {
       global $EVENT_HANDLER;
-      $EVENT_HANDLER->register_hook('PARSER_HANDLER_DONE', 'BEFORE', $this, 'meta_scripts');   
       $EVENT_HANDLER->register_hook('PARSER_CACHE_USE', 'AFTER', $this, 'cache_bypass_after');
    }
 
@@ -214,11 +213,8 @@ class syntax_plugin_fckg_dwplugin extends DokuWiki_Syntax_Plugin {
 
 
 
-    function & setup_plugin($plugin, $pattern) {
-         global $DWPLUGINS;
+    function & setup_plugin($plugin, $pattern) {         
          global  $DOKU_PLUGINS;
-
-
 
          $plugin_name = ltrim($plugin, '_');
          $plugin_name = substr($plugin_name,7); // remove 'plugin_'               
@@ -237,7 +233,7 @@ class syntax_plugin_fckg_dwplugin extends DokuWiki_Syntax_Plugin {
             }
          }
 
-         if($p_ref && $this->escaped_pattern) $DWPLUGINS[] =  $plugin;  
+        
          return $p_ref;
     }
 
@@ -451,29 +447,6 @@ function meta_io ($read_only,$data=array()) {
      io_saveFile($meta_path, $data);
 
 }
-
-function meta_scripts(&$event) {
-  global $DWPLUGINS, $INFO, $conf;
-  require_once(DOKU_INC . 'inc/io.php');
-
-
-          if(count($DWPLUGINS)) {
-            $list = array();            
-            foreach ($DWPLUGINS as $p){
-                if(file_exists(DOKU_PLUGIN."$p/script.js")) {
-                $list[$p] = DOKU_BASE."lib/plugins/$p/script.js";
-                }
-            }
-              $meta_data = array($list, $DWPLUGINS);
-               
-              $meta_path = str_replace(':', '/', $INFO['id']);
-              $meta_path = $conf['metadir']  . '/' . $meta_path . '_dwpi.meta';
-              $data = serialize($meta_data);
-              io_saveFile($meta_path, $data);
-          }
-
-  }
-
  
 
     function cache_bypass_after(&$event, $param) 

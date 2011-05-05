@@ -505,13 +505,6 @@ global $INFO;
                  title = "<?php echo $fckg_lang['title_dw_cancel']?>"
              />
 
-            <input class="button" id="edbtn__preview" type="submit" name="do[preview]"  
-                     <?php echo $DW_EDIT_disabled; ?>
-                     onmousedown="saveFCKEditorNode(this);return true;"  
-                     style="display:none" 
-                     value="<?php echo $fckg_lang['dw_btn_fck_preview']?>"
-                />
-
   
             <input class="button" type="button" value = "<?php echo $fckg_lang['dw_btn_lang']?>"
                    title="<?php echo $fckg_lang['title_dw_lang']?>"
@@ -572,6 +565,10 @@ global $INFO;
                       <?php echo $DW_EDIT_disabled; ?>
                       title="<?php echo $lang['btn_save']?> "  />
 
+            <!-- Not used by fckgLite but required to prevent null error when DW adds events -->
+            <input type="button" id='edbtn__preview' style="display: none"/>
+
+
  <div id='saved_wiki_html' style = 'display:none;' ></div>
 
   <script type="text/javascript">
@@ -586,22 +583,6 @@ global $INFO;
         }
 
         unsetDokuWikiLockTimer();  
-
-       /**
-             Saves contents of the FCKeditor text area so that unsaved edits in FCK TextArea are
-             not lost when switching from the FCKEditor to DokuWiki preview mode: FCK Preview             
-        */
-        function saveFCKEditorNode(e) {
-          if(!confirm("<?php echo $fckg_lang['confirm_preview']?>")) return false;
-           var dwform = $('dw__editform');
-           if(dwform && dwform.elements && dwform.elements.fckEditor_text && ourFCKEditorNode) {           
-               dwform.elements.fckEditor_text.value = ourFCKEditorNode.innerHTML; 
-         }
-          $('fck_preview_mode').value = 'preview';
-           parse_wikitext('edbtn__preview'); 
-           return true;
-        }
-
 
         function dwfck_size_ctl(which) {
            var height = parseInt(document.getElementById('wiki__text___Frame').style.height); 
