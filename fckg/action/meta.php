@@ -42,14 +42,11 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
             $controller->register_hook( 'HTML_EDITFORM_INJECTION', 'AFTER', $this, 'postprocess');              
             $controller->register_hook( 'TPL_METAHEADER_OUTPUT', 'AFTER', $this, 'loadScript');    
             $controller->register_hook( 'HTML_EDITFORM_INJECTION', 'AFTER', $this, 'preprocess'); 
-            $controller->register_hook( 'HTML_EDITFORM_OUTPUT', 'BEFORE', $this, 'insertFormElement');
-            
-            $controller->register_hook('DOKUWIKI_STARTED', 'BEFORE', $this, 'file_type');
-         
+            $controller->register_hook( 'HTML_EDITFORM_OUTPUT', 'BEFORE', $this, 'insertFormElement');            
+            $controller->register_hook('DOKUWIKI_STARTED', 'BEFORE', $this, 'file_type');         
             $controller->register_hook('TPL_CONTENT_DISPLAY', 'AFTER', $this, 'prevent_output');       
             $controller->register_hook('TPL_CONTENT_DISPLAY', 'BEFORE', $this, 'output_before');
-           $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'fnencode_check');
-      
+            $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'fnencode_check');      
   }
 
 
@@ -59,27 +56,7 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
 
  $param = array();
 
- $label = "Show Preview Button"; 
- if($_REQUEST['prefix'] || $_REQUEST['suffix']) { 
-    $label .= " (disabled during section edits)";
- }
- $checkbox = array('_elem'=>'checkboxfield', '_text'=>$label, '_class'=>"", 
-                           'id'=>'fckL_show_prev', 'name'=>'fckL_show_prev', 'value'=>'show');
- $checkbox['onclick'] = 'fckL_show_preview()';
- $checkbox['title'] = 'Use with caution';
- 
- if(!isset($_COOKIE['FCKW_USE'])) {
-   $pos = $event->data->findElementByAttribute('type','submit');
-       //inserts HTML data after that position.
-     if($_REQUEST['prefix'] || $_REQUEST['suffix']) { 
-           $checkbox['disabled'] = 1;
-     }
-     $event->data->insertElement($pos+=3,$checkbox);
-     
-     echo "<style type = 'text/css'> #edbtn__save, #edbtn__save { display: none; }\n";
-     echo "div.summary { display: none; } </style>\n";
- }
- elseif(isset($_REQUEST['mode']) && $_REQUEST['mode'] == 'dwiki') {
+ if(isset($_REQUEST['mode']) && $_REQUEST['mode'] == 'dwiki') {
  $button = array
         (
             '_elem' => 'button',
@@ -96,9 +73,10 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
    $event->data->insertElement($pos+=1,$button);
    echo "<style type = 'text/css'> #edbtn__save, #edbtn__save { display: none; } </style>";
  }
+
    global $ID;
    $dwedit_ns = @$this->getConf('dwedit_ns');
-   if(isset($dwedit_ns)) {
+   if(isset($dwedit_ns) && $dwedit_ns) {
        $ns_choices = explode(',',$dwedit_ns);
        foreach($ns_choices as $ns) {
          $ns = trim($ns);
@@ -128,29 +106,6 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
 echo <<<JSFN
  <script type="text/javascript">
  //<![CDATA[ 
- var ShowPreviewButtonAlerted = false;
-  function fckL_show_preview() { 
-      var chkbx = document.getElementById('fckL_show_prev');
-      var but = document.getElementById('edbtn__preview');
-      if(chkbx.value == 'show') {
-           if(!ShowPreviewButtonAlerted) {
-               alert("Clicking 'Preview' will result in the loss of all work that has not been previously saved.");
-               but.style.display="inline";
-               chkbx.value = 'hide';
-           }
-           else {
-               but.style.display="inline";
-               chkbx.value = 'hide';
-           }
-          ShowPreviewButtonAlerted=true;
-      }
-      else {
-        but.style.display="none";
-        chkbx.value = 'show';
-      }
-       
-  }
-
   function FCKL_edit_disable() {
       var but = document.getElementById('edbtn__save');
       but.disabled=true;
@@ -206,62 +161,6 @@ JSFN;
     $event->data->insertElement(++$pos,$button);
 
  return;
-
-// The below recovery facility was for FCK Preview mode, which has now been removed
-/*
- $recovery_action = false;
- if(isset($_REQUEST['do']))  {  
-     $do = $_REQUEST['do'];
-     if(is_array($do) && array_key_exists('recover', $do)) {
-          $recovery_action = true;
-     }
-     else {
-        if($do == 'recover') {
-            $recovery_action = true;
-        }
-     }
- }
-
-
-   $section_edit = false;
-   if(preg_match('/([=]{3,})|(<code>)|(class\s*=\s*code)/mi',$_REQUEST['wikitext'])) {
-          $section_edit = true;
-   }
-
-   if($recovery_action) { 
-     if($section_edit) {
-          $button['title'] = 'Section edit cannot be recovered';
-          $button['value'] = 'Restore Original';
-     }
-     else {
-          $button['title'] = 'Edit Recovered Draft';
-          $button['value'] = 'Edit Recovered Draft';
-     }
-     $button['id'] = 'btn_recover';                  
-     $button['_action']   = 'edit';
-     echo "<style type = 'text/css'> #edbtn__save, #edbtn__preview { display: none; } </style>";
-    }
-
-
-
-   // get position of the submit button in the form.
-    $pos = $event->data->findElementByAttribute('type','submit');
-       //inserts HTML data after that position.
-    $event->data->insertElement(++$pos,$button);
-
-      $event->data->_hidden['mode'] = "";
-
-      if($recovery_action) {
-          $event->data->_hidden['recovery'] = "";
-          $event->data->_hidden['do'] = 'edit';    
-      }
-      else {
-           $event->data->_hidden['do'] = 'edit'; 
-      }
-    
-      $event->data->_hidden['fckEditor_text'] = '';
-
- */
  
   }
 
@@ -275,23 +174,11 @@ JSFN;
 
 
 
-if(isset($_REQUEST['do']) && is_array($_REQUEST['do'])) {
-  if(isset($_REQUEST['do']['preview'])) {
-     return;
-/*
-  echo <<<BUT
- <br />
- <input id = "fckg_mode_type"  type="hidden" name="mode" value="" />
- <input class="button" id="ebtn__edit"
-  onclick ="return setDWEditCookie(1, this);" 
-  type="submit" name="do[edit]" value="FCK Edit" accesskey="d" title="FCK Edit [ALT+E]" tabindex="6"  />
-
-BUT;
-*/
-
-}
-
-}
+ if(isset($_REQUEST['do']) && is_array($_REQUEST['do'])) {
+   if(isset($_REQUEST['do']['preview'])) {
+      return;
+   }
+ }
 
 if(!isset($_REQUEST['mode']) && !isset($_COOKIE['FCKW_USE'])) return;
 
@@ -314,29 +201,6 @@ BUT;
 
   }
 
-
- function disable_textarea(&$event, $param) {	
-/* 
- $recovery_action = false;
- if(isset($_REQUEST['do']))  {  
-     $do = $_REQUEST['do'];
-     if(is_array($do) && array_key_exists('recover', $do)) {
-          $recovery_action = true;
-     }
-     else {
-        if($do == 'recover') {
-            $recovery_action = true;
-        }
-     }
- }
-
-   if($recovery_action) {
-     echo "<script type='text/javascript'>;\n";
-     echo  "document.getElementById('wiki__text').focus = function() {};";  //otherwise IE complains
-     echo  "document.getElementById('wiki__text').disabled = true; </script>\n";
-   }
-*/
- }
 
 
  function preprocess(&$event, $param) {	 

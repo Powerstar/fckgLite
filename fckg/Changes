@@ -1,4 +1,4 @@
-rev 11-May_04-10_40
+rev 11-May_05-13_55
 
 01 Oct 2009
     Temporary fix to security in media and link tools, preventing any user access to toolbar
@@ -1583,3 +1583,16 @@ Nov 8 2009
  
  Removed unused FCK Preview button and javascript funtion it accessed. This was
  left over from DokuWikiFCK and not used in fckgLite.
+ 
+ 05 May
+ Added check for blank $dwedit_ns at top of edit.php and in insertFormElement() of meta.php;
+ if user happens delete all strings from that configration setting, an error is thrown
+ by php and in the case of edit.php, the editor cannot be changed back to the FCKeditor
+ but reverts to the DW editor.
+ 
+ Automated insertion of regex to convert %5D to ']' in the javascript function safe_convert
+ in  edit.php.  A ehck is done to see whether the new post_indicator version is in place
+ and if so the php inserts the javascript replacement.
+ 
+ Cleaned up much unused coding in meta.php left over from earlier versions of both
+ DowkuWikFCK and fckgLite.

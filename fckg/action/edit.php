@@ -78,7 +78,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
           $Fck_NmSp = $_COOKIE['FCK_NmSp'];
         }
         $dwedit_ns = @$this->getConf('dwedit_ns');
-        if(isset($dwedit_ns)) {
+        if(isset($dwedit_ns) && $dwedit_ns) {
             $ns_choices = explode(',',$dwedit_ns);
             foreach($ns_choices as $ns) {
               $ns = trim($ns);
@@ -640,10 +640,27 @@ var fckgLPluginPatterns = new Array();
    function safe_convert(value) {            
 
      if(oDokuWiki_FCKEditorInstance.dwiki_fnencode && oDokuWiki_FCKEditorInstance.dwiki_fnencode == 'safe') {
+      <?php
+       global $updateVersion;
+       if(!isset($updateVersion)) $updateVersion = 0;
+       echo "updateVersion=$updateVersion;";
+       $list = plugin_list('action');       
+       $safe_converted = false;
+       if(in_array( 'safefnrecode' , $list)) {
+          $safe_converted = true;          
+       }
+       
+     ?>
 
  		if(value.match(/%25/ && value.match(/%25[a-z0-9]/))) {
                           value = value.replace(/%25/g,"%");
-                          value =  SafeFN_decode(value,'safe');
+                          <?php                         
+                          if($updateVersion > 30 || $safe_converted) {
+                            echo 'value = value.replace(/%5D/g,"]");';
+                          }
+                          ?>
+
+                          value =  dwikiUTF8_decodeFN(value,'safe');
                        }
         }
         return value;
