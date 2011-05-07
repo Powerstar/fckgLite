@@ -131,6 +131,9 @@ function auth_nameencode($name,$skip_group=false){
   $cache =& $cache_authname;
   $name  = (string) $name;
 
+  // never encode wildcard FS#1955
+  if($name == '%USER%') return $name;
+
   if (!isset($cache[$name][$skip_group])) {
     if($skip_group && $name{0} =='@'){
       $cache[$name][$skip_group] = '@'.preg_replace('/([\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f])/e',
