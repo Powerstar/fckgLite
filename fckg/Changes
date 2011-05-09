@@ -1596,3 +1596,12 @@ Nov 8 2009
  
  Cleaned up much unused coding in meta.php left over from earlier versions of both
  DowkuWikFCK and fckgLite.
+
+ 07 May
+ Created wildcard branch which updates handling of wildcards (%USER%) to Anteater.
+
+ Added new configuration option 'auth_ci', which if true sets username checks to be case insensitiv
+
+ This version also respects ACL_AUTH 0, and hides files and directories to which user does not have
+
+

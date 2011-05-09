@@ -74,11 +74,12 @@ function GetFolders( $resourceType, $currentFolder )
 				
 
                 if(has_permission($currentFolder .'/' . $sFile,  $resourceType) || has_open_access() ) {  
-              
+                   
                    $class = ($_FolderClass < 8) ? 'r' : 'u';   
-
+                   if($_FolderClass) {   
 			  	   $aFolders[] = '<Folder name="' . ConvertToXmlAttribute( $sFile ) .   
                         '" class="'. $class .'" />' ;
+                   }
 
                }
 			}
@@ -170,7 +171,7 @@ function GetFoldersAndFiles( $resourceType, $currentFolder )
          }
          else $sfclass = ($_FolderClass >= 8  || has_open_access()) ? 'u' : 'r'; 
     }    
-   
+    if(!$_FolderClass) return;
     $aFolders[] = '<Folder name="' . ConvertToXmlAttribute( $sFile ) .   
                             '" class="'. $sfclass .'" />' ;
  
@@ -193,9 +194,10 @@ function GetFoldersAndFiles( $resourceType, $currentFolder )
                 
                     if(has_permission($currentFolder  .$sFile,  $resourceType) || has_open_access()) {                  
                        $class = ($_FolderClass < 8) ? 'r' : 'u'; 
-               
-				  	   $aFolders[] = '<Folder name="' . ConvertToXmlAttribute( $sFile ) .   
+                      if($_FolderClass){
+				  	    $aFolders[] = '<Folder name="' . ConvertToXmlAttribute( $sFile ) .   
                             '" class="'. $class .'" />' ;
+                     }
                     }
                     
 				}

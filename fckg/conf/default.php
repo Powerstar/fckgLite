@@ -13,4 +13,4 @@ $conf['editor_bak'] =  0;
 $conf['create_folder'] ='n';
 $conf['dwedit_ns'] = 'NONE';
 $conf['acl_del'] = 0;
-
+$conf['auth_ci'] = 0;

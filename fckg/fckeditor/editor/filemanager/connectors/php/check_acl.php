@@ -1,7 +1,9 @@
 <?php 
 if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../../../../../../../').'/');
-require_once DOKU_INC.'inc/utf8.php';
+if(!defined('DOKU_CONF')) define('DOKU_CONF',DOKU_INC.'conf/');
 
+require_once DOKU_INC.'inc/utf8.php';
+require_once DOKU_INC.'inc/config_cascade.php';
 // some ACL level defines
   define('AUTH_NONE',0);
   define('AUTH_READ',1);
@@ -11,8 +13,13 @@ require_once DOKU_INC.'inc/utf8.php';
   define('AUTH_DELETE',16);
   define('AUTH_ADMIN',255);
   global $AUTH_ACL;
-  $AUTH_ACL = file(DOKU_INC . '/conf/acl.auth.php');
+
   global $cache_authname; $cache_authname = array();
+  global $config_cascade;
+  global $Dwfck_conf_values; 
+  $AUTH_ACL = array();
+ //load ACL into a global array XXX
+  $AUTH_ACL = auth_loadACL();
  
 /**
  * Returns the maximum rights a user has for
@@ -28,7 +35,7 @@ require_once DOKU_INC.'inc/utf8.php';
 function auth_aclcheck($id,$user,$groups, $_auth=1){
  
   global $AUTH_ACL;
-  $AUTH_ACL = str_replace('%USER%',$user,$AUTH_ACL);
+//  $AUTH_ACL = str_replace('%USER%',$user,$AUTH_ACL);
    
   if($_auth == 255) {
         return 255; 
@@ -41,7 +48,9 @@ function auth_aclcheck($id,$user,$groups, $_auth=1){
 
   //if user is superuser or in superusergroup return 255 (acl_admin)
  // if(auth_isadmin($user,$groups)) { return AUTH_ADMIN; }
-
+  $ci = '';
+  if(!auth_isCaseSensitive()) $ci = 'ui';
+ 
   $user = auth_nameencode($user);
 
   //prepend groups with @ and nameencode
@@ -65,8 +74,7 @@ function auth_aclcheck($id,$user,$groups, $_auth=1){
   }
 
   //check exact match first
-  $matches = preg_grep('/^'.preg_quote($id,'/').'\s+('.$regexp.')\s+/',$AUTH_ACL);
-  
+  $matches = preg_grep('/^'.preg_quote($id,'/').'\s+('.$regexp.')\s+/'.$ci,$AUTH_ACL);  
   if(count($matches)){
     foreach($matches as $match){
       $match = preg_replace('/#.*$/','',$match); //ignore comments
@@ -90,8 +98,7 @@ function auth_aclcheck($id,$user,$groups, $_auth=1){
   }
 
   do{
-    $matches = preg_grep('/^'.$path.'\s+('.$regexp.')\s+/',$AUTH_ACL);
-      
+    $matches = preg_grep('/^'.$path.'\s+('.$regexp.')\s+/'.$ci,$AUTH_ACL);         
     if(count($matches)){
       foreach($matches as $match){
         
@@ -124,6 +131,15 @@ function auth_aclcheck($id,$user,$groups, $_auth=1){
 
   //still here? return no permissions
   return AUTH_NONE;
+}
+
+function auth_isCaseSensitive() {
+  global $Dwfck_conf_values;
+  $fckg = $Dwfck_conf_values['plugin']['fckg'];
+  if(isset($fckg['auth_ci']) && $fckg['auth_ci']) {
+     return false;
+  }
+  return true;
 }
 
 function auth_nameencode($name,$skip_group=false){
@@ -209,6 +225,43 @@ function cleanID($raw_id,$ascii=false,$media=false){
 
   $cache[(string)$raw_id] = $id;
   return($id);
+}
+
+
+/**
+ * Loads the ACL setup and handle user wildcards
+ *
+ * @author Andreas Gohr <andi@splitbrain.org>
+ * @returns array
+ */
+function auth_loadACL(){
+    global $config_cascade;
+    
+    if(!is_readable($config_cascade['acl']['default'])) return array();
+
+    $acl = file($config_cascade['acl']['default']);
+    if(!isset($sess_id) || $sess_id != $_COOKIE['FCK_NmSp_acl']) {
+           session_id($_COOKIE['FCK_NmSp_acl']);
+           session_start();    
+           if(isset($_SESSION['dwfck_client'])) {
+             $_SERVER['REMOTE_USER'] = $_SESSION['dwfck_client'];
+           }
+    }
+    //support user wildcard
+    if(isset($_SERVER['REMOTE_USER'])){
+        $len = count($acl);
+        for($i=0; $i<$len; $i++){
+            if($acl[$i]{0} == '#') continue;
+            list($id,$rest) = preg_split('/\s+/',$acl[$i],2);
+            $id   = str_replace('%USER%',cleanID($_SERVER['REMOTE_USER']),$id);
+            $rest = str_replace('%USER%',auth_nameencode($_SERVER['REMOTE_USER']),$rest);
+            $acl[$i] = "$id\t$rest";
+        }
+    }
+    else {
+       $acl = str_replace('%USER%',$user,$acl);  // fall-back, in case client not found
+    }
+    return $acl;
 }
 
 function checkacl_write_debug($data) {
