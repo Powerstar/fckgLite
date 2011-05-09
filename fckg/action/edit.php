@@ -1318,7 +1318,7 @@ function parse_wikitext(id) {
         }   // End Attributes Loop
 
            if(this.is_smiley) {
-                 results += alt;
+                 results += alt + ' ';
                  alt = "";
                  return;
            }
