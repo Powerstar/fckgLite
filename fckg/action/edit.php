@@ -29,6 +29,8 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
     var $debug = false;
     var $test = false;
     var $page_from_template;
+    var $draft_found = false;
+    var $draft_text;
     /**
      * Constructor
      */
@@ -56,19 +58,18 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
     {
         global $FCKG_show_preview;
         $FCKG_show_preview = true;
+
+        if(isset($_REQUEST['do']) && $_REQUEST['do'] == 'draft') {
+          //return;
+        }
+
         if(isset($_REQUEST['mode']) && $_REQUEST['mode'] == 'dwiki') {
-           if(isset($_REQUEST['fck_convert'])) {
-            //  $controller->register_hook('IO_WIKIPAGE_READ', 'BEFORE', $this, 'fck_convert_text');  
-           }
           $FCKG_show_preview = true;
           return;
         }
         elseif(isset($_COOKIE['FCKW_USE'])) {
              preg_match('/_\w+_/',  $_COOKIE['FCKW_USE'], $matches);
              if($matches[0] == '_false_') {
-               if(isset($_REQUEST['fck_convert'])) {
-                 // $controller->register_hook('IO_WIKIPAGE_READ', 'BEFORE', $this, 'fck_convert_text');  
-               }
                   $FCKG_show_preview = true;     
                    return;
              }
@@ -158,6 +159,8 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
     function fckg_edit(&$event)
     {
   
+        global $INFO;
+
         // we only change the edit behaviour
         if ($event->data != 'edit') {
             return;
@@ -190,7 +193,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
         global $SUM;
         global $lang;
         global $conf;
-
+        global $fckg_lang; 
         //set summary default
         if(!$SUM){
             if($REV){
@@ -213,7 +216,6 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                  if(!$text && $this->page_from_template) $text = $this->page_from_template;
             }
               
- 
       if(strpos($text, '%%') !== false) {
        $text= preg_replace('/%%\s*<([^%]+)>\s*%%/m','<nowiki><$1></nowiki>',$text);        
        $text= preg_replace('/%%\s*\{([^%]+)\}\s*%%/m','<nowiki>{$1}</nowiki>',$text);        
@@ -240,7 +242,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
             create_function(
                 '$matches',         
                  '$matches[4] = preg_replace("/<(?!\s)/ms", "&lt;", $matches[4]); 
-                  $matches[4] = preg_replace("/(?<!\s)>/ms", "&gt;", $matches[4]);
+                  $matches[4] = preg_replace("/(?<!\s)>/ms", "&gt;", $matches[4]);                    
                   $matches[4] = str_replace("\"", "__GESHI_QUOT__", $matches[4]);     
                   return "<" . $matches[1] . $matches[2] . $matches[3] . $matches[4] . $matches[5];'            
             ),
@@ -287,6 +289,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
        $text = preg_replace($email_regex,"<$1>",$text);
 
        $this->xhtml = $this->_render_xhtml($text);
+
        $this->xhtml = str_replace("__GESHI_QUOT__", '&#34;', $this->xhtml);
 
        $this->xhtml = str_replace('CHEVRONescC', '>>',$this->xhtml);
@@ -305,6 +308,14 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                 ),
                 $this->xhtml
               ); 
+       }
+       $cname = getCacheName($INFO['client'].$ID,'.draft.fckl');
+       if(file_exists($cname)) {
+          $cdata =  unserialize(io_readFile($cname,false));
+          $this->draft_text = $cdata['text'];
+          $this->draft_found = true;
+          unlink($cname);
+          msg($fckg_lang['draft_msg']) ;
        }
 
         return true;
@@ -338,7 +349,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
    }
 
    /**
-    * function _preprocess
+    * function _print
     * @author  Myron Turner
     */ 
     function _print()
@@ -409,7 +420,6 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
       <input type="hidden" name="prefix" value="<?php echo formText($PRE)?>" />
       <input type="hidden" name="suffix" value="<?php echo formText($SUF)?>" />
       <input type="hidden" id="fckg_mode_type"  name="mode" value="" />
-      <input type="hidden" id="fckEditor_text"  name="fckEditor_text" value="" />
       <input type="hidden" id="fck_preview_mode"  name="fck_preview_mode" value="nil" />
       <input type="hidden" id="fck_wikitext"    name="fck_wikitext" value="__false__" />
       <?php
@@ -420,7 +430,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
     </div>
 
     <textarea name="wikitext" id="wiki__text" <?php echo $ro?> cols="80" rows="10" class="edit" tabindex="1"><?php echo "\n".$this->xhtml?></textarea>
-
+    
 <?php 
 
 $temp=array();
@@ -487,7 +497,7 @@ $DW_EDIT_hide = $this->dw_edit_displayed();
                  type="submit" name="do[save]" value="<?php echo $fckg_lang['btn_dw_edit']?>"  
                  title="<?php echo $fckg_lang['title_dw_edit']?>"
                   />
-           
+
 <?php
  
 global $INFO;
@@ -517,19 +527,21 @@ global $INFO;
                    onmousedown="parse_wikitext('test');"
                   /> 
 
- <?php if($this->debug) { ?>
-         <input class="button" type="button" value = "Debug"
-                   title="Debug"                     
-                   onclick="HTMLParser_debug();"
-                  /> 
+ <?php if($this->draft_found) { ?>
+             <input class="button"                   
+                 onclick ="fckg_get_draft();" 
+                 style = "background-color: yellow"
+                 id="fckg_draft_btn" 
+                 type="button" value="<?php echo $fckg_lang['btn_draft'] ?>"  
+                 title="<?php echo $fckg_lang['title_draft'] ?>"
+                  />
+ <?php } else { ?>
 
-            <br />
- <?php } ?>
   
              <input class="button" type="button"
                    value="<?php echo $backup_btn ?>"
                    title="<?php echo $backup_title ?>"  
-                   onclick="renewLock('bakup');"  
+                   onclick="renewLock(true);"  
                   />
  
              <input class="button" type="button"
@@ -540,6 +552,16 @@ global $INFO;
               
  <br />
 
+ <?php }  ?>
+
+ <?php if($this->debug) { ?>
+         <input class="button" type="button" value = "Debug"
+                   title="Debug"                     
+                   onclick="HTMLParser_debug();"
+                  /> 
+
+            <br />
+ <?php } ?>
 
    <div id = "backup_msg" class="backup_msg" style=" display:none;">
      <table><tr><td class = "backup_msg_td">
@@ -570,10 +592,14 @@ global $INFO;
 
 
  <div id='saved_wiki_html' style = 'display:none;' ></div>
+ <div id='fckg_draft_html' style = 'display:none;' >
+ <?php echo $this->draft_text; ?>
+ </div>
 
   <script type="text/javascript">
 //<![CDATA[
-
+        //window.setInterval("draft_rename()", 480000); //check for dw draft every 8 minutes
+         window.setInterval("draft_rename()", 15000);  //check for dw draft every 2.5 minutes
         <?php  echo 'var backup_empty = "' . $fckg_lang['backup_empty'] .'";'; ?>
 
         function aspell_window() {
@@ -635,8 +661,27 @@ var fckgLPluginPatterns = new Array();
    echo "var doku_base = '" . DOKU_BASE ."'"; 
      
 ?>  
+          
+   var fckg_draft_btn = "<?php echo $fckg_lang['btn_exit_draft'] ?>";
+   var fckg_draft_btn_title = "<?php echo $fckg_lang['title_exit_draft']?>";
+   function fckg_get_draft() {
+      var dom = $('fckg_draft_html');
+      var draft = dom.innerHTML;
+      var dw_text = oDokuWiki_FCKEditorInstance.GetData( true );    
+      oInst = oDokuWiki_FCKEditorInstance.get_FCK();
+      oInst =oInst.EditorDocument.body;
+      oInst.innerHTML = draft;
+      dom.innerHTML = dw_text;
+      var btn = $('fckg_draft_btn');
+      var tmp = btn.value;  
+      btn.value = fckg_draft_btn;
+      fckg_draft_btn = tmp;
+      tmp = fckg_draft_btn_title;
+      btn.title = fckg_draft_btn_title;
+      fckg_draft_btn_title = tmp;
+   }
 
-   
+
    function safe_convert(value) {            
 
      if(oDokuWiki_FCKEditorInstance.dwiki_fnencode && oDokuWiki_FCKEditorInstance.dwiki_fnencode == 'safe') {
@@ -2027,7 +2072,8 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
       <?php }?>
   </div>
   </form>
-  
+
+  <!-- draft messages from DW -->
   <div id="draft__status"></div>
   
 <?php
@@ -2166,7 +2212,8 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
         $Renderer->notoc();
         $Renderer->smileys = getSmileys();
         $Renderer->entities = getEntities();
-        $Renderer->acronyms = getAcronyms();
+       // $Renderer->acronyms = getAcronyms();
+        $Renderer->acronyms = array();
         $Renderer->interwiki = getInterwiki();
         #$Renderer->badwords = getBadWords();
 
@@ -2233,6 +2280,7 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
     }
 
   function write_debug($what) {
+     return;
      $handle = fopen("edit_php.txt", "a");
      if(is_array($what)) $what = print_r($what,true);
      fwrite($handle,"$what\n");

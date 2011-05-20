@@ -17,7 +17,12 @@ $fckg_lang['confirm_preview'] = "Any work not saved will be lost.";
 $fckg_lang['dw_btn_backup'] ="Back-up";
 $fckg_lang['title_dw_backup'] ="Back up editor window & Renew lock";
 $fckg_lang['backup_empty'] = "The back-up buffer appears to be empty. Do you wish to continue?";
-
+$fckg_lang['btn_draft'] = "Get Draft";
+$fckg_lang['title_draft'] = "View, Show, Edit Draft";
+$fckg_lang['btn_exit_draft'] = "Exit Draft";
+$fckg_lang['title_draft'] = "View, Show, Edit Draft";
+$fckg_lang['title_exit_draft'] = "Return to current document";
+$fckg_lang['draft_msg']= "This document has a draft file. The draft button toggles between the this document and the draft. You can edit and save either of the two." ;
 
 
 

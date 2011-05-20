@@ -49,24 +49,13 @@ class helper_plugin_fckg extends DokuWiki_Plugin {
 
     $meta_fn = metaFN($ID,'.fckg');
     $meta_id = 'meta/' . str_replace(':','/',$ID) . '.fckg';
-    // recovery is text recovered from drafts
-    // recovery is set up in meta.php
-    //|(class\s*=\s*code)
-    $section_edit = false; 
-    $recovery = isset($_REQUEST['recovery']) ? $_REQUEST['recovery'] : '__null';
-    if($recovery != '__null' && !preg_match('/([=]{3,})|(<code>)|(class\s*=\s*code)/mi',$recovery))  {
-           $recovery = preg_replace('/[\n\r]+/', ' ',$recovery); 
-           $recovery  = addcslashes ($recovery, '"'); 
-           $recovery = preg_replace('/[\xa0-\xff]/', "&nbsp;", $recovery );    
-    }
-    else { 
-        $recovery = '__null';   
-    }
 
   global $INFO; 
   global $conf;
   global $USERINFO;
-  
+ // global $CNAME;
+
+  $cname = getCacheName($INFO['client'].$ID,'.draft');
   $open_upload = $this->getConf('open_upload');
   $editor_backup = $this->getConf('editor_bak');
   $create_folder = $this->getConf('create_folder');
@@ -126,7 +115,7 @@ class helper_plugin_fckg extends DokuWiki_Plugin {
 <script type='text/javascript'>
  //<![CDATA[
  
-var FCKRecovery = "$recovery";
+var FCKRecovery = "";
 var oldonload = window.onload;
 var ourLockTimerINI = false;
 
@@ -143,8 +132,9 @@ var ourLockTimerINI = false;
  var ourFCKEditorNode = null;
  var ourLockTimerIntervalID;
    /**
-        handles both mousepresses and keystrokes from FCKeditor window
-        assigned in fckeditor.html
+    *    event handler
+    *    handles both mousepresses and keystrokes from FCKeditor window
+    *    assigned in fckeditor.html
   */
  function handlemouspress(e) { 
    if(ourLockTimerIsSet) {
@@ -196,8 +186,8 @@ var ourLockTimerINI = false;
 
  function lockTimerRefresh(bak) {
         var now = new Date();
-    
-        if((now.getTime() - locktimer.our_lasttime.getTime() > 60*1000) || bak){            
+   
+        if((now.getTime() - locktimer.our_lasttime.getTime() > 45*1000) || bak){            
            var dwform = $('dw__editform');
             window.clearTimeout(ourLockTimerWarningtimerID);
             var params = 'call=lock&id='+encodeURIComponent(locktimer.pageid);
@@ -208,34 +198,18 @@ var ourLockTimerINI = false;
                 params += '&suffix='+encodeURIComponent(dwform.elements.suffix.value);
                 params += '&date='+encodeURIComponent(dwform.elements.date.value);
             }
-            locktimer.our_lasttime = now;    
+            locktimer.our_lasttime = now;   
             locktimer.sack.runAJAX(params); 
         }
-
+        
  }
 
 
-  /** tied into but does not depend upon draft system:
-  *   puts recovered text into FCKeditor window
-  *     1. when draft recovery is accessed by DW
-  *     2. when switching between FCKeditor window and FCK Preview and back
-  *           contents of FCKeditor window are saved and then restored when clicking FCK Edit button
-  *           in FCK Preview mode; this insures that any edits made in FCKeditor window will
-  *           not be lost, because it will not have been saved to file and when switching back from
-  *           preview mode DW re-reads the file.
-  */  
+ /**
+   Legacy function has no current use
+ */
  function getRecoveredText() {
-      if(!ourFCKEditorNode) return;
-      var fck_text = $('fckEd__text');
-      if(FCKRecovery != '__null') {
-         ourFCKEditorNode.innerHTML =  FCKRecovery ;       
-         return;
-      }
-      if(fck_text) {
-           ourFCKEditorNode.innerHTML = fck_text.innerHTML;
-           return;
-      }
-  
+    return FCKRecovery;
  }
 
  function resetDokuWikiLockTimer(delete_checkbox) {
@@ -269,7 +243,9 @@ function renewLock(bak) {
   if(ourLockTimerIsSet) {
          lockTimerRefresh(true);
    }
-   else locktimer.refresh();
+   else { 
+    locktimer.refresh();
+   }
    locktimer.reset();
 
 
@@ -317,6 +293,26 @@ function revert_to_prev() {
     ourFCKEditorNode.innerHTML = $('saved_wiki_html').innerHTML;
 }
 
+function draft_rename() {
+        var debug = false;
+        var params = "draft_id=$cname";
+        var draft_rn = new sack(DOKU_BASE + 'lib/plugins/fckg/scripts/draft_rename.php');
+ 
+        draft_rn.onCompletion = function() {
+        	if (draft_rn.responseStatus){   
+                if(draft_rn.responseStatus[0] == 200) {
+                  if(draft_rn.response && draft_rn.response != 'done') {
+                    if(debug) alert('success: ' + draft_rn.response);
+                  }
+                }
+                else alert("error [2] saving draft");
+            }
+        };
+
+        draft_rn.runAJAX(params);
+
+}
+
 function disableDokuWikiLockTimer() {
   resetDokuWikiLockTimer(false);
   if(ourLockTimerIntervalID) {
@@ -358,6 +354,12 @@ function FCKeditor_OnComplete( editorInstance )
     editorInstance.EditorDocument.addEventListener('keydown', CTRL_Key_Formats, false) ;
   else
    editorInstance.EditorDocument.attachEvent('onkeydown', CTRL_Key_Formats) ;
+
+  var FCK = oDokuWiki_FCKEditorInstance.get_FCK();
+  if(FCK.EditorDocument && FCK.EditorDocument.body  && !ourFCKEditorNode) {
+     ourFCKEditorNode = FCK.EditorDocument.body;     
+  }
+
 }
 
 

@@ -9,6 +9,7 @@ require_once(DOKU_PLUGIN.'action.php');
 global $conf;
 global $fckg_lang;
 
+
 $default_english_file = DOKU_PLUGIN . 'fckg/action/lang/en.php';
 require_once($default_english_file);
 if(isset($conf['lang'])) {
@@ -20,6 +21,7 @@ if(isset($conf['lang'])) {
  
 class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
   var $session_id = false;    
+  var $draft_file;
   /**
    * return some info
    */
@@ -38,19 +40,30 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
   /*
    * Register its handlers with the dokuwiki's event controller
    */
-  function register(&$controller) {
-            $controller->register_hook( 'HTML_EDITFORM_INJECTION', 'AFTER', $this, 'postprocess');              
+  function register(&$controller) {            
             $controller->register_hook( 'TPL_METAHEADER_OUTPUT', 'AFTER', $this, 'loadScript');    
             $controller->register_hook( 'HTML_EDITFORM_INJECTION', 'AFTER', $this, 'preprocess'); 
             $controller->register_hook( 'HTML_EDITFORM_OUTPUT', 'BEFORE', $this, 'insertFormElement');            
             $controller->register_hook('DOKUWIKI_STARTED', 'BEFORE', $this, 'file_type');         
             $controller->register_hook('TPL_CONTENT_DISPLAY', 'AFTER', $this, 'prevent_output');       
-            $controller->register_hook('TPL_CONTENT_DISPLAY', 'BEFORE', $this, 'output_before');
             $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'fnencode_check');      
+            $controller->register_hook('DOKUWIKI_DONE', 'BEFORE', $this, 'remove_draftfile');      
+   
   }
 
 
+ function remove_draftfile(&$event,$param) {
 
+   global $ACT;
+   global $FCKG_draft_file; 
+   if($ACT != 'show') return;
+   if(isset($_REQUEST['id']) && !$_REQUEST['id']) return;
+
+   if(file_exists($this->draft_file)) { 
+          unlink($this->draft_file);
+   }
+ 
+ }
  function  insertFormElement(&$event, $param) {	 
    global $FCKG_show_preview;  
 
@@ -62,7 +75,7 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
             '_elem' => 'button',
             'type' => 'submit',
             '_action' => 'cancel',
-            'value' => 'Exit',
+            'value' => '__Exit__',
             'class' => 'button',
             'id' => 'edbtn__edit',
             'title' => 'Exit to Switch Editors',              
@@ -81,7 +94,7 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
        foreach($ns_choices as $ns) {
          $ns = trim($ns);
          if(preg_match("/$ns/",$ID)) {
-            echo "<style type = 'text/css'> #edbtn__save, #edbtn__save { display: inline; } </style>";         
+            echo "<style type = 'text/css'>#edbtn__preview,#edbtn__save, #edbtn__save { display: inline; } </style>";         
             break;
          }
        }
@@ -103,33 +116,7 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
     echo '<style type="text/css">#edbtn__preview { position:absolute; visibility:hidden; }</style>';
  }
 
-echo <<<JSFN
- <script type="text/javascript">
- //<![CDATA[ 
-  function FCKL_edit_disable() {
-      var but = document.getElementById('edbtn__save');
-      but.disabled=true;
-  }
-//]]> 
- </script>
-JSFN;
  global $fckg_lang;
-
- $recovery_action = false;
- if(isset($_REQUEST['do']))  {  
-     $do = $_REQUEST['do'];
-     if(is_array($do) && array_key_exists('recover', $do)) {
-          $recovery_action = true;
-     }
-     else {
-        if($do == 'recover') {
-            $recovery_action = true;
-        }
-     }
- }
- if($recovery_action) {
-   echo "<style type = 'text/css'>#edbtn__preview { display: none; } </style>";
- }
 
   if($_REQUEST['fck_preview_mode']== 'preview'){
     return;
@@ -160,47 +147,9 @@ JSFN;
        //inserts HTML data after that position.
     $event->data->insertElement(++$pos,$button);
 
- return;
+   return;
  
   }
-
-
- function  postprocess(&$event, $param) {	 
-
-   $act = $event->data;
-   if(is_string($act) && $act != 'edit') {  
-        return;
-   }
-
-
-
- if(isset($_REQUEST['do']) && is_array($_REQUEST['do'])) {
-   if(isset($_REQUEST['do']['preview'])) {
-      return;
-   }
- }
-
-if(!isset($_REQUEST['mode']) && !isset($_COOKIE['FCKW_USE'])) return;
-
-if(isset($_REQUEST['mode']) &&  $_REQUEST['mode'] == 'fck') {
-        return;
-}
-elseif(isset($_COOKIE['FCKW_USE']) && $_COOKIE['FCKW_USE'] != '_false_') return;
-
-if(!$_REQUEST['mode'] && !$_COOKIE['FCKW_USE']) return;
-
-echo <<<BUT
-
-<br />
- <input id = "fckg_mode_type"  type="hidden" name="mode" value="" />
- <input class="button" id="ebtn__edit"
-  onclick ="return setDWEditCookie(1, this);" 
-  type="submit" name="do[edit]" value="FCK Edit" accesskey="d" title="FCK Edit" [ALT+E]" tabindex="6" />
-
-BUT;
-
-  }
-
 
 
  function preprocess(&$event, $param) {	 
@@ -209,40 +158,14 @@ BUT;
    if(is_string($act) && $act != 'edit') {  
         return;
    }
-
   
-  $this->fck_editor($event, $param);
-  global $lang;
-  $notSavedStr = "'" . $lang['notsavedyet']. "'";
+  ///$this->fck_editor($event, $param);
  
   echo <<<SCRIPT
     <script type="text/javascript">
     //<![CDATA[ 
     //var oldChangeCheck = changeCheck;
     function setDWEditCookie(which, e) { 
-         
-      remove_draft();
-      var dwform = $('dw__editform');   
-      //dwform.rev.value = "";
-      if(dwform && dwform.elements && dwform.elements.recovery) {           
-           dwform.elements.recovery.value = dwform.elements.wikitext.value; 
-      }
-         /**
-             The contents of the FCKeditor are saved in a hidden DIV when
-             FCK Preview is clicked
-         */
-      if(dwform && dwform.elements && dwform.elements.fckEditor_text) {           
-            var dom = document.getElementById('fckEd__text');
-            if(dom) {
-               dwform.elements.fckEditor_text.value = dom.innerHTML;  
-              if(dwform.elements.changecheck) {
-                     var parent = dwform.elements.changecheck.parentNode;
-                     parent.removeChild(dwform.elements.changecheck);
-                     parent.removeChild(dwform.elements.sectok);
-                     parent.removeChild(dwform.elements.date);
-              }
-            }
-      }
       
        var dom = document.getElementById('fckg_mode_type');          
        if(which == 1) {
@@ -282,7 +205,15 @@ SCRIPT;
       global $ID;
 
       if($this->session_id) return;       
- 
+           $cname = getCacheName($INFO['client'].$ID,'.draft');   
+           if(file_exists($cname)) {
+              $fckl_draft = $cname . '.fckl';
+              if(file_exists($fckl_draft)) {
+                    unlink($fckl_draft);
+              }
+              rename($cname, $fckl_draft);
+           }
+           $this->draft_file = $cname . '.fckl';
            $session_string =  session_id(); 
            $this->session_id = $session_string;      
        
@@ -376,10 +307,8 @@ function loadScript(&$event) {
 SCRIPT;
 
 }
-
+/*
 function fck_editor(&$event) {
-
-
   
     if($_REQUEST['fckEditor_text'] ) {
         echo "<div id = 'fckEd__text' style='position:absolute; visibility:hidden;'>";   
@@ -389,17 +318,15 @@ function fck_editor(&$event) {
 
 
 }
- 
-function output_before(&$event) {
-
-
-}
+*/
 
 /** 
- *  Insures that textarea is empty when empty DW window is requested
+ *  Handle features need for DW Edit: 
+ *    1. load script, if not loaded
+ *    2. Re-label Cancel Button "Exit" when doing a preview  
 */
   function prevent_output(&$event) {
-   global $ACT;
+  global $ACT;
 
   $url = DOKU_URL . 'lib/plugins/fckg/scripts/script-cmpr.js';
   echo <<<SCRIPT
@@ -419,9 +346,6 @@ function output_before(&$event) {
 
 SCRIPT;
 
-
-
-
   if(isset($_REQUEST['do']) && is_array($_REQUEST['do'])) {
     if(isset($_REQUEST['do']['preview'])) {
            echo '<script type="text/javascript">';
@@ -429,13 +353,6 @@ SCRIPT;
            echo  '</script>';
     }
   }
-   if($ACT != 'edit') return;
-
-
-   if(isset($_REQUEST['fckg_bak'])) {    
-     echo "<script type='text/javascript'>;\n";
-     echo  "document.getElementById('wiki__text').value = ''; </script>\n";
-   }
  
 
   }
