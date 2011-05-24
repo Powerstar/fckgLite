@@ -3,7 +3,7 @@ if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../../..
 if(!defined('DOKU_CONF')) define('DOKU_CONF',DOKU_INC.'conf/');
 
 require_once DOKU_INC.'inc/utf8.php';
-require_once DOKU_INC.'inc/config_cascade.php';
+
 // some ACL level defines
   define('AUTH_NONE',0);
   define('AUTH_READ',1);
@@ -19,7 +19,8 @@ require_once DOKU_INC.'inc/config_cascade.php';
   global $Dwfck_conf_values; 
   $AUTH_ACL = array();
  //load ACL into a global array XXX
-  $AUTH_ACL = auth_loadACL();
+  $AUTH_ACL = file(DOKU_INC . '/conf/acl.auth.php');
+ 
  
 /**
  * Returns the maximum rights a user has for
@@ -34,9 +35,8 @@ require_once DOKU_INC.'inc/config_cascade.php';
  */
 function auth_aclcheck($id,$user,$groups, $_auth=1){
  
-  global $AUTH_ACL;
-//  $AUTH_ACL = str_replace('%USER%',$user,$AUTH_ACL);
-   
+  global $AUTH_ACL; 
+  $AUTH_ACL = auth_loadACL($AUTH_ACL);
   if($_auth == 255) {
         return 255; 
   }
@@ -234,15 +234,19 @@ function cleanID($raw_id,$ascii=false,$media=false){
  * @author Andreas Gohr <andi@splitbrain.org>
  * @returns array
  */
-function auth_loadACL(){
+function auth_loadACL($acl_file){
     global $config_cascade;
-    
-    if(!is_readable($config_cascade['acl']['default'])) return array();
 
-    $acl = file($config_cascade['acl']['default']);
+    $acl = $acl_file;
+    $sess_id = session_id();
     if(!isset($sess_id) || $sess_id != $_COOKIE['FCK_NmSp_acl']) {
            session_id($_COOKIE['FCK_NmSp_acl']);
            session_start();    
+           if(isset($_SESSION['dwfck_client'])) {
+             $_SERVER['REMOTE_USER'] = $_SESSION['dwfck_client'];
+           }
+    }
+    else {
            if(isset($_SESSION['dwfck_client'])) {
              $_SERVER['REMOTE_USER'] = $_SESSION['dwfck_client'];
            }

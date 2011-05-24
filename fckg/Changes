@@ -1,4 +1,4 @@
-rev 11-May_19-19_28
+rev 11-May_23-23_49
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -32,6 +32,15 @@ Dokuwiki Draft mechanism.
 
 19  May 
 Removed DW Renderer's acronym processing from the output to the FCKEditor editor;
-this does not interfer with acronyms  processed for final output in browser. This
+this does not interfere with acronyms processed for final output in browser. This
 solves a problem of acronymic names that appear in plugins and plugin syntax, since
 the editor sess these as acronyms instead of as plugin syntax.
+ 
+23 May
+Fixed ACL check in filemanager/connectors/php/check_acl.php which was not fully
+backwardly comaptible with DW after upgrading %USER% substitions and which
+could fail under some conditions even in current DW distros. 
+
+Put array check into edit.php when checking for guest user in edit.php where
+the save and delete buttons are disabled for guests (approx lines 435ff.).  Some
+systems got a PHP warning because the $INFO[userinfo][grps] did not hold an array.
