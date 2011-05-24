@@ -437,21 +437,24 @@ $temp=array();
 trigger_event('HTML_EDITFORM_INJECTION', $temp);
 
 $DW_EDIT_disabled = '';
-$guest_perm =  $acl = auth_quickaclcheck($_REQUEST['id']);
+$guest_perm = auth_quickaclcheck($_REQUEST['id']);
 $guest_group = false;
 $guest_user = false;
-if(isset($INFO['userinfo'])) {
-  $user_groups = $INFO['userinfo']['grps'];
+
+if(isset($INFO['userinfo'])&& isset($INFO['userinfo']['grps'])) {
+   $user_groups = $INFO['userinfo']['grps'];
+   if(is_array($user_groups) && $user_groups) {  
       foreach($user_groups as $group) { 
         if (strcasecmp('guest', $group) == 0) {
           $guest_group = true;
           break;
         }
      }
+   }
   if($INFO['client'] == 'guest') $guest_user = true; 
 }
 
-if(($guest_user || $guest_group) && $guest_perm < 2) $DW_EDIT_disabled = 'disabled';
+if(($guest_user || $guest_group) && $guest_perm <= 2) $DW_EDIT_disabled = 'disabled';
 
 
 $DW_EDIT_hide = $this->dw_edit_displayed(); 
