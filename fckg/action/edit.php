@@ -1188,6 +1188,14 @@ function parse_wikitext(id) {
                        if(!this.attr.match(/^:/)) {
                          this.attr = ':' + this.attr;
                        }
+                      if(this.attr.match(/\?.*?=/)){
+                       var elems = this.attr.split(/\?/);                       
+                       elems[0] = elems[0].replace(/\//g,':'); 
+                       this.attr = elems[0] + '?' + elems[1];
+                      }
+                      else {
+                          this.attr = this.attr.replace(/\//g,':'); 
+                      }
 
                    /* catch query strings attached to internal links for .htacess nice urls  */
                       if(!qs_set && attrs[i].name == 'href') { 
