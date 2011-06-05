@@ -408,9 +408,12 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                  );
         }
 
-      
 
 ?>
+
+   <!--  style type="text/css"> 
+  .button.btn_show { display:none }
+  </style -->
 
    <form id="dw__editform" method="post" action="<?php echo script()?>"  "accept-charset="<?php echo $lang['encoding']?>">
     <div class="no">
@@ -421,7 +424,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
       <input type="hidden" name="suffix" value="<?php echo formText($SUF)?>" />
       <input type="hidden" id="fckg_mode_type"  name="mode" value="" />
       <input type="hidden" id="fck_preview_mode"  name="fck_preview_mode" value="nil" />
-      <input type="hidden" id="fck_wikitext"    name="fck_wikitext" value="__false__" />
+      <input type="hidden" id="fck_wikitext"    name="fck_wikitext" value="__false__" />     
       <?php
       if(function_exists('formSecurityToken')) {
            formSecurityToken();  
@@ -488,6 +491,7 @@ $DW_EDIT_hide = $this->dw_edit_displayed();
                    <?php echo $DW_EDIT_disabled; ?>
                    name="do[delete]" value="<?php echo $lang['btn_delete']?>"
                    title="<?php echo $fckg_lang['title_dw_delete'] ?>"
+                   onmouseup="draft_delete();"
                    onclick = "return confirm('<?php echo $fckg_lang['confirm_delete']?>');"
             />
 
@@ -515,6 +519,7 @@ global $INFO;
             <input class="button" type="submit" 
                  name="do[draftdel]" 
                  value="<?php echo $lang['btn_cancel']?>" 
+                 onmouseup="draft_delete();" 
                  title = "<?php echo $fckg_lang['title_dw_cancel']?>"
              />
 
@@ -587,6 +592,7 @@ global $INFO;
 
       <input style="display:none;" class="button" id="edbtn__save" type="submit" name="do[save]" 
                       value="<?php echo $lang['btn_save']?>" 
+                      onmouseup="draft_delete();"
                       <?php echo $DW_EDIT_disabled; ?>
                       title="<?php echo $lang['btn_save']?> "  />
 
@@ -601,8 +607,8 @@ global $INFO;
 
   <script type="text/javascript">
 //<![CDATA[
-        //window.setInterval("draft_rename()", 480000); //check for dw draft every 8 minutes
-         window.setInterval("draft_rename()", 15000);  //check for dw draft every 2.5 minutes
+        
+
         <?php  echo 'var backup_empty = "' . $fckg_lang['backup_empty'] .'";'; ?>
 
         function aspell_window() {
@@ -711,13 +717,13 @@ var fckgLPluginPatterns = new Array();
                           value =  dwikiUTF8_decodeFN(value,'safe');
                        }
         }
-        return value;
+        return value; 
 
      }
 
 var HTMLParser_DEBUG = "";
 function parse_wikitext(id) {
-
+ if(id != 'bakup')  draft_delete();
  var line_break = "\nL_BR_K  \n";
     var markup = { 'b': '**', 'i':'//', 'em': '//', 'u': '__', 'br':line_break, 
          'del': '<del>', 'strike': '<del>', p: "\n\n" , 'a':'[[', 'img': '\{\{',

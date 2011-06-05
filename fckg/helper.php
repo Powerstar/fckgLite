@@ -186,7 +186,7 @@ var ourLockTimerINI = false;
 
  function lockTimerRefresh(bak) {
         var now = new Date();
-   
+  
         if((now.getTime() - locktimer.our_lasttime.getTime() > 45*1000) || bak){            
            var dwform = $('dw__editform');
             window.clearTimeout(ourLockTimerWarningtimerID);
@@ -293,11 +293,13 @@ function revert_to_prev() {
     ourFCKEditorNode.innerHTML = $('saved_wiki_html').innerHTML;
 }
 
-function draft_rename() {
+
+function draft_delete() {
+
         var debug = false;
         var params = "draft_id=$cname";
-        var draft_rn = new sack(DOKU_BASE + 'lib/plugins/fckg/scripts/draft_rename.php');
- 
+        var draft_rn = new sack(DOKU_BASE + 'lib/plugins/fckg/scripts/draft_delete.php');
+        draft_rn.asynchronous = false;
         draft_rn.onCompletion = function() {
         	if (draft_rn.responseStatus){   
                 if(draft_rn.responseStatus[0] == 200) {
@@ -305,7 +307,7 @@ function draft_rename() {
                     if(debug) alert('success: ' + draft_rn.response);
                   }
                 }
-                else alert("error [2] saving draft");
+                
             }
         };
 
@@ -385,8 +387,41 @@ function CTRL_Key_Formats(parm) {
 
   }
 
-  var DWikifnEncode = "$fnencode";
 
+ 
+  var DWikifnEncode = "$fnencode";
+  
+/* Make sure that show buttons in top and/or bottom clear the fckl file */
+function get_showButtons() {
+	var buttons = new Array();
+	var forms = document.getElementsByTagName('form');
+
+	for(var i=0; i<forms.length;i++) {
+	   var f = forms[i]; 
+	   var stoploop = false;
+	   for(name in f) {
+	    if(name.match(/classList/i)){   
+	        var fnm =new String(f[name]); 
+	        if(!fnm) continue; 
+	        if(fnm.match(/btn_show/)) {
+	           buttons.push(f);
+	        }
+	   }
+	 }
+   }
+  
+  
+  for(var i=0; i<buttons.length; i++) {
+    var f = buttons[i].elements;
+    for(var i in f) {
+        if(f[i].type && f[i].type.match(/submit/i)) {
+           f[i].onmouseup = draft_delete;
+        }
+    }
+  }
+}
+
+ get_showButtons();
  //]]>
  
 </script>

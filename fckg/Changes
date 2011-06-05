@@ -1,4 +1,4 @@
-rev 11-May_23-23_49
+rev 11-Jun_05-10_24
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -38,9 +38,28 @@ the editor sess these as acronyms instead of as plugin syntax.
  
 23 May
 Fixed ACL check in filemanager/connectors/php/check_acl.php which was not fully
-backwardly comaptible with DW after upgrading %USER% substitions and which
+backwardly compatible with DW after upgrading %USER% wildcard substitions and which
 could fail under some conditions even in current DW distros. 
 
 Put array check into edit.php when checking for guest user in edit.php where
 the save and delete buttons are disabled for guests (approx lines 435ff.).  Some
 systems got a PHP warning because the $INFO[userinfo][grps] did not hold an array.
+
+25 May
+Forward slashes in userewrite=2 were not being converted to colons, when saved.
+This is now fixed in edit.php.
+
+3 June
+Re-worked the new draft recovery facility so that fckl draft files are removed in a
+timely fashion, so as to prevent false draft file notifications.  Save, Show, Delete,
+and Cancel buttons call draft_rename(), which deletes the fckl file, so that
+it remains on the server only in cases where there is some interruption of
+normal processing.
+
+4 June
+Made Call to draft_rename synchronous; otherwise there is no guarantee that it will
+delete the draft file from the server.
+
+5 June
+Renamed draft_refresh to draft_delete in function calls and fckg/scripts to reflect
+the new use of that function (see 3 June).

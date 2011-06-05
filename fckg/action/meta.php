@@ -22,6 +22,7 @@ if(isset($conf['lang'])) {
 class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
   var $session_id = false;    
   var $draft_file;
+  
   /**
    * return some info
    */
@@ -47,23 +48,10 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
             $controller->register_hook('DOKUWIKI_STARTED', 'BEFORE', $this, 'file_type');         
             $controller->register_hook('TPL_CONTENT_DISPLAY', 'AFTER', $this, 'prevent_output');       
             $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'fnencode_check');      
-            $controller->register_hook('DOKUWIKI_DONE', 'BEFORE', $this, 'remove_draftfile');      
-   
+         
   }
 
-
- function remove_draftfile(&$event,$param) {
-
-   global $ACT;
-   global $FCKG_draft_file; 
-   if($ACT != 'show') return;
-   if(isset($_REQUEST['id']) && !$_REQUEST['id']) return;
-
-   if(file_exists($this->draft_file)) { 
-          unlink($this->draft_file);
-   }
  
- }
  function  insertFormElement(&$event, $param) {	 
    global $FCKG_show_preview;  
 
@@ -113,9 +101,9 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
       echo '<style type="text/css">#edbtn__preview { display: inline; } </style>';
  }
  else {
-    echo '<style type="text/css">#edbtn__preview { position:absolute; visibility:hidden; }</style>';
+    echo '<style type="text/css">#edbtn__preview, .btn_show { position:absolute; visibility:hidden; }</style>';
  }
-
+  
  global $fckg_lang;
 
   if($_REQUEST['fck_preview_mode']== 'preview'){
@@ -159,8 +147,7 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
         return;
    }
   
-  ///$this->fck_editor($event, $param);
- 
+  
   echo <<<SCRIPT
     <script type="text/javascript">
     //<![CDATA[ 
@@ -203,17 +190,20 @@ SCRIPT;
       global $USERINFO, $INFO; 
       global $conf; 
       global $ID;
-
+      global $ACT;
+    
       if($this->session_id) return;       
-           $cname = getCacheName($INFO['client'].$ID,'.draft');   
+
+           $cname = getCacheName($INFO['client'].$ID,'.draft');  
+
            if(file_exists($cname)) {
               $fckl_draft = $cname . '.fckl';
               if(file_exists($fckl_draft)) {
                     unlink($fckl_draft);
               }
-              rename($cname, $fckl_draft);
+              @rename($cname, $fckl_draft);
            }
-           $this->draft_file = $cname . '.fckl';
+          
            $session_string =  session_id(); 
            $this->session_id = $session_string;      
        
@@ -353,12 +343,13 @@ SCRIPT;
            echo  '</script>';
     }
   }
- 
+
 
   }
 
 function fnencode_check() {
-   
+
+
        global $conf;
        global $updateVersion;
        $rencode = false;
@@ -395,7 +386,7 @@ function fnencode_check() {
 
 
 function write_debug($data) {
-  return;
+ // return;
   if (!$handle = fopen(DOKU_INC .'meta.txt', 'a')) {
     return;
     }

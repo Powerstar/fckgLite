@@ -13,11 +13,9 @@ if(file_exists($cname)) {
    if(file_exists($fckg_cname)) {
       unlink($fckg_cname); 
    }
-   if(rename($cname,$fckg_cname)) {
-      @io_unlock($cname);
-      echo  $cname;
-      exit;
-   }
+   unlink($cname); 
+
+  exit;
 }
 
 echo "done";
