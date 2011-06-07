@@ -241,8 +241,17 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
             '/<(code|file)(.*?)(>)(.*?)(<\/\1>)/ms',
             create_function(
                 '$matches',         
-                 '$matches[4] = preg_replace("/(?<!<)<(?!\s)/ms", "&lt;", $matches[4]); 
-                  $matches[4] = preg_replace("/(?<!\s)(?!>)>/ms", "&gt;", $matches[4]);                    
+                 'if(preg_match("/\w+/",$matches[2])) {
+                   $matches[4] = str_replace("CHEVRONescC", ">>",$matches[4]);
+                   $matches[4] = str_replace("CHEVRONescO", "<<",$matches[4]);
+                   $matches[4] = preg_replace("/<(?!\s)/ms", "__GESHI_OPEN__", $matches[4]); 
+                //   $matches[4] = str_replace("<", "", $matches[4]); 
+                 //  $matches[4] = str_replace(">", "__GESHI_CLOSE__", $matches[4]);                                    
+                  }
+                  else {
+                  $matches[4] = preg_replace("/<(?!\s)/ms", "&lt;", $matches[4]); 
+                  $matches[4] = preg_replace("/(?<!\s)>/ms", "&gt;", $matches[4]);                    
+                  }
                   $matches[4] = str_replace("\"", "__GESHI_QUOT__", $matches[4]);     
                   return "<" . $matches[1] . $matches[2] . $matches[3] . $matches[4] . $matches[5];'            
             ),
@@ -290,10 +299,11 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
 
        $this->xhtml = $this->_render_xhtml($text);
 
-       $this->xhtml = str_replace("__GESHI_QUOT__", '&#34;', $this->xhtml);
-
+       $this->xhtml = str_replace("__GESHI_QUOT__", '&#34;', $this->xhtml);        
+       $this->xhtml = str_replace("__GESHI_OPEN__", "&#60; ", $this->xhtml); 
        $this->xhtml = str_replace('CHEVRONescC', '>>',$this->xhtml);
        $this->xhtml = str_replace('CHEVRONescO', '<<',$this->xhtml);
+     
 
        if($pos !== false) {
        $this->xhtml = preg_replace_callback(
@@ -309,6 +319,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                 $this->xhtml
               ); 
        }
+
        $cname = getCacheName($INFO['client'].$ID,'.draft.fckl');
        if(file_exists($cname)) {
           $cdata =  unserialize(io_readFile($cname,false));
