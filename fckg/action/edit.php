@@ -241,8 +241,8 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
             '/<(code|file)(.*?)(>)(.*?)(<\/\1>)/ms',
             create_function(
                 '$matches',         
-                 '$matches[4] = preg_replace("/<(?!\s)/ms", "&lt;", $matches[4]); 
-                  $matches[4] = preg_replace("/(?<!\s)>/ms", "&gt;", $matches[4]);                    
+                 '$matches[4] = preg_replace("/(?<!<)<(?!\s)/ms", "&lt;", $matches[4]); 
+                  $matches[4] = preg_replace("/(?<!\s)(?!>)>/ms", "&gt;", $matches[4]);                    
                   $matches[4] = str_replace("\"", "__GESHI_QUOT__", $matches[4]);     
                   return "<" . $matches[1] . $matches[2] . $matches[3] . $matches[4] . $matches[5];'            
             ),
