@@ -312,10 +312,14 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
        $cname = getCacheName($INFO['client'].$ID,'.draft.fckl');
        if(file_exists($cname)) {
           $cdata =  unserialize(io_readFile($cname,false));
-          $this->draft_text = $cdata['text'];
-          $this->draft_found = true;
+          preg_match_all("/<\/(.*?)\>/", $cdata['text'],$matches);
+          /* exclude drafts saved from preview mode */
+          if (!in_array('code', $matches[1]) && !in_array('file', $matches[1]) && !in_array('nowiki', $matches[1])) {
+              $this->draft_text = $cdata['text'];
+              $this->draft_found = true;
+              msg($fckg_lang['draft_msg']) ;
+          }
           unlink($cname);
-          msg($fckg_lang['draft_msg']) ;
        }
 
         return true;
@@ -411,10 +415,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
 
 ?>
 
-   <!--  style type="text/css"> 
-  .button.btn_show { display:none }
-  </style -->
-
+ 
    <form id="dw__editform" method="post" action="<?php echo script()?>"  "accept-charset="<?php echo $lang['encoding']?>">
     <div class="no">
       <input type="hidden" name="id"   value="<?php echo $ID?>" />

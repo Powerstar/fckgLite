@@ -47,33 +47,14 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
             $controller->register_hook( 'HTML_EDITFORM_OUTPUT', 'BEFORE', $this, 'insertFormElement');            
             $controller->register_hook('DOKUWIKI_STARTED', 'BEFORE', $this, 'file_type');         
             $controller->register_hook('TPL_CONTENT_DISPLAY', 'AFTER', $this, 'prevent_output');       
-            $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'fnencode_check');      
-         
+            $controller->register_hook('DOKUWIKI_STARTED', 'AFTER', $this, 'fnencode_check');                 
   }
 
  
  function  insertFormElement(&$event, $param) {	 
    global $FCKG_show_preview;  
 
- $param = array();
-
- if(isset($_REQUEST['mode']) && $_REQUEST['mode'] == 'dwiki') {
- $button = array
-        (
-            '_elem' => 'button',
-            'type' => 'submit',
-            '_action' => 'cancel',
-            'value' => '__Exit__',
-            'class' => 'button',
-            'id' => 'edbtn__edit',
-            'title' => 'Exit to Switch Editors',              
-        );
-
-   $pos = $event->data->findElementByAttribute('type','submit');
-       //inserts HTML data after that position.
-   $event->data->insertElement($pos+=1,$button);
-   echo "<style type = 'text/css'> #edbtn__save, #edbtn__save { display: none; } </style>";
- }
+  $param = array();
 
    global $ID;
    $dwedit_ns = @$this->getConf('dwedit_ns');
@@ -258,7 +239,7 @@ SCRIPT;
   function file_type(&$event, $param) {	 
        global $ACT, $TEXT;
        global $USERINFO, $INFO, $ID; 
-     
+
        if(isset($_COOKIE['FCK_NmSp'])) $this->set_session(); 
        /* set cookie to pass namespace to FCKeditor's media dialog */
       // $expire = time()+60*60*24*30;
@@ -386,7 +367,7 @@ function fnencode_check() {
 
 
 function write_debug($data) {
- // return;
+  return;
   if (!$handle = fopen(DOKU_INC .'meta.txt', 'a')) {
     return;
     }

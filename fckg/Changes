@@ -1,4 +1,4 @@
-rev 11-Jun_06-12_54
+rev 11-Jun_06-22_09
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -67,3 +67,9 @@ the new use of that function (see 3 June).
 6 June
 Added regex to save.php that preserves %[a-f]{2} sequences, like %ad in %admin,
 from being mistaken by rawurldecode for html-encoded characters.
+
+Cleaned up some useless code in meta.php.
+
+Added check in edit.php to ignore draft files left over by DW Edit previews
+when switching from DW Edit to FCKG Edit; these are not deleted, as they
+are when saving of canceling when in DW Edit.
