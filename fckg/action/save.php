@@ -43,10 +43,22 @@ class action_plugin_fckg_save extends DokuWiki_Action_Plugin {
         }
 
 
-        $TEXT = str_replace('%%', "FCKGPERCENTESC",  $TEXT);
+      $TEXT = str_replace('%%', "FCKGPERCENTESC",  $TEXT);
+     
+          $TEXT = preg_replace_callback('/^(.*?)(\[\[.*?\]\])*(.*?)$/ms', 
+               create_function(
+                     '$matches',         
+                     '$matches[1] = preg_replace("/%([A-F]+)/i", "URLENC_PERCENT$1", $matches[1]);
+                      $matches[3] = preg_replace("/%([A-F]+)/i", "URLENC_PERCENT$1", $matches[3]);
+                      return $matches[1].$matches[2].$matches[3];'            
+                ),
+                $TEXT
+             );
+        
+
         $TEXT = rawurldecode($TEXT);
         $TEXT = preg_replace('/NOWIKI_(.)_/', '$1',$TEXT);
-         
+        $TEXT = preg_replace('/URLENC_PERCENT/', '%',$TEXT); 
           /* preserve newlines in code blocks */
           $TEXT = preg_replace_callback(
             '/(<code>|<file>)(.*?)(<\/code>|<\/file>)/ms',
