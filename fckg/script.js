@@ -237,5 +237,24 @@ function show_backup_msg(msg) {
  
 }
 
+function dwedit_draft_delete(cname) {
+        var debug = false;
+        var params = "draft_id=" +cname;
+        var draft_rn = new sack(DOKU_BASE + 'lib/plugins/fckg/scripts/prev_delete.php');
+        draft_rn.asynchronous = false;
+        draft_rn.onCompletion = function() {
+        	if (draft_rn.responseStatus){                           
+                if(draft_rn.responseStatus[0] == 200) {               
+                  if(draft_rn.response && draft_rn.response != 'done') {
+                    if(debug) alert('success: ' + draft_rn.response);
+                  }
+                }
+                
+            }
+        };
+
+        draft_rn.runAJAX(params);
+
+}
 var dokuBase = location.host + DOKU_BASE;
 //var insertedDokuSmiley = false;

@@ -1,4 +1,4 @@
-rev 11-Jun_06-22_09
+rev 11-Jun_09-10_09
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -73,3 +73,12 @@ Cleaned up some useless code in meta.php.
 Added check in edit.php to ignore draft files left over by DW Edit previews
 when switching from DW Edit to FCKG Edit; these are not deleted, as they
 are when saving of canceling when in DW Edit.
+
+
+7 June
+Fixed problem where HTML brackets were replaced by entities in GESHI blocks. Open brackets
+are now replaced by "< ", and the space is removed on save. 
+
+9 June
+Permanent fix for draft file left over after DW Edit preview -- there was a bug in the
+Javascript call, which corrupted  draft filename.

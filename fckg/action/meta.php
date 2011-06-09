@@ -127,16 +127,18 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
    if(is_string($act) && $act != 'edit') {  
         return;
    }
-  
+  global $INFO;
+  $cname =  $INFO['draft'];   
   
   echo <<<SCRIPT
     <script type="text/javascript">
     //<![CDATA[ 
-    //var oldChangeCheck = changeCheck;
+    
     function setDWEditCookie(which, e) { 
-      
+       var cname = "$cname";       
        var dom = document.getElementById('fckg_mode_type');          
        if(which == 1) {
+           dwedit_draft_delete("$cname");
            document.cookie='FCKW_USE=other;expires=Thu,01-Jan-70 00:00:01 GMT;'
            if(e && e.form) {
                     if(e.form['mode']) {
@@ -149,11 +151,12 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
            }
            else dom.value = 'fck';  
        }
-        else {
+        else {            
             var nextFCKyear=new Date();
             nextFCKyear.setFullYear(nextFCKyear.getFullYear() +1 );
             document.cookie = 'FCKW_USE=_false_;expires=' + nextFCKyear.toGMTString() + ';';    
             dom.value = 'dwiki';        
+
         }
          e.form.submit();
     }

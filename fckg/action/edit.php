@@ -245,8 +245,6 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                    $matches[4] = str_replace("CHEVRONescC", ">>",$matches[4]);
                    $matches[4] = str_replace("CHEVRONescO", "<<",$matches[4]);
                    $matches[4] = preg_replace("/<(?!\s)/ms", "__GESHI_OPEN__", $matches[4]); 
-                //   $matches[4] = str_replace("<", "", $matches[4]); 
-                 //  $matches[4] = str_replace(">", "__GESHI_CLOSE__", $matches[4]);                                    
                   }
                   else {
                   $matches[4] = preg_replace("/<(?!\s)/ms", "&lt;", $matches[4]); 
