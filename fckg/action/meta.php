@@ -179,14 +179,21 @@ SCRIPT;
       if($this->session_id) return;       
 
            $cname = getCacheName($INFO['client'].$ID,'.draft');  
+           $fckl_draft = $cname . '.fckl';
+           if(isset($ACT) && is_array($ACT)) {
+              if(isset($ACT['draftdel']) || isset($ACT['cancel'])) {
+                 @unlink($fckl_draft);   
+                 @unlink($cname); 
+              }
+           }
 
            if(file_exists($cname)) {
-              $fckl_draft = $cname . '.fckl';
               if(file_exists($fckl_draft)) {
                     unlink($fckl_draft);
               }
               @rename($cname, $fckl_draft);
            }
+
           
            $session_string =  session_id(); 
            $this->session_id = $session_string;      

@@ -1,4 +1,4 @@
-rev 11-Jun_09-10_09
+rev 11-Jun_11-12_05
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -82,3 +82,7 @@ are now replaced by "< ", and the space is removed on save.
 9 June
 Permanent fix for draft file left over after DW Edit preview -- there was a bug in the
 Javascript call, which corrupted  draft filename.
+
+10 June
+Spoke too soon on 9 June.  With multiple previews in DW Edit, draft file remains on
+server.  This is now removed in meta.php set_session().
