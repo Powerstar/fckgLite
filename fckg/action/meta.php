@@ -129,10 +129,19 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
    }
   global $INFO;
   $cname =  $INFO['draft'];   
-  
+    
+ $url = DOKU_URL . 'lib/plugins/fckg/scripts/jq_alt.js';    
+ 
   echo <<<SCRIPT
     <script type="text/javascript">
     //<![CDATA[ 
+    
+      if(!window.jQuery){
+        LoadScript("$url"); 
+      }
+ 
+      
+   
     
     function setDWEditCookie(which, e) { 
        var cname = "$cname";       
@@ -175,13 +184,13 @@ SCRIPT;
       global $conf; 
       global $ID;
       global $ACT;
-    
+
       if($this->session_id) return;       
 
            $cname = getCacheName($INFO['client'].$ID,'.draft');  
            $fckl_draft = $cname . '.fckl';
-           if(isset($ACT) && is_array($ACT)) {
-              if(isset($ACT['draftdel']) || isset($ACT['cancel'])) {
+           if((isset($ACT) && is_array($ACT)) || isset($_REQUEST['dwedit_preview'])) {
+              if(isset($ACT['draftdel']) || isset($ACT['cancel']) || isset($_REQUEST['dwedit_preview'])) {
                  @unlink($fckl_draft);   
                  @unlink($cname); 
               }
@@ -321,7 +330,17 @@ function fck_editor(&$event) {
     catch (ex) {  
          LoadScript("$url");        
     }             
-
+    function createRequestValue() {
+        try{
+        var inputNode=document.createElement('input');
+        inputNode.setAttribute('type','hidden');
+        inputNode.setAttribute('value','yes');
+        inputNode.setAttribute('name','dwedit_preview');
+        inputNode.setAttribute('id','dwedit_preview');
+        var dwform = $("dw__editform");
+        dwform.appendChild(inputNode);
+        }catch(e) { alert(e); }
+    }
 //]]> 
  </script>
 
@@ -331,6 +350,7 @@ SCRIPT;
     if(isset($_REQUEST['do']['preview'])) {
            echo '<script type="text/javascript">';
            echo ' var dwform = $("dw__editform"); dwform["do[draftdel]"].value = "Exit"';
+           echo "\ncreateRequestValue()\n";
            echo  '</script>';
     }
   }

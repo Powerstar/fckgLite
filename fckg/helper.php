@@ -159,8 +159,6 @@ var ourLockTimerINI = false;
         locktimer.clear();  /// alert(locktimer.timeout);
         window.clearTimeout(ourLockTimerWarningtimerID);
         ourLockTimerWarningtimerID =  window.setTimeout(function () { locktimer.warning(); }, locktimer.timeout);
-     //  ourLockTimerWarningtimerID =  window.setTimeout(function () { locktimer.warning(); }, (2*60*1000));
-      
    };
 
    locktimer.warning = function(){    
@@ -184,9 +182,36 @@ var ourLockTimerINI = false;
 
  }
 
+
+  if(!window.jQuery) {
+     var jQuery = {
+      ajax: function(obj) {
+         var s = new sack(obj.url); 
+         s.asynchronous = obj.async;
+         s.onCompletion = function() {
+        	if (s.responseStatus &&s.responseStatus[0] == 200) {   
+                  obj.success(s.response);
+        	}
+         };
+         s.runAJAX(obj.data);
+     
+      },
+      post: function(url,params,callback,context) {
+         var s = new sack(url);
+         s.onCompletion = function() {
+        	if (s.responseStatus &&s.responseStatus[0] == 200) {   
+                  callback(s.response);
+        	}
+         };
+         s.runAJAX(params);
+      }
+     };
+  }
+
  function lockTimerRefresh(bak) {
         var now = new Date();
-  
+        if(!ourLockTimerINI)  unsetDokuWikiLockTimer();
+
         if((now.getTime() - locktimer.our_lasttime.getTime() > 45*1000) || bak){            
            var dwform = $('dw__editform');
             window.clearTimeout(ourLockTimerWarningtimerID);
@@ -198,9 +223,18 @@ var ourLockTimerINI = false;
                 params += '&suffix='+encodeURIComponent(dwform.elements.suffix.value);
                 params += '&date='+encodeURIComponent(dwform.elements.date.value);
             }
-            locktimer.our_lasttime = now;   
-            locktimer.sack.runAJAX(params); 
-        }
+            locktimer.our_lasttime = now;  
+            jQuery.post(
+                DOKU_BASE + 'lib/exe/ajax.php',
+                params,
+                function (data) {
+                    data = data.replace(/auto/,"")  + ' by fckgLite';
+                    locktimer.response = data; 
+                    locktimer.refreshed(data);
+                },
+                'html'
+            );
+       }
         
  }
 
@@ -222,8 +256,6 @@ var ourLockTimerINI = false;
              ourLockTimerIsSet = false;             
              locktimer.reset = locktimer.old_reset; 
              locktimer.refresh(); 
-            // dom_checkbox.style.display = 'inline';
-            // dom_label.style.display = 'inline';
              return;
         }
       
@@ -262,26 +294,23 @@ function renewLock(bak) {
        
         var params = "rsave_id=$meta_fn";
         params += '&wikitext='+encodeURIComponent(dwform.elements.fck_wikitext.value);      
-        var sack_rs = new sack(DOKU_BASE + 'lib/plugins/fckg/scripts/refresh_save.php');
- 
-        sack_rs.onCompletion = function() {
-        	if (sack_rs.responseStatus){   
-                if(sack_rs.responseStatus[0] == 200) {
-                   if(!sack_rs.response || sack_rs.response != 'done') {
-                    alert("error saving: " + id);
-                   }
-                   else {
-                    show_backup_msg("$meta_id"); 
-                   }
-                }
-                else alert("error saving: " + id);
-            }
-        };
-
-        sack_rs.runAJAX(params);
+        jQuery.post(
+                DOKU_BASE + 'lib/plugins/fckg/scripts/refresh_save.php',
+                params,
+                function (data) {                    
+                    if(data == 'done') {
+                        show_backup_msg("$meta_id");  
+                    }
+                    else {
+                      alert("error saving: " + id);
+                    }
+                },
+                'html'
+            );
     }
 
 }
+
 
 
 function revert_to_prev() {
@@ -294,26 +323,27 @@ function revert_to_prev() {
 }
 
 
+
 function draft_delete() {
 
         var debug = false;
         var params = "draft_id=$cname";
-        var draft_rn = new sack(DOKU_BASE + 'lib/plugins/fckg/scripts/draft_delete.php');
-        draft_rn.asynchronous = false;
-        draft_rn.onCompletion = function() {
-        	if (draft_rn.responseStatus){   
-                if(draft_rn.responseStatus[0] == 200) {
-                  if(draft_rn.response && draft_rn.response != 'done') {
-                    if(debug) alert('success: ' + draft_rn.response);
-                  }
-                }
-                
-            }
-        };
-
-        draft_rn.runAJAX(params);
+        jQuery.ajax({
+           url: DOKU_BASE + 'lib/plugins/fckg/scripts/draft_delete.php',
+           async: false,
+           data: params,    
+           type: 'POST',
+           dataType: 'html',         
+           success: function(data){                 
+               if(debug) {            
+                  alert(data);
+               }
+              
+    }
+    });
 
 }
+
 
 function disableDokuWikiLockTimer() {
   resetDokuWikiLockTimer(false);
@@ -328,10 +358,6 @@ function disableDokuWikiLockTimer() {
 var oDokuWiki_FCKEditorInstance;
 function FCKeditor_OnComplete( editorInstance )
 {
- // VKI_attach(document.getElementById('wiki__text___Frame'));  
-//oDokuWiki_FCKEditorInstance.EditorDocument.body
-
-
 
   oDokuWiki_FCKEditorInstance = editorInstance;
 
