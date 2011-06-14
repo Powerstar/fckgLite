@@ -5,7 +5,7 @@
          var s = new sack(obj.url); 
          s.asynchronous = obj.async;
          s.onCompletion = function() {
-        	if (s.responseStatus &&s.responseStatus[0] == 200) {   
+        	if (s.responseStatus && s.responseStatus[0] == 200) {   
                   obj.success(s.response);
         	}
          };
@@ -15,7 +15,7 @@
       post: function(url,params,callback,context) {
          var s = new sack(url);
          s.onCompletion = function() {
-        	if (s.responseStatus &&s.responseStatus[0] == 200) {   
+        	if (s.responseStatus && s.responseStatus[0] == 200) {   
                   callback(s.response);
         	}
          };
