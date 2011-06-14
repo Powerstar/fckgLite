@@ -267,5 +267,8 @@ function dwedit_draft_delete(cname) {
      };
   }
 
+  function GetE(e) {
+       return  document.getElementById(e);
+  }
 var dokuBase = location.host + DOKU_BASE;
 

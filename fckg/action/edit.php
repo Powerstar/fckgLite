@@ -684,14 +684,14 @@ var fckgLPluginPatterns = new Array();
    var fckg_draft_btn = "<?php echo $fckg_lang['btn_exit_draft'] ?>";
    var fckg_draft_btn_title = "<?php echo $fckg_lang['title_exit_draft']?>";
    function fckg_get_draft() {
-      var dom = $('fckg_draft_html');
+      var dom = GetE('fckg_draft_html');
       var draft = dom.innerHTML;
       var dw_text = oDokuWiki_FCKEditorInstance.GetData( true );    
       oInst = oDokuWiki_FCKEditorInstance.get_FCK();
       oInst =oInst.EditorDocument.body;
       oInst.innerHTML = draft;
       dom.innerHTML = dw_text;
-      var btn = $('fckg_draft_btn');
+      var btn = GetE('fckg_draft_btn');
       var tmp = btn.value;  
       btn.value = fckg_draft_btn;
       fckg_draft_btn = tmp;
@@ -2029,7 +2029,7 @@ function parse_wikitext(id) {
       return; 
     }
 
-    var dwform = $('dw__editform');
+    var dwform = GetE('dw__editform');
     dwform.elements.fck_wikitext.value = results;
 
    if(id == 'bakup') {
@@ -2037,7 +2037,7 @@ function parse_wikitext(id) {
       return;
    }
     if(id) {
-       var dom =  $(id);
+       var dom =  GetE(id);
       dom.click();
       return true;
     }

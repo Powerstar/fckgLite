@@ -53,8 +53,7 @@ class helper_plugin_fckg extends DokuWiki_Plugin {
   global $INFO; 
   global $conf;
   global $USERINFO;
- // global $CNAME;
-
+ 
   $cname = getCacheName($INFO['client'].$ID,'.draft');
   $open_upload = $this->getConf('open_upload');
   $editor_backup = $this->getConf('editor_bak');
@@ -120,7 +119,10 @@ var oldonload = window.onload;
 var ourLockTimerINI = false;
 
   var fckg_onload = function() { $js };
-  window.addEvent(window, 'load', fckg_onload);
+  if(window.jQuery && jQuery.bind) {
+      jQuery(window).bind('load',{},fckg_onload);
+  }
+  else window.addEvent(window, 'load', fckg_onload);
   function getCurrentWikiNS() {
         var DWikiMediaManagerCommand_ns = '$media_tmp_ns';
         return DWikiMediaManagerCommand_ns;
@@ -188,7 +190,7 @@ var ourLockTimerINI = false;
         if(!ourLockTimerINI)  unsetDokuWikiLockTimer();
 
         if((now.getTime() - locktimer.our_lasttime.getTime() > 45*1000) || bak){            
-           var dwform = $('dw__editform');
+           var dwform = GetE('dw__editform');
             window.clearTimeout(ourLockTimerWarningtimerID);
             var params = 'call=lock&id='+encodeURIComponent(locktimer.pageid);
             if(ourFCKEditorNode) {  
@@ -260,9 +262,9 @@ function renewLock(bak) {
         var id = "$ID"; 
         parse_wikitext('bakup');
 
-        var dwform = $('dw__editform');
+        var dwform = GetE('dw__editform');
         if(dwform.elements.fck_wikitext.value == '__false__' ) return;
-        $('saved_wiki_html').innerHTML = ourFCKEditorNode.innerHTML; 
+        GetE('saved_wiki_html').innerHTML = ourFCKEditorNode.innerHTML; 
         if(($editor_backup) == 0 ) {           
            return; 
         }
@@ -289,12 +291,12 @@ function renewLock(bak) {
 
 
 function revert_to_prev() {
-  if(!($('saved_wiki_html').innerHTML.length)) {
+  if(!(GetE('saved_wiki_html').innerHTML.length)) {
             if(!confirm(backup_empty)) {
                            return;
             }
   }
-    ourFCKEditorNode.innerHTML = $('saved_wiki_html').innerHTML;
+    ourFCKEditorNode.innerHTML = GetE('saved_wiki_html').innerHTML;
 }
 
 
