@@ -627,7 +627,7 @@ global $INFO;
                     "smallwin", "width=600,height=500,scrollbars=yes");
         }
 
-        if(unsetDokuWikiLockTimer) unsetDokuWikiLockTimer();  
+        unsetDokuWikiLockTimer();  
 
         function dwfck_size_ctl(which) {
            var height = parseInt(document.getElementById('wiki__text___Frame').style.height); 
@@ -684,14 +684,14 @@ var fckgLPluginPatterns = new Array();
    var fckg_draft_btn = "<?php echo $fckg_lang['btn_exit_draft'] ?>";
    var fckg_draft_btn_title = "<?php echo $fckg_lang['title_exit_draft']?>";
    function fckg_get_draft() {
-      var dom = GetE('fckg_draft_html');
+      var dom = $('fckg_draft_html');
       var draft = dom.innerHTML;
       var dw_text = oDokuWiki_FCKEditorInstance.GetData( true );    
       oInst = oDokuWiki_FCKEditorInstance.get_FCK();
       oInst =oInst.EditorDocument.body;
       oInst.innerHTML = draft;
       dom.innerHTML = dw_text;
-      var btn = GetE('fckg_draft_btn');
+      var btn = $('fckg_draft_btn');
       var tmp = btn.value;  
       btn.value = fckg_draft_btn;
       fckg_draft_btn = tmp;
@@ -2029,7 +2029,7 @@ function parse_wikitext(id) {
       return; 
     }
 
-    var dwform = GetE('dw__editform');
+    var dwform = $('dw__editform');
     dwform.elements.fck_wikitext.value = results;
 
    if(id == 'bakup') {
@@ -2037,7 +2037,7 @@ function parse_wikitext(id) {
       return;
    }
     if(id) {
-       var dom =  GetE(id);
+       var dom =  $(id);
       dom.click();
       return true;
     }
@@ -2283,6 +2283,8 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
         $xhtml = str_replace('_fckg_QUOT_', '&quot;', $xhtml);
         $xhtml = str_replace('_fckg_NL', "\n", $xhtml);
         $xhtml = str_replace('</pre>', "\n\n</pre><p>&nbsp;</p>", $xhtml);
+        // inserts p before an initial codeblock to enable text entry above block
+        $xhtml = preg_replace('/^<pre/',"<p>&nbsp;</p><pre",$xhtml);  
         //remove empty markup remaining after removing marked-up acronyms in lists
         $xhtml = preg_replace('/<(em|b|u|i)>\W+<\/(em|b|u|i)>/ms',"",$xhtml);
 

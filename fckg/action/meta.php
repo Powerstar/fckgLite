@@ -129,19 +129,10 @@ class action_plugin_fckg_meta extends DokuWiki_Action_Plugin {
    }
   global $INFO;
   $cname =  $INFO['draft'];   
-    
- $url = DOKU_URL . 'lib/plugins/fckg/scripts/jq_alt.js';    
- 
+  
   echo <<<SCRIPT
     <script type="text/javascript">
     //<![CDATA[ 
-    
-      if(!window.jQuery){
-        LoadScript("$url"); 
-      }
- 
-      
-   
     
     function setDWEditCookie(which, e) { 
        var cname = "$cname";       
@@ -337,7 +328,7 @@ function fck_editor(&$event) {
         inputNode.setAttribute('value','yes');
         inputNode.setAttribute('name','dwedit_preview');
         inputNode.setAttribute('id','dwedit_preview');
-        var dwform = GetE("dw__editform");
+        var dwform = $("dw__editform");
         dwform.appendChild(inputNode);
         }catch(e) { alert(e); }
     }
@@ -349,7 +340,7 @@ SCRIPT;
   if(isset($_REQUEST['do']) && is_array($_REQUEST['do'])) {
     if(isset($_REQUEST['do']['preview'])) {
            echo '<script type="text/javascript">';
-           echo ' var dwform = GetE("dw__editform"); dwform["do[draftdel]"].value = "Exit"';
+           echo ' var dwform = $("dw__editform"); dwform["do[draftdel]"].value = "Exit"';
            echo "\ncreateRequestValue()\n";
            echo  '</script>';
     }
