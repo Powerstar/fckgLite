@@ -2283,6 +2283,8 @@ if(window.DWikifnEncode && window.DWikifnEncode == 'safe') {
         $xhtml = str_replace('_fckg_QUOT_', '&quot;', $xhtml);
         $xhtml = str_replace('_fckg_NL', "\n", $xhtml);
         $xhtml = str_replace('</pre>', "\n\n</pre><p>&nbsp;</p>", $xhtml);
+        // inserts p before an initial codeblock to enable text entry above block
+        $xhtml = preg_replace('/^<pre/',"<p>&nbsp;</p><pre",$xhtml);  
         //remove empty markup remaining after removing marked-up acronyms in lists
         $xhtml = preg_replace('/<(em|b|u|i)>\W+<\/(em|b|u|i)>/ms',"",$xhtml);
 
