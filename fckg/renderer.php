@@ -3,6 +3,7 @@
  * Renderer for XHTML output
  *
  * @author Pierre Spring <pierre.spring@liip.ch>
+ * @author Myron Turner <turnermm02@shaw.ca>
  */
 // must be run within Dokuwiki
 if(!defined('DOKU_INC')) die();
@@ -19,6 +20,10 @@ class renderer_plugin_fckg extends Doku_Renderer_xhtml
     var $ver_anteater;
     var $dwiki_version;
 
+/**
+ * Establish version in constructor 
+ * @author Myron Turner <turnermm02@shaw.ca>
+ */
     
     function renderer_plugin_fckg() {
       global $conf;
@@ -40,7 +45,6 @@ class renderer_plugin_fckg extends Doku_Renderer_xhtml
           }
         }
       }
-
     }
     /**
      * return some info
@@ -99,7 +103,10 @@ class renderer_plugin_fckg extends Doku_Renderer_xhtml
         $this->doc .= '</strike>';
     }
     
-     // isolate table from bottom and top editor window margins
+    /**
+     * isolate table from bottom and top editor window margins
+     * @author Myron Turner <turnermm02@shaw.ca>
+     */
     function table_close()
     {
         global $conf;  
@@ -107,8 +114,8 @@ class renderer_plugin_fckg extends Doku_Renderer_xhtml
         if($this->dwiki_version >= $this->ver_anteater) {
            $this->doc .= "</div>";
         }
-    }
-    
+    } 
+   
     function table_open($maxcols = null, $numrows = null, $pos = null){
         $this->doc .= "\n<span class='np_break'>&nbsp;</span>\n";
         parent::table_open($maxcols = null, $numrows = null, $pos = null);
