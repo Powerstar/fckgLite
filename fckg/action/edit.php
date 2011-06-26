@@ -247,8 +247,16 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                    $matches[4] = preg_replace("/<(?!\s)/ms", "__GESHI_OPEN__", $matches[4]); 
                   }
                   else {
-                  $matches[4] = preg_replace("/<(?!\s)/ms", "&lt;", $matches[4]); 
-                  $matches[4] = preg_replace("/(?<!\s)>/ms", "&gt;", $matches[4]);                    
+                  if( preg_match("/MULTI/",$matches[0])) {
+                     $open = "< ";
+                     $close = " >";
+                  }
+                  else {  
+                     $open = "&lt;";
+                     $close = "&gt;";
+                  }
+                  $matches[4] = preg_replace("/<(?!\s)/ms", $open, $matches[4]); 
+                  $matches[4] = preg_replace("/(?<!\s)>/ms", $close, $matches[4]);                    
                   }
                   $matches[4] = str_replace("\"", "__GESHI_QUOT__", $matches[4]);     
                   return "<" . $matches[1] . $matches[2] . $matches[3] . $matches[4] . $matches[5];'            
@@ -295,6 +303,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
        $email_regex = '/\/\/\<\/\/(.*?@.*?)>/';
        $text = preg_replace($email_regex,"<$1>",$text);
 
+       $text = preg_replace('/{{(.*)\.swf(\s*)}}/ms',"SWF$1.swf$2FWS",$text);
        $this->xhtml = $this->_render_xhtml($text);
 
        $this->xhtml = str_replace("__GESHI_QUOT__", '&#34;', $this->xhtml);        
@@ -2019,7 +2028,10 @@ function parse_wikitext(id) {
                      return start + mid.replace(regex,"NOWIKI_$1_") + close; 
              });
     }
-    
+
+    results = results.replace(/SWF(\s*)\[*/g,"{{$1");
+    results = results.replace(/\|.*?\]*(\s*)FWS/g,"$1}}");    
+    results = results.replace(/(\s*)FWS/g,"$1}}");    
     results = results.replace(/\n{3,}/g,'\n\n');
    
     if(id == 'test') {

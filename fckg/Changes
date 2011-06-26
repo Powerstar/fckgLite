@@ -1,4 +1,4 @@
-rev 11-Jun_11-12_05
+rev 11-Jun_26-11_29
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -86,3 +86,17 @@ Javascript call, which corrupted  draft filename.
 10 June
 Spoke too soon on 9 June.  With multiple previews in DW Edit, draft file remains on
 server.  This is now removed in meta.php set_session().
+
+Added additional check to above by creating a new POST/hidden input item for the edit form
+Qbject that appears in the $_REQUEST object only when DW Edit preview is in effect.
+
+20 June
+Inserted paragraph break above a code block that comes at top of file to enable insertion
+of text above it; it is removed on save.
+
+25 June
+Added mechanism to handle swf files.
+
+26 June
+Fix for corrupted code blocks containing MULTI_PLUGIN (uses old style "< " and " >' instead
+of &lt; and &gt; for html-style elements.
