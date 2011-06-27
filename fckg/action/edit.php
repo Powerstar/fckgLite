@@ -219,7 +219,8 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
       if(strpos($text, '%%') !== false) {
        $text= preg_replace('/%%\s*<([^%]+)>\s*%%/m','<nowiki><$1></nowiki>',$text);        
        $text= preg_replace('/%%\s*\{([^%]+)\}\s*%%/m','<nowiki>{$1}</nowiki>',$text);        
-       $text= preg_replace('/%%\s*([~#\:\^])([^%]+)\1\s*%%/m','<nowiki>$1$2$1</nowiki>',$text);        
+       $text= preg_replace('/%%\s*([~#\:\^])([^%]+)\1\s*%%/m','<nowiki>$1$2$1</nowiki>',$text);
+       $text= preg_replace('/%%\s*([^%]+)\s*%%/m','<nowiki>$1</nowiki>',$text);                
       }
 
        $pos = strpos($text, '<');

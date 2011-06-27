@@ -1,4 +1,4 @@
-rev 11-Jun_26-11_29
+rev 11-Jun_26-19_09
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -100,3 +100,8 @@ Added mechanism to handle swf files.
 26 June
 Fix for corrupted code blocks containing MULTI_PLUGIN (uses old style "< " and " >' instead
 of &lt; and &gt; for html-style elements.
+
+Added flash icon to FCKeditor
+
+Added %%. . .%% escape around characters, which is converted o <nowiki>; this is an extension
+of the earlier use of this on 12 Jan 2011.
