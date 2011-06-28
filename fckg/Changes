@@ -1,4 +1,4 @@
-rev 11-Jun_26-19_09
+rev 11-Jun_28-09_52
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -105,3 +105,10 @@ Added flash icon to FCKeditor
 
 Added %%. . .%% escape around characters, which is converted o <nowiki>; this is an extension
 of the earlier use of this on 12 Jan 2011.
+
+27 June
+Added support for nolinks and direct image links.
+
+28 June
+Fixed bug where direct (internal) links were being identified as external; also where
+external direct were being missed.

@@ -215,7 +215,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                 //Check for text from template event handler
                  if(!$text && $this->page_from_template) $text = $this->page_from_template;
             }
-              
+            
       if(strpos($text, '%%') !== false) {
        $text= preg_replace('/%%\s*<([^%]+)>\s*%%/m','<nowiki><$1></nowiki>',$text);        
        $text= preg_replace('/%%\s*\{([^%]+)\}\s*%%/m','<nowiki>{$1}</nowiki>',$text);        
@@ -795,6 +795,7 @@ function parse_wikitext(id) {
     attribute: "",
     link_title: "",
     link_class: "",
+    image_link_type: "",
     td_align: "",  
     in_td: false, 
     td_colspan: 0,
@@ -860,16 +861,14 @@ function parse_wikitext(id) {
             this.prev_list_level = this.list_level;
             this.list_level++;     
             if(this.list_level == 1) this.list_started = false;
-//           if(this.list_started) this.prev_li = markup['li'] ;
             if(this.list_started) this.prev_li.push(markup['li']) ;
             markup['li'] = markup[tag];
 
             return;
         }
         else if(!this.list_level) {
-             markup['li'] = "";
-          //  this.prev_li = ""; 
-              this.prev_li = new Array(); 
+             markup['li'] = "";          
+             this.prev_li = new Array(); 
         }
 
         if(tag == 'img') {
@@ -898,6 +897,7 @@ function parse_wikitext(id) {
             this.code_snippet = false;
             this.downloadable_file = "";
             var qs_set = false;
+            
         }
   
        if(tag == 'p') {         
@@ -940,15 +940,15 @@ function parse_wikitext(id) {
        
        
         var matches;        
-        this.attr=false;    
-       // this.td_align = '';
+        this.attr=false;           
         this.format_tag = false;
+        
         if(format_chars[tag])this.format_tag = true;
         var dwfck_note = false;  
 
         for ( var i = 0; i < attrs.length; i++ ) {     
     
-          // alert(tag + ' ' + attrs[i].name + '="' + attrs[i].escaped + '"');
+          // if(!confirm(tag + ' ' + attrs[i].name + '="' + attrs[i].escaped + '"')) exit;
              if(attrs[i].escaped == 'u' && tag == 'em' ) {
                      tag = 'u';
                      this.attr='u'    
@@ -1075,9 +1075,16 @@ function parse_wikitext(id) {
                   type = attrs[i].value;
                }               
             
-              else if(attrs[i].name == 'href' && !this.code_type) {        
+              else if(attrs[i].name == 'href' && !this.code_type) { 
+            //if(!confirm(tag + ' ' + attrs[i].name + '="' + attrs[i].escaped + '"', "top")) exit;  
+                    var http =  attrs[i].escaped.match(/http:\/\//) ? true : false; 
+                    if(attrs[i].escaped.match(/\/lib\/exe\/detail.php/)) {
+                        this.image_link_type = 'detail';
+                    }
+                    else if(attrs[i].escaped.match(/exe\/fetch.php/)) {
+                       this.image_link_type = 'direct';
+                    }
 
-            // alert(tag + ' ' + attrs[i].name + '="' + attrs[i].escaped + '"', "top");             
                     // required to distinguish external images from external mime types 
                     // that are on the wiki which also use {{url}}
                     var media_type = attrs[i].escaped.match(/fetch\.php.*?media=.*?\.(png|gif|jpg|jpeg)$/i);
@@ -1106,7 +1113,7 @@ function parse_wikitext(id) {
                         local_image = false;
                     }
                         // external mime types after they've been saved first time
-                   else if(!media_type && (matches = attrs[i].escaped.match(/fetch\.php(.*)/)) ) { 
+                   else if(http && !media_type && (matches = attrs[i].escaped.match(/fetch\.php(.*)/)) ) { 
                          if(matches[1].match(/media=/)) {
                             elems = matches[1].split(/=/);
                             this.attr = elems[1];    
@@ -1297,6 +1304,10 @@ function parse_wikitext(id) {
                 if(attrs[i].name == 'alt') {                  
                      alt=attrs[i].value;
                 }
+                if(attrs[i].name == 'type') {                  
+                     this.image_link_type = attrs[i].value;
+                }
+                
                 if(attrs[i].name == 'src') {                  
                   //  alert(attrs[i].name + ' = ' + attrs[i].value + ',  fnencode=' + oDokuWiki_FCKEditorInstance.dwiki_fnencode);
 
@@ -1546,13 +1557,25 @@ function parse_wikitext(id) {
               results += this.attr + '|';
           }
           else if(tag == 'img') {      
+               var link_type = this.image_link_type;              
+               this.image_link_type="";
+               if(!link_type){
+                  link_type = 'nolink'; 
+               }
+               else if(link_type == 'detail') {
+                    link_type = "";
+               }
+               
+               if(link_type) { 
+                     img_size += link_type + '&';  
+               }
                if(width && height) {
                   img_size +=width + 'x' + height;                  
                }
                else if(width) {
                   img_size +=width;                  
                }
-               else {
+               else if(!link_type) {
                   img_size="";
                }
                if(img_align && img_align != 'left') {

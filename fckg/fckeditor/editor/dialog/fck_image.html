@@ -33,6 +33,9 @@
 document.write( FCKTools.GetStyleHtml( GetCommonDialogCss() ) ) ;
 
 		</script>
+<style type="text/css">
+td { font-size: 90%; }
+</style>
 </head>
 <body scroll="no" style="overflow: hidden">
 	<div id="divInfo">
@@ -116,7 +119,7 @@ document.write( FCKTools.GetStyleHtml( GetCommonDialogCss() ) ) ;
 											<input type="text" size="2" id="txtVSpace" onkeyup="UpdatePreview();" /></td>
 									</tr>
 									<tr>
-										<td nowrap="nowrap">
+										<td nowrap="nowrap" align='right'>
 											<span fcklang="DlgImgAlign">Align</span>&nbsp;</td>
 										<td>
 											<select id="cmbAlign" onchange="UpdatePreview();">
@@ -135,9 +138,6 @@ document.write( FCKTools.GetStyleHtml( GetCommonDialogCss() ) ) ;
 												<option fcklang="DlgImgAlignTop" value="top">Top</option  -->
                                                 <option fcklang="DlgImgAlignBaseline" value="baseline">Baseline</option>
                                                 <option value="none">Remove Align</option>
-
-
-
 											</select>
 										</td>
 									</tr>
@@ -161,12 +161,29 @@ document.write( FCKTools.GetStyleHtml( GetCommonDialogCss() ) ) ;
 							</td>
 						</tr>
 					</table>
+           <tr><td>
+                <tr><td>
+                <form id='getLinkType'>
+                <table cellspacing='2'>                                      
+                <tr><td align='center' style='font-size:95%'>Link Type:&nbsp;&nbsp;</td>               
+                  <td style='font-size:90%' align='center'>&nbsp;detail&nbsp;
+                     <input type = 'radio' checked style='font-size:90%' name ='link_type' value = 'detail'>&nbsp;&nbsp;
+                  <td style='font-size:90%' align='center'>&nbsp;direct&nbsp;
+                     <input type = 'radio' style='font-size:90%' name ='link_type' value = 'direct'>&nbsp;&nbsp;
+                  <td style='font-size:90%' align='center'>&nbsp;nolink&nbsp;
+                    <input type = 'radio' style='font-size:90%' name ='link_type' value = 'nolink'>&nbsp;
+                </tr>
+                </table>
+                </form>
+	 <td></tr>
+
 				</td>
 			</tr>
 		</table>
 	</div>
+
 	<div id="divUpload" style="display: none">
-     
+    
 		<form id="frmUpload" method="post" target="UploadWindow" enctype="multipart/form-data" action="" onsubmit="return CheckUpload();">
 			<span fcklang="DlgLnkUpload">Upload</span><br />
 			<input id="txtUploadFile" style="width: 100%" type="file" size="40" name="NewFile" /><br />
