@@ -1,4 +1,4 @@
-rev 11-Jun_28-09_52
+rev 11-Jun_28-13_25
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -112,3 +112,5 @@ Added support for nolinks and direct image links.
 28 June
 Fixed bug where direct (internal) links were being identified as external; also where
 external direct were being missed.
+
+In link.js removed wikilink class from URL when re-writing a url that had been an internal link.
