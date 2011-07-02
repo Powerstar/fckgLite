@@ -1,4 +1,4 @@
-rev 11-Jun_06-22_09
+rev 11-Jun_30-22_22
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -73,3 +73,47 @@ Cleaned up some useless code in meta.php.
 Added check in edit.php to ignore draft files left over by DW Edit previews
 when switching from DW Edit to FCKG Edit; these are not deleted, as they
 are when saving of canceling when in DW Edit.
+
+
+7 June
+Fixed problem where HTML brackets were replaced by entities in GESHI blocks. Open brackets
+are now replaced by "< ", and the space is removed on save. 
+
+9 June
+Permanent fix for draft file left over after DW Edit preview -- there was a bug in the
+Javascript call, which corrupted  draft filename.
+
+10 June
+Spoke too soon on 9 June.  With multiple previews in DW Edit, draft file remains on
+server.  This is now removed in meta.php set_session().
+
+Added additional check to above by creating a new POST/hidden input item for the edit form
+Qbject that appears in the $_REQUEST object only when DW Edit preview is in effect.
+
+20 June
+Inserted paragraph break above a code block that comes at top of file to enable insertion
+of text above it; it is removed on save.
+
+25 June
+Added mechanism to handle swf files.
+
+26 June
+Fix for corrupted code blocks containing MULTI_PLUGIN (uses old style "< " and " >' instead
+of &lt; and &gt; for html-style elements.
+
+Added flash icon to FCKeditor
+
+Added %%. . .%% escape around characters, which is converted o <nowiki>; this is an extension
+of the earlier use of this on 12 Jan 2011.
+
+27 June
+Added support for nolinks and direct image links.
+
+28 June
+Fixed bug where direct (internal) links were being identified as external; also where
+external direct were being missed.
+
+In link.js removed wikilink class from URL when re-writing a url that had been an internal link.
+
+30 June
+Upgraded ent.ser to handle addtional Latin entities.

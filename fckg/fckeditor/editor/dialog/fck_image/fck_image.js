@@ -306,10 +306,20 @@ function UpdateImage( e, skipId)
 	if ( ! skipId ) 
 		SetAttribute( e, 'id', GetE('txtAttId').value ) ;       
 
+    var dwlinkType = "";
+    var dom = GetE('getLinkType');
+    var rbuttons = dom['link_type'];
+    for(var i=0; i< rbuttons.length; i++) {
+           if(rbuttons[i].checked) {
+              dwlinkType = rbuttons[i].value;
+           }
+    }
+
 	SetAttribute( e, 'dir'		, GetE('cmbAttLangDir').value ) ;
 	SetAttribute( e, 'lang'		, GetE('txtAttLangCode').value ) ;
 	SetAttribute( e, 'title'	, GetE('txtAttTitle').value ) ;
 	SetAttribute( e, 'longDesc'	, GetE('txtLongDesc').value ) ;
+	SetAttribute( e, 'type'	,  dwlinkType) ;
 
 	if ( oEditor.FCKBrowserInfo.IsIE )
 	{
@@ -366,7 +376,7 @@ function UpdateImage( e, skipId)
  
 		SetAttribute( e, 'style', GetE('txtAttStyle').value ) ;
 	}
-    
+
 }
 
 var eImgPreview ;

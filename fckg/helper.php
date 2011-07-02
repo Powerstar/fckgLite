@@ -184,7 +184,6 @@ var ourLockTimerINI = false;
 
  }
 
-
  function lockTimerRefresh(bak) {
         var now = new Date();
         if(!ourLockTimerINI)  unsetDokuWikiLockTimer();
@@ -289,7 +288,6 @@ function renewLock(bak) {
 }
 
 
-
 function revert_to_prev() {
   if(!(GetE('saved_wiki_html').innerHTML.length)) {
             if(!confirm(backup_empty)) {
@@ -298,7 +296,6 @@ function revert_to_prev() {
   }
     ourFCKEditorNode.innerHTML = GetE('saved_wiki_html').innerHTML;
 }
-
 
 
 function draft_delete() {
@@ -320,7 +317,6 @@ function draft_delete() {
     });
 
 }
-
 
 function disableDokuWikiLockTimer() {
   resetDokuWikiLockTimer(false);

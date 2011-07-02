@@ -1061,6 +1061,7 @@ function Ok()
         }
 
         else if(sLinkType == 'url'){
+            GetE('txtAttClasses').value = GetE('txtAttClasses').value.replace(/wikilink\d\s*/,"");
             GetE('txtAttClasses').value += ' urlextern ';
         }
         else if(sLinkType == 'samba'){

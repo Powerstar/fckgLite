@@ -8,14 +8,14 @@ $cname = urldecode($cname);
 
 if(file_exists($cname)) {
    if(unlink($cname)){
-     echo  "$cname: unlinked";   
+     echo  "$cname unlinked";   
      exit;
    }
    else {
-     echo "unlink failed: $cname";   
+     echo "unlink failed";   
    }
       
 }
-else echo "Not found: $cname\n";
+
 echo "done";
 

@@ -14,8 +14,8 @@ if(file_exists($cname)) {
       unlink($fckg_cname); 
    }
    unlink($cname); 
-  
-   exit;
+
+  exit;
 }
 
 echo "done";
