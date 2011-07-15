@@ -216,14 +216,27 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                  if(!$text && $this->page_from_template) $text = $this->page_from_template;
             }
             
-      if(strpos($text, '%%') !== false) {
-       $text= preg_replace('/%%\s*<([^%]+)>\s*%%/m','<nowiki><$1></nowiki>',$text);        
-       $text= preg_replace('/%%\s*\{([^%]+)\}\s*%%/m','<nowiki>{$1}</nowiki>',$text);        
-       $text= preg_replace('/%%\s*([~#\:\^])([^%]+)\1\s*%%/m','<nowiki>$1$2$1</nowiki>',$text);
-       $text= preg_replace('/%%\s*([^%]+)\s*%%/m','<nowiki>$1</nowiki>',$text);                
+      if(strpos($text, '%%') !== false) {     
+         $text= preg_replace_callback(
+            '/(<nowiki>)*(\s*)%%\s*([^%]+)\s*%%(<\/nowiki>)*(\s*)/ms',
+             create_function(
+               '$matches',
+                'if(preg_match("/<nowiki>/",$matches[1])) {
+                   $matches[1] .= "%%";
+                }
+                else  $matches[1] = "<nowiki>";
+                if(preg_match("/<\/nowiki>/",$matches[4])) {
+                   $matches[4] = "%%</nowiki>";
+                }
+                else $matches[4] = "</nowiki>";  
+                return   $matches[1] .  $matches[2] .  $matches[3] . $matches[4] . $matches[5];'  
+             ),
+             $text
+            );   
       }
 
        $pos = strpos($text, '<');
+
        if($pos !== false) {
 
            $text = preg_replace_callback(
@@ -287,7 +300,9 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
          $text = preg_replace('/TPRE_CLOSE\s+/ms',"TPRE_CLOSE",$text); 
       
          $text = preg_replace('/<(?!code|file|plugin|del|sup|sub|\/\/|\s|\/del|\/code|\/file|\/plugin|\/sup|\/sub)/ms',"//<//",$text);
-                           
+   
+         $text = str_replace('%%//<//', '&#37;&#37;&#60;', $text);              
+
          $text = preg_replace_callback('/<plugin(.*?)(?=<\/plugin>)/ms',
                         create_function(
                           '$matches', 

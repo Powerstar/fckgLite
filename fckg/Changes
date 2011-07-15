@@ -1,4 +1,4 @@
-rev 11-Jun_28-13_25
+rev 11-Jul_15-10_08
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -114,3 +114,16 @@ Fixed bug where direct (internal) links were being identified as external; also 
 external direct were being missed.
 
 In link.js removed wikilink class from URL when re-writing a url that had been an internal link.
+
+30 June
+Upgraded ent.ser to handle addtional Latin entities.
+
+4 Jul
+Fix for bugs in converting percent escapes to nowiki tags
+
+Further Fix:  created single preg_replace_callback which handles all nested configurations of
+percents and nowiki tags.
+
+15 Jul
+In helper.php: fixed bug in passing usergroups to filebrowser's browser.html, which affects
+acl determination in config.php
