@@ -73,10 +73,11 @@ class helper_plugin_fckg extends DokuWiki_Plugin {
   
   $fnencode = isset($conf['fnencode']) ? $conf['fnencode'] : 'url';  
   $user_groups = $USERINFO['grps'];
-
   if (@in_array("guest", $user_groups)) {
      $create_folder = 'n';
   }
+  $user_groups = implode(";;",$user_groups);
+
   if($INFO['isadmin'] || $INFO['ismanager']) {    
      $client = "";
   }
