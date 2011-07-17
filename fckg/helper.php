@@ -53,8 +53,7 @@ class helper_plugin_fckg extends DokuWiki_Plugin {
   global $INFO; 
   global $conf;
   global $USERINFO;
- // global $CNAME;
-
+ 
   $cname = getCacheName($INFO['client'].$ID,'.draft');
   $open_upload = $this->getConf('open_upload');
   $editor_backup = $this->getConf('editor_bak');
@@ -119,9 +118,19 @@ class helper_plugin_fckg extends DokuWiki_Plugin {
 var FCKRecovery = "";
 var oldonload = window.onload;
 var ourLockTimerINI = false;
+var oldBeforeunload;
 
   var fckg_onload = function() { $js };
   window.addEvent(window, 'load', fckg_onload);
+
+ function fckgEditorTextChanged() {
+   window.textChanged = false;   
+   oldBeforeunload(); 
+   if(window.dwfckTextChanged) {        
+      return LANG.notsavedyet;
+   }  
+ }
+
   function getCurrentWikiNS() {
         var DWikiMediaManagerCommand_ns = '$media_tmp_ns';
         return DWikiMediaManagerCommand_ns;
@@ -132,6 +141,8 @@ var ourLockTimerINI = false;
  var ourLockTimerWarningtimerID;
  var ourFCKEditorNode = null;
  var ourLockTimerIntervalID;
+ var dwfckTextChanged = false;
+
    /**
     *    event handler
     *    handles both mousepresses and keystrokes from FCKeditor window
@@ -141,7 +152,7 @@ var ourLockTimerINI = false;
    if(ourLockTimerIsSet) {
          lockTimerRefresh();
    }
-
+   window.dwfckTextChanged = true;
  }
 
  function unsetDokuWikiLockTimer() {
@@ -160,8 +171,6 @@ var ourLockTimerINI = false;
         locktimer.clear();  /// alert(locktimer.timeout);
         window.clearTimeout(ourLockTimerWarningtimerID);
         ourLockTimerWarningtimerID =  window.setTimeout(function () { locktimer.warning(); }, locktimer.timeout);
-     //  ourLockTimerWarningtimerID =  window.setTimeout(function () { locktimer.warning(); }, (2*60*1000));
-      
    };
 
    locktimer.warning = function(){    
@@ -329,10 +338,6 @@ function disableDokuWikiLockTimer() {
 var oDokuWiki_FCKEditorInstance;
 function FCKeditor_OnComplete( editorInstance )
 {
- // VKI_attach(document.getElementById('wiki__text___Frame'));  
-//oDokuWiki_FCKEditorInstance.EditorDocument.body
-
-
 
   oDokuWiki_FCKEditorInstance = editorInstance;
 
@@ -357,6 +362,9 @@ function FCKeditor_OnComplete( editorInstance )
     editorInstance.EditorDocument.addEventListener('keydown', CTRL_Key_Formats, false) ;
   else
    editorInstance.EditorDocument.attachEvent('onkeydown', CTRL_Key_Formats) ;
+
+  oldBeforeunload = onbeforeunload;
+  window.onbeforeunload = fckgEditorTextChanged;
 
   var FCK = oDokuWiki_FCKEditorInstance.get_FCK();
   if(FCK.EditorDocument && FCK.EditorDocument.body  && !ourFCKEditorNode) {

@@ -1,4 +1,4 @@
-rev 11-Jul_15-10_08
+rev 11-Jul_17-10_52
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -127,3 +127,7 @@ percents and nowiki tags.
 15 Jul
 In helper.php: fixed bug in passing usergroups to filebrowser's browser.html, which affects
 acl determination in config.php
+
+17 Jul
+In helper.php: intercept DW's onbeforeunload to issue our own warning when changes have
+been made but not saved.
