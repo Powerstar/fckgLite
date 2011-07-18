@@ -118,12 +118,21 @@ class helper_plugin_fckg extends DokuWiki_Plugin {
 var FCKRecovery = "";
 var oldonload = window.onload;
 var ourLockTimerINI = false;
+var oldBeforeunload;
 
   var fckg_onload = function() { $js };
   if(window.jQuery && jQuery.bind) {
       jQuery(window).bind('load',{},fckg_onload);
   }
   else window.addEvent(window, 'load', fckg_onload);
+ function fckgEditorTextChanged() {
+   window.textChanged = false;   
+   oldBeforeunload(); 
+   if(window.dwfckTextChanged) {        
+      return LANG.notsavedyet;
+   }  
+ }
+
   function getCurrentWikiNS() {
         var DWikiMediaManagerCommand_ns = '$media_tmp_ns';
         return DWikiMediaManagerCommand_ns;
@@ -134,6 +143,8 @@ var ourLockTimerINI = false;
  var ourLockTimerWarningtimerID;
  var ourFCKEditorNode = null;
  var ourLockTimerIntervalID;
+ var dwfckTextChanged = false;
+
    /**
     *    event handler
     *    handles both mousepresses and keystrokes from FCKeditor window
@@ -143,7 +154,7 @@ var ourLockTimerINI = false;
    if(ourLockTimerIsSet) {
          lockTimerRefresh();
    }
-
+   window.dwfckTextChanged = true;
  }
 
  function unsetDokuWikiLockTimer() {
@@ -356,6 +367,9 @@ function FCKeditor_OnComplete( editorInstance )
     editorInstance.EditorDocument.addEventListener('keydown', CTRL_Key_Formats, false) ;
   else
    editorInstance.EditorDocument.attachEvent('onkeydown', CTRL_Key_Formats) ;
+
+  oldBeforeunload = onbeforeunload;
+  window.onbeforeunload = fckgEditorTextChanged;
 
   var FCK = oDokuWiki_FCKEditorInstance.get_FCK();
   if(FCK.EditorDocument && FCK.EditorDocument.body  && !ourFCKEditorNode) {

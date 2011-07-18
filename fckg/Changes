@@ -1,4 +1,4 @@
-rev 11-Jul_15-10_07
+rev 11-Jul_17-10_52
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -38,7 +38,7 @@ the editor sess these as acronyms instead of as plugin syntax.
  
 23 May
 Fixed ACL check in filemanager/connectors/php/check_acl.php which was not fully
-backwardly compatible with DW after upgrading wilcdard %USER% substitions and which
+backwardly compatible with DW after upgrading %USER% wildcard substitions and which
 could fail under some conditions even in current DW distros. 
 
 Put array check into edit.php when checking for guest user in edit.php where
@@ -58,7 +58,7 @@ normal processing.
 
 4 June
 Made Call to draft_rename synchronous; otherwise there is no guarantee that it will
-delete the draft file from the server
+delete the draft file from the server.
 
 5 June
 Renamed draft_refresh to draft_delete in function calls and fckg/scripts to reflect
@@ -70,12 +70,14 @@ from being mistaken by rawurldecode for html-encoded characters.
 
 Cleaned up some useless code in meta.php.
 
-Added check in edit.php to ignore draft files left over by DW Edit previews 
+Added check in edit.php to ignore draft files left over by DW Edit previews
 when switching from DW Edit to FCKG Edit; these are not deleted, as they
 are when saving of canceling when in DW Edit.
 
+
 7 June
-Fixed problem where HTML brackets were replaced by entities in GESHI blocks.
+Fixed problem where HTML brackets were replaced by entities in GESHI blocks. Open brackets
+are now replaced by "< ", and the space is removed on save. 
 
 9 June
 Permanent fix for draft file left over after DW Edit preview -- there was a bug in the
@@ -95,14 +97,13 @@ of text above it; it is removed on save.
 25 June
 Added mechanism to handle swf files.
 
-
 26 June
 Fix for corrupted code blocks containing MULTI_PLUGIN (uses old style "< " and " >' instead
 of &lt; and &gt; for html-style elements.
 
 Added flash icon to FCKeditor
 
-Added %%. . .%% escape around characters, which is converted to <nowiki>; this is an extension
+Added %%. . .%% escape around characters, which is converted o <nowiki>; this is an extension
 of the earlier use of this on 12 Jan 2011.
 
 27 June
@@ -115,14 +116,18 @@ external direct were being missed.
 In link.js removed wikilink class from URL when re-writing a url that had been an internal link.
 
 30 June
-Upgraded action/ent.ser to handle additional Latin entities
+Upgraded ent.ser to handle addtional Latin entities.
 
 4 Jul
 Fix for bugs in converting percent escapes to nowiki tags
 
-Further Fix:  created single preg_replace_callback which handles all nested configurations of 
+Further Fix:  created single preg_replace_callback which handles all nested configurations of
 percents and nowiki tags.
 
 15 Jul
 In helper.php: fixed bug in passing usergroups to filebrowser's browser.html, which affects
 acl determination in config.php
+
+17 Jul
+In helper.php: intercept DW's onbeforeunload to issue our own warning when changes have
+been made but not saved.
