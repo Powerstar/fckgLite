@@ -53,7 +53,7 @@ class helper_plugin_fckg extends DokuWiki_Plugin {
   global $INFO; 
   global $conf;
   global $USERINFO;
- 
+  $_OS = strtolower(PHP_OS);
   $cname = getCacheName($INFO['client'].$ID,'.draft');
   $open_upload = $this->getConf('open_upload');
   $editor_backup = $this->getConf('editor_bak');
@@ -155,6 +155,7 @@ var oldBeforeunload;
    window.dwfckTextChanged = true;
  }
 
+
  function unsetDokuWikiLockTimer() {
      
     if(window.locktimer && !ourLockTimerINI) {
@@ -232,8 +233,6 @@ var oldBeforeunload;
              ourLockTimerIsSet = false;             
              locktimer.reset = locktimer.old_reset; 
              locktimer.refresh(); 
-            // dom_checkbox.style.display = 'inline';
-            // dom_label.style.display = 'inline';
              return;
         }
       
@@ -335,6 +334,30 @@ function disableDokuWikiLockTimer() {
   }
 }
 
+var dwfck_keyPressHandlerInstalled=false;
+function MT_keyPressHandlerInstalled() {
+  dwfck_keyPressHandlerInstalled=true;
+}
+
+function dwfckKeypressBak() {
+  if(window.addEventListener){
+    if(!dwfck_keyPressHandlerInstalled) {
+      oDokuWiki_FCKEditorInstance.EditorDocument.addEventListener('keyup', handlemouspress, false) ;
+    }
+  }
+  else {
+   if(!dwfck_keyPressHandlerInstalled) {
+     oDokuWiki_FCKEditorInstance.EditorDocument.attachEvent('onkeyup', handlemouspress) ;
+   }
+  }
+}
+
+var DWFCK_EditorWinObj;
+function FCKEditorWindowObj(w) { 
+  DWFCK_EditorWinObj = w;
+}
+
+
 var oDokuWiki_FCKEditorInstance;
 function FCKeditor_OnComplete( editorInstance )
 {
@@ -358,19 +381,27 @@ function FCKeditor_OnComplete( editorInstance )
   document.getElementById('wiki__text___Frame').style.height = "450px";
   document.getElementById('size__ctl').innerHTML = document.getElementById('fck_size__ctl').innerHTML;
   
-  if(window.addEventListener)
+  if(window.addEventListener){
     editorInstance.EditorDocument.addEventListener('keydown', CTRL_Key_Formats, false) ;
-  else
+  }
+  else {
    editorInstance.EditorDocument.attachEvent('onkeydown', CTRL_Key_Formats) ;
+  }
+  window.setTimeout(dwfckKeypressBak, 3000);
+  
+  var index = navigator.userAgent.indexOf('Safari'); 
 
-  oldBeforeunload = onbeforeunload;
-  window.onbeforeunload = fckgEditorTextChanged;
-
+  if(index == -1  || (navigator.userAgent.indexOf('Chrome'))) {
+    oldBeforeunload = window.onbeforeunload;
+    window.onbeforeunload = fckgEditorTextChanged;
+  }
+ 
   var FCK = oDokuWiki_FCKEditorInstance.get_FCK();
   if(FCK.EditorDocument && FCK.EditorDocument.body  && !ourFCKEditorNode) {
      ourFCKEditorNode = FCK.EditorDocument.body;     
   }
-
+ 
+ 
 }
 
 

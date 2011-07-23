@@ -221,12 +221,13 @@ window.onload = function()
 		LoadToolbarSetup() ;
 
   getDocAttemptsID = window.setTimeout(getdocbody, 1000);
-
+  top.FCKEditorWindowObj(window);
 }
 
 function getdocbody() {
    window.clearTimeout(getDocAttemptsID);
    getDocAttempts++;
+
    if(getDocAttempts > 7 && top.resetDokuWikiLockTimer) {
          top.resetDokuWikiLockTimer(false);
          return;
@@ -246,8 +247,9 @@ function getdocbody() {
             mt.eventLoop ();     
             MT_DataEvent.notify(mt);
      }
+     
     }
-
+     
    else {
      getDocAttemptsID = window.setTimeout(getdocbody, 1000);
    }

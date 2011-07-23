@@ -1,4 +1,4 @@
-rev 11-Jul_17-10_52
+rev 11-Jul_23-09_24
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -131,3 +131,13 @@ acl determination in config.php
 17 Jul
 In helper.php: intercept DW's onbeforeunload to issue our own warning when changes have
 been made but not saved.
+
+20 Jul 
+Added support for link-only images.  Experimental.
+
+Set window.dwfckTextChanged to false on save, because Anteater gives onbeforunload warning
+on save.
+
+21 Jul
+Removed onbeforeunload from Safari which freezes when message is canceled and improved
+keyhandler install.

@@ -758,6 +758,7 @@ var fckgLPluginPatterns = new Array();
 
 var HTMLParser_DEBUG = "";
 function parse_wikitext(id) {
+ window.dwfckTextChanged = false;
  if(id != 'bakup')  draft_delete();
  var line_break = "\nL_BR_K  \n";
     var markup = { 'b': '**', 'i':'//', 'em': '//', 'u': '__', 'br':line_break, 
@@ -844,6 +845,7 @@ function parse_wikitext(id) {
     format_in_list: false,
     prev_li: new Array(),
     immutable_plugin: false,
+    link_only: false,
 
     backup: function(c1,c2) {
         var c1_inx = results.lastIndexOf(c1);     // start position of chars to delete
@@ -912,7 +914,7 @@ function parse_wikitext(id) {
             this.code_snippet = false;
             this.downloadable_file = "";
             var qs_set = false;
-            
+            this.link_only = false;
         }
   
        if(tag == 'p') {         
@@ -963,7 +965,7 @@ function parse_wikitext(id) {
 
         for ( var i = 0; i < attrs.length; i++ ) {     
     
-          // if(!confirm(tag + ' ' + attrs[i].name + '="' + attrs[i].escaped + '"')) exit;
+           //if(!confirm(tag + ' ' + attrs[i].name + '="' + attrs[i].escaped + '"')) exit;
              if(attrs[i].escaped == 'u' && tag == 'em' ) {
                      tag = 'u';
                      this.attr='u'    
@@ -1080,6 +1082,9 @@ function parse_wikitext(id) {
                   else if(attrs[i].value.match(/fn_bot/)) {
                      bottom_note = true;
                   }
+                  else if(attrs[i].value.match(/mf_(png|gif|jpg|jpeg)/i)) {
+                     this.link_only=true;
+                  }
                   this.link_class= attrs[i].escaped;                 
                   media_class = this.link_class.match(/mediafile/);              
                }
@@ -1091,7 +1096,7 @@ function parse_wikitext(id) {
                }               
             
               else if(attrs[i].name == 'href' && !this.code_type) { 
-            //if(!confirm(tag + ' ' + attrs[i].name + '="' + attrs[i].escaped + '"', "top")) exit;  
+           // if(!confirm(tag + ' ' + attrs[i].name + '="' + attrs[i].escaped + '"', "top")) exit;  
                     var http =  attrs[i].escaped.match(/http:\/\//) ? true : false; 
                     if(attrs[i].escaped.match(/\/lib\/exe\/detail.php/)) {
                         this.image_link_type = 'detail';
@@ -1266,7 +1271,7 @@ function parse_wikitext(id) {
                    this.link_title = "";
                    this.link_class= "";
 
-                   break;
+                 //  break;
                  }
             }
 
@@ -1430,7 +1435,7 @@ function parse_wikitext(id) {
                  alt = "";
                  return;
            }
-      
+          if(this.link_only) tag = 'img';
           if(tag == 'br') {  
                 if(this.in_multi_plugin) {
                     results += "\n";
@@ -1574,6 +1579,7 @@ function parse_wikitext(id) {
           else if(tag == 'img') {      
                var link_type = this.image_link_type;              
                this.image_link_type="";
+               if(this.link_only) link_type = 'link_only';
                if(!link_type){
                   link_type = 'nolink'; 
                }
@@ -1581,7 +1587,10 @@ function parse_wikitext(id) {
                     link_type = "";
                }
                
-               if(link_type) { 
+               if(link_type == 'link_only') {
+                    img_size='?linkonly';
+               }
+               else if(link_type) { 
                      img_size += link_type + '&';  
                }
                if(width && height) {
@@ -1620,7 +1629,10 @@ function parse_wikitext(id) {
 
 
     if(this.in_endnotes && tag == 'a') return;
-
+    if(this.link_only){     
+       this.link_only=false;
+       return;
+    }
     if(!markup[tag]) return; 
 
      if(tag == 'sup' && this.attr == 'dwfcknote') {         
@@ -1819,7 +1831,7 @@ function parse_wikitext(id) {
     },
 
     chars: function( text ) {
-
+    if(this.link_only) return;
     if(!this.code_type) { 
         if(! this.last_col_pipes) {
             text = text.replace(/\x20{6,}/, "   "); 
