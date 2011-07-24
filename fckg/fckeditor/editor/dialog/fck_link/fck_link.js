@@ -1050,7 +1050,10 @@ function Ok()
                  }
                  else GetE('txtAttClasses').value += ' mediafile ';
              }
-  
+             if(matches[1].match(/(gif|jpg|png|jpeg)/)) {               
+                    GetE('txtAttClasses').value = ' media ' + GetE('txtAttClasses').value;
+                    SetAttribute( oLink, 'type', 'linkonly');                
+           }
         }
         else if(sLinkType == 'internal') {
              if(!classes.match(/wikilink/)) {
