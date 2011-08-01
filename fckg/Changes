@@ -1,4 +1,4 @@
-rev 11-Jul_23-09_24
+rev 11-Aug_01-15_21
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -141,3 +141,8 @@ on save.
 21 Jul
 Removed onbeforeunload from Safari which freezes when message is canceled and improved
 keyhandler install.
+
+1 Aug
+Removed upload and folder create buttons from filebrowser when DW's 'Show pagesource' is in effect.
+
+Eliminated php warning from an implode in helper.php.

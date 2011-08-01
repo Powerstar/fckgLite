@@ -73,6 +73,7 @@ class helper_plugin_fckg extends DokuWiki_Plugin {
   
   $fnencode = isset($conf['fnencode']) ? $conf['fnencode'] : 'url';  
   $user_groups = $USERINFO['grps'];
+  if(!$user_groups) $user_groups = array();
   if (@in_array("guest", $user_groups)) {
      $create_folder = 'n';
   }
