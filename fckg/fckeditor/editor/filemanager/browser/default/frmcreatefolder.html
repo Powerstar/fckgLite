@@ -97,7 +97,7 @@ window.onload = function()
    window.top.IsLoadedCreateFolder = true ;
    setupLanguage();
 
-   if(CurrentDWikiUser == 'visitor' || isLocalDwikiBrowser) {
+  if(CurrentDWikiUser == 'visitor' || isLocalDwikiBrowser || !CurrentDWikiUser) {
      document.getElementById("btn__create_folder").disabled = true;    
      document.getElementById("create_folder").innerHTML = "";
    }

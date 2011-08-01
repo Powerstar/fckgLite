@@ -108,7 +108,7 @@ window.onload = function()
 {
     window.top.IsLoadedUpload = true ;
     setupLanguage();
-    if(CurrentDWikiUser == 'visitor' || isLocalDwikiBrowser) {
+    if(CurrentDWikiUser == 'visitor' || isLocalDwikiBrowser || !CurrentDWikiUser) { 
        document.getElementById('btnUpload').disabled = true ;
        document.getElementById('btnUpload_div').innerHTML = "";
 

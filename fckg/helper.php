@@ -73,6 +73,7 @@ class helper_plugin_fckg extends DokuWiki_Plugin {
   
   $fnencode = isset($conf['fnencode']) ? $conf['fnencode'] : 'url';  
   $user_groups = $USERINFO['grps'];
+  if(!$user_groups) $user_groups = array();
   if (@in_array("guest", $user_groups)) {
      $create_folder = 'n';
   }
@@ -121,10 +122,8 @@ var ourLockTimerINI = false;
 var oldBeforeunload;
 
   var fckg_onload = function() { $js };
-  if(window.jQuery && jQuery.bind) {
-      jQuery(window).bind('load',{},fckg_onload);
-  }
-  else window.addEvent(window, 'load', fckg_onload);
+  window.addEvent(window, 'load', fckg_onload);
+
  function fckgEditorTextChanged() {
    window.textChanged = false;   
    oldBeforeunload(); 
@@ -156,6 +155,7 @@ var oldBeforeunload;
    }
    window.dwfckTextChanged = true;
  }
+
 
  function unsetDokuWikiLockTimer() {
      
@@ -198,10 +198,9 @@ var oldBeforeunload;
 
  function lockTimerRefresh(bak) {
         var now = new Date();
-        if(!ourLockTimerINI)  unsetDokuWikiLockTimer();
-
+  
         if((now.getTime() - locktimer.our_lasttime.getTime() > 45*1000) || bak){            
-           var dwform = GetE('dw__editform');
+           var dwform = $('dw__editform');
             window.clearTimeout(ourLockTimerWarningtimerID);
             var params = 'call=lock&id='+encodeURIComponent(locktimer.pageid);
             if(ourFCKEditorNode) {  
@@ -211,18 +210,9 @@ var oldBeforeunload;
                 params += '&suffix='+encodeURIComponent(dwform.elements.suffix.value);
                 params += '&date='+encodeURIComponent(dwform.elements.date.value);
             }
-            locktimer.our_lasttime = now;  
-            jQuery.post(
-                DOKU_BASE + 'lib/exe/ajax.php',
-                params,
-                function (data) {
-                    data = data.replace(/auto/,"")  + ' by fckgLite';
-                    locktimer.response = data; 
-                    locktimer.refreshed(data);
-                },
-                'html'
-            );
-       }
+            locktimer.our_lasttime = now;   
+            locktimer.sack.runAJAX(params); 
+        }
         
  }
 
@@ -273,40 +263,44 @@ function renewLock(bak) {
         var id = "$ID"; 
         parse_wikitext('bakup');
 
-        var dwform = GetE('dw__editform');
+        var dwform = $('dw__editform');
         if(dwform.elements.fck_wikitext.value == '__false__' ) return;
-        GetE('saved_wiki_html').innerHTML = ourFCKEditorNode.innerHTML; 
+        $('saved_wiki_html').innerHTML = ourFCKEditorNode.innerHTML; 
         if(($editor_backup) == 0 ) {           
            return; 
         }
        
         var params = "rsave_id=$meta_fn";
         params += '&wikitext='+encodeURIComponent(dwform.elements.fck_wikitext.value);      
-        jQuery.post(
-                DOKU_BASE + 'lib/plugins/fckg/scripts/refresh_save.php',
-                params,
-                function (data) {                    
-                    if(data == 'done') {
-                        show_backup_msg("$meta_id");  
-                    }
-                    else {
-                      alert("error saving: " + id);
-                    }
-                },
-                'html'
-            );
+        var sack_rs = new sack(DOKU_BASE + 'lib/plugins/fckg/scripts/refresh_save.php');
+ 
+        sack_rs.onCompletion = function() {
+        	if (sack_rs.responseStatus){   
+                if(sack_rs.responseStatus[0] == 200) {
+                   if(!sack_rs.response || sack_rs.response != 'done') {
+                    alert("error saving: " + id);
+                   }
+                   else {
+                    show_backup_msg("$meta_id"); 
+                   }
+                }
+                else alert("error saving: " + id);
+            }
+        };
+
+        sack_rs.runAJAX(params);
     }
 
 }
 
 
 function revert_to_prev() {
-  if(!(GetE('saved_wiki_html').innerHTML.length)) {
+  if(!($('saved_wiki_html').innerHTML.length)) {
             if(!confirm(backup_empty)) {
                            return;
             }
   }
-    ourFCKEditorNode.innerHTML = GetE('saved_wiki_html').innerHTML;
+    ourFCKEditorNode.innerHTML = $('saved_wiki_html').innerHTML;
 }
 
 
@@ -314,19 +308,20 @@ function draft_delete() {
 
         var debug = false;
         var params = "draft_id=$cname";
-        jQuery.ajax({
-           url: DOKU_BASE + 'lib/plugins/fckg/scripts/draft_delete.php',
-           async: false,
-           data: params,    
-           type: 'POST',
-           dataType: 'html',         
-           success: function(data){                 
-               if(debug) {            
-                  alert(data);
-               }
-              
-    }
-    });
+        var draft_rn = new sack(DOKU_BASE + 'lib/plugins/fckg/scripts/draft_delete.php');
+        draft_rn.asynchronous = false;
+        draft_rn.onCompletion = function() {
+        	if (draft_rn.responseStatus){   
+                if(draft_rn.responseStatus[0] == 200) {
+                  if(draft_rn.response && draft_rn.response != 'done') {
+                    if(debug) alert('success: ' + draft_rn.response);
+                  }
+                }
+                
+            }
+        };
+
+        draft_rn.runAJAX(params);
 
 }
 
@@ -406,7 +401,8 @@ function FCKeditor_OnComplete( editorInstance )
   if(FCK.EditorDocument && FCK.EditorDocument.body  && !ourFCKEditorNode) {
      ourFCKEditorNode = FCK.EditorDocument.body;     
   }
-
+ 
+ 
 }
 
 
