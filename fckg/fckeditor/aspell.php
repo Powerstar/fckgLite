@@ -6,7 +6,7 @@ if(isset($_REQUEST['dw_conf_lang'])) {
   $dw_conf_lang = $_REQUEST['dw_conf_lang'];
 }
 
-$spell_chk_lang = $_COOKIE['FCK_aspell'] ?  $_COOKIE['FCK_aspell'] : '';
+$spell_chk_lang = isset($_COOKIE['FCK_aspell']) ?  $_COOKIE['FCK_aspell'] : '';
 
 ?>
 
