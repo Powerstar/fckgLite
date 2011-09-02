@@ -38,9 +38,10 @@ var Doku_Base = FCK.dwiki_doku_base;
 var DWIKI_fnencode = FCK.dwiki_fnencode;
 var dwiki_version =FCK.dwiki_version;
 var anteater = FCK.dwiki_anteater;
-
+var currentNameSpace = null;
 FCK.islocal_dwikibrowser = false;
 
+GetCurentNameSapce();
 //#### Dialog Tabs
 
 // Set the dialog tabs.
@@ -815,7 +816,7 @@ function Ok()
 {
 	var sUri, sInnerHtml, internalInnerHTML ;  // internalInnerHTML is for urls that are in fact internal media
     var wikiQS;  // internal link query string (DW Anteater or later)
-
+    var current_ns = false;  // if internal link has no leading colon current_ns = true
 	oEditor.FCKUndo.SaveUndoStep() ;
 
 	switch ( GetE('cmbLinkType').value )
@@ -872,14 +873,22 @@ function Ok()
 
             wikiQS = GetE('txtDokuWikiQS').value;          
             if((wikiQS=checkDokuQS(wikiQS)) === false) return;
-            if(!wiki_id.match(/^:/)) wiki_id = ':' + wiki_id;  
 
             var dwiki_dir = window.location.pathname;
       
             dwiki_dir = dwiki_dir.replace(/lib\/plugins.*$/, "");
 
-            sUri = dwiki_dir + 'doku.php?id=' + wiki_id;   
-           
+
+        if(wiki_id.match(/^[^:]/)  && currentNameSpace)  {
+             wiki_id = ':' + currentNameSpace + ':' + wiki_id; 
+        }
+
+            if(!wiki_id.match(/^:/)) {
+			    wiki_id = ':' + wiki_id;  
+			}
+		
+          sUri = dwiki_dir + 'doku.php?id=' + wiki_id;   
+         
 			break ;
 
 	case 'other_mime' :
@@ -1307,4 +1316,28 @@ var anchorOption = {
 };
 
 
+function GetCurentNameSapce()
+{
+    var ajax2 = new sack();
+	ajax2.requestFile =  '../filemanager/connectors/php/connector.php';
+	ajax2.method = 'GET';
+	ajax2.setVar('Command','GetDwfckNs');
+	ajax2.setVar('Type','File');
+	ajax2.setVar('CurrentFolder','nothing');
+	ajax2.onCompletion = function() {
+	
+	   if(ajax2.responseStatus && ajax2.responseStatus[0] == 200) {         
+         var str = decodeURIComponent(ajax2.response);
+		 currentNameSpace = str; 		
+		 // gotCurrentNameSpace = true;
+	    }
+	
+	};
+    
+	ajax2.runAJAX();
+}
+
+
+
+	
 
