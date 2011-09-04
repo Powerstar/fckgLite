@@ -325,7 +325,9 @@ function fck_editor(&$event) {
     //<![CDATA[ 
 
     try {
-    if(!HTMLParserInstalled){};
+    if(!HTMLParserInstalled){
+         LoadScript("$url");        
+    }
     }
     catch (ex) {  
          LoadScript("$url");        
