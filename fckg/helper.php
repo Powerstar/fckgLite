@@ -115,7 +115,10 @@ class helper_plugin_fckg extends DokuWiki_Plugin {
 
 <script type='text/javascript'>
  //<![CDATA[
- 
+
+if(window.dw_locktimer) {
+   var locktimer = dw_locktimer;
+} 
 var FCKRecovery = "";
 var oldonload = window.onload;
 var ourLockTimerINI = false;
