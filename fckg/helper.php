@@ -207,7 +207,7 @@ var oldBeforeunload;
         if((now.getTime() - locktimer.our_lasttime.getTime() > 45*1000) || bak){            
            var dwform = GetE('dw__editform');
             window.clearTimeout(ourLockTimerWarningtimerID);
-            var params = 'call=lock&id='+encodeURIComponent(locktimer.pageid);
+            var params = 'call=lock&id='+locktimer.pageid;
             if(ourFCKEditorNode) {  
                 dwform.elements.wikitext.value = ourFCKEditorNode.innerHTML;
                 params += '&prefix='+encodeURIComponent(dwform.elements.prefix.value);
