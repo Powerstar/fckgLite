@@ -1,4 +1,4 @@
-rev 11-Aug_01-15_21
+rev 11-Sep_04-13_52
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -146,3 +146,15 @@ keyhandler install.
 Removed upload and folder create buttons from filebrowser when DW's 'Show pagesource' is in effect.
 
 Eliminated php warning from an implode in helper.php.
+
+12 Aug
+aspell.php: added isset() check for 'FCK_aspell' index in $COOKIE array.
+
+2 Sep
+fckeditor link dialog:  when manually entering internal links, any link name that is not specified 
+as being from the top of the wiki is now treated as relative to the current namespace, i.e.
+any name that does not begin with a colon for instance, namespace:file, whereas :namespace:file
+is treated as coming off the wiki's root directory.
+
+4 Sep
+Minor non-affecting edito to meta.php
