@@ -1,4 +1,4 @@
-rev 11-Sep_04-13_52
+rev 11-Sep_14-19_31
 
 Note:  For the log of Changes prior to thei document, see the file named Changes.1.
 
@@ -157,4 +157,14 @@ any name that does not begin with a colon for instance, namespace:file, whereas 
 is treated as coming off the wiki's root directory.
 
 4 Sep
-Minor non-affecting edito to meta.php
+Minor non-affecting edit to meta.php
+
+10 Sep
+This distribution of fckgLite is compatible with Dokuwiki's implementation of JQuery for its internal
+Javascript library.  It is also backwardly compatible with Dokuwiki's pre-JQuery distributions.  
+All future distributions of fckgLite will be based on this model.  Please report any issues.
+
+
+14 Sep
+Fix to fckdialog.html, where JQuery-like syntax $(id) caused Javascript error in IE 9.  Fixed font plugin,
+which failed in FireFox 6 because it fails to recgnize the deprecated font tag.

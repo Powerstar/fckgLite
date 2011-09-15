@@ -27,7 +27,7 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
     var $helper       = false;
     var $fckg_bak_file = "";
     var $debug = false;
-    var $test = false;
+    var $test = true;
     var $page_from_template;
     var $draft_found = false;
     var $draft_text;
@@ -341,6 +341,23 @@ class action_plugin_fckg_edit extends DokuWiki_Action_Plugin {
                 ),
                 $this->xhtml
               ); 
+			  
+			 /*
+       $this->xhtml = preg_replace_callback(
+                '/(<style\s+class=\'face\' \s+style=\'.*?\')(.*?)(<\/style>)/ms',
+                create_function(
+                   '$matches', 
+                   '$matches[1] = preg_replace("/TPRE_CODE/","<pre class=\'code\'>\n", $matches[1]);  
+                    $matches[1] = preg_replace("/TPRE_FILE/","<pre class=\'file\'>\n", $matches[1]);  
+                    $matches[2] = preg_replace("/TC_NL/ms", "\n", $matches[2]);  
+                    $matches[3] = "</pre>";                    
+                    return $matches[1] . $matches[2] . $matches[3];'            
+                ),
+                $this->xhtml
+              );
+*/			  
+			
+			  
        }
 
        $cname = getCacheName($INFO['client'].$ID,'.draft.fckl');
@@ -847,6 +864,7 @@ function parse_wikitext(id) {
     prev_li: new Array(),
     immutable_plugin: false,
     link_only: false,
+	in_font: false,
 
     backup: function(c1,c2) {
         var c1_inx = results.lastIndexOf(c1);     // start position of chars to delete
@@ -925,12 +943,12 @@ function parse_wikitext(id) {
               HTMLParser_TABLE=true;
           }
        }
-       else if(tag == 'font') {
+       else if(tag=='span') {
           var font_family = "arial";
           var font_size = "9pt";
           var font_weight = "normal";
-          var font_color = ""; 
-          var font_bgcolor = "";
+          var font_color = "inherit"; 
+          var font_bgcolor = "inherit";
        }
        
        if(tag == 'table') {
@@ -1015,11 +1033,12 @@ function parse_wikitext(id) {
                    this.immutable_plugin = fckLImmutables[matches[1]];
                }
             }
-            else if(tag == 'font') {
+            else if(tag == 'span') {
                if(attrs[i].name == 'face') {
-                    font_family = attrs[i].value;
+			   	   this.in_font=true;    		   	   
+                   font_family = attrs[i].value;
                }
-               else if(attrs[i].name == 'style') {
+               if(attrs[i].name == 'style') {
                    matches = attrs[i].value.match(/font-size:\s*(\d+(\w+|%))/);
                    if(matches){
                      font_size = matches[1];
@@ -1028,22 +1047,19 @@ function parse_wikitext(id) {
                    if(matches) {
                       font_weight = matches[1];
                    }
-                   matches = attrs[i].value.match(/[^\-]color:\s*([#\w\s\d,\(\)]+);?/);   
+                   matches = attrs[i].value.match(/\bcolor:\s*([#\w\s\d,\(\)]+);?/);   
                    if(matches) {
                       font_color = matches[1];
                    }
-                 matches = attrs[i].value.match(/background[-]color:\s*([#\w\s\d,\(\)]+);?/i);
-             //      matches = attrs[i].value.match(/background\-color:\s*(.*);?/);   
+				 
+                 matches = attrs[i].value.match(/background[-]color:\s*([#\w\s\d,\(\)]+);?/i);			
                    if(matches) {
                       font_bgcolor = matches[1];
                    }
-
-
                }
                else if(attrs[i].name == 'color') {
                     font_color = attrs[i].value;
                }
-            
             }
             if(tag == 'td' || tag == 'th') { 
               if(tag == 'td') {
@@ -1551,7 +1567,7 @@ function parse_wikitext(id) {
                }
                return;
           }
-          else if(tag == 'font') {
+          else if(this.in_font || tag == 'font') {
               /* <font 18pt:bold/garamond;;color;;background_color>  */
                if(font_color) font_family = font_family + ';;'+ font_color;
                if(font_bgcolor) font_family = font_family + ';;'+ font_bgcolor;
@@ -1643,6 +1659,10 @@ function parse_wikitext(id) {
         this.is_smiley = false;
         return;
      }
+	 if(tag == 'span' && this.in_font) {
+	      tag = 'font';
+		  this.in_font=false;
+	 }
      if(tag == 'span' && this.curid) {
              this.curid = false;
              return; 
