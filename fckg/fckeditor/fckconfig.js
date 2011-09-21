@@ -404,6 +404,8 @@ FCKConfig.ToolbarSets["Dokuwiki"] = [
   ['FontFormat'], ['Undo','Redo','RemoveFormat', '-','Table' ],   
   ['Plugin_Tool',  'Delete_P' ],['FitWindow'],
   ['Link','Unlink'], ['Image', 'Source','geshi' ],   
+  ['OrderedList','UnorderedList','-','Outdent','Indent','Blockquote','CreateDiv'],
+  ['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
   ['About','keyboard']  
 ] ;  
 
