@@ -846,6 +846,7 @@ function parse_wikitext(id) {
     prev_li: new Array(),
     immutable_plugin: false,
     link_only: false,
+	is_styledtext: false, //alex
 
     backup: function(c1,c2) {
         var c1_inx = results.lastIndexOf(c1);     // start position of chars to delete
@@ -971,6 +972,24 @@ function parse_wikitext(id) {
                      this.attr='u'    
                      break;
               }
+			  
+//alex
+            if(tag == 'p') {
+              if(attrs[i].name == 'style' && attrs[i].escaped.match(/(center)/)) {
+                     this.is_styledtext = true;
+                     this.attribute = 'center';
+              }
+              if(attrs[i].name == 'style' && attrs[i].escaped.match(/(right)/)) {
+                     this.is_styledtext = true;
+                     this.attribute = 'right';
+              }
+              if(attrs[i].name == 'style' && attrs[i].escaped.match(/(left)/)) {
+                     this.is_styledtext = true;
+                     this.attribute = 'left';
+              }
+            }
+
+//alex
 
             if(tag == 'div') {
               if(attrs[i].name == 'class' && attrs[i].value == 'footnotes') {
@@ -1561,7 +1580,13 @@ function parse_wikitext(id) {
 
           if(this.in_endnotes && tag == 'a') return; 
           if(this.code_type && tag == 'span') tag = 'blank'; 
-          results += markup[tag];
+          if(markup[tag] && tag == 'p' && this.is_styledtext) {
+            results += '<html><p style=\"text-align: ' + this.attribute + ';\">'; //alex
+            this.attribute = '';
+          }
+          else {
+              results += markup[tag];
+          }
 
           if(tag == 'td' || tag == 'th' || (this.last_col_pipes && this.td_align == 'center')) {
               if(this.is_rowspan) {          
@@ -1721,6 +1746,10 @@ function parse_wikitext(id) {
           }       
          this.code_type = false;
         
+    }
+	else if(tag == 'p' && this.is_styledtext) {
+    tag = '</p></html>'; //alex
+    this.is_styledtext = false;
     }
     else if(markup_end[tag]) {
             tag = markup_end[tag];
